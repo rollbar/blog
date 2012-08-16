@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Writing a simple deploy script with Fabric and @roles"
-date: 2012-08-15 18:48
+date: 2012-08-16 11:52
 comments: true
 author: Brian Rue
 categories: deployment
@@ -22,7 +22,7 @@ I wanted a simple deployment script that would do the following:
   <li>check to make sure it’s running as the user "deploy" (since that's the user that has ssh keys set up and owns the code on the remote machines)</li>
   <li>for each webserver:
     <ol style="list-style:lower-alpha;margin-left:20px;">
-      <li>git pull
+      <li>git pull</li>
       <li>pip install -r requirements.txt</li>
       <li>in series, restart each web process</li>
     </ol>
@@ -30,7 +30,7 @@ I wanted a simple deployment script that would do the following:
   <li>make an HTTP POST to our <a href="https://ratchet.io/docs/deploys/">deploys api</a> to record that the deploy completed successfully</li>
 </ol>
 
-Here’s my first attempt:
+Here’s my first attempt:<!--more-->
 
 {% include_code fabfile1.py %}
 
@@ -108,7 +108,7 @@ Disconnecting from web2... done.
 Disconnecting from web1... done.
 ```
 
-It's doing the whole process -- check user, update and restart, record deploy -- twice, once for each host. That's not quite what we want.
+Lots of good things happening. But there are it's doing the whole process -- `check_user`, `update_and_restart`, `ratchet_record_deploy` -- twice, once for each host. The duplicate `check_user` just slows things down, but the duplicate `ratchet_record_deploy` is going to mess with our deploy history, and it's only going to get worse as we add more servers.
 
 Fabric's solution to this, described in their [docs](http://docs.fabfile.org/en/1.4.3/usage/execution.html), is "roles". We can map hosts to roles, then decorate tasks with which roles they apply to. Here we replace the `env.hosts` declaration with `env.roledefs`, decorate `update_and_restart` with `@roles`, and call `update_and_restart` with `execute` so that the `@roles` decorator is honored:
 
@@ -165,5 +165,3 @@ Disconnecting from web1... done.
 ```
 
 That's more like it. Since `env.hosts` is not set, the undecorated tasks just run locally (and only once), and the `@roles('web')`-decorated task runs for each web host.
-
-*Are you using Fabric? If I'm doing it wrong, let me know in the comments.*
