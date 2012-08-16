@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
+    <url>
+        <loc>
+            http://ratchet.io/blog/post/2012/08/16/writing-a-simple-deploy-script-with-fabric-and-roles/
+        </loc>
+        <lastmod>2012-08-16T12:25:17-07:00</lastmod>
+    </url>
+    <url>
+        <loc>http://ratchet.io/blog/blog/archives/</loc>
+        <lastmod>2012-08-16T12:25:17-07:00</lastmod>
+    </url>
+    <url>
+        <loc>http://ratchet.io/blog/</loc>
+        <lastmod>2012-08-16T12:25:17-07:00</lastmod>
+    </url>
+</urlset>

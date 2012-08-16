@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: deployment | Ratchet.io blog]]></title>
+  <link href="http://ratchet.io/blog/blog/categories/deployment/atom.xml" rel="self"/>
+  <link href="http://ratchet.io/blog/"/>
+  <updated>2012-08-16T13:58:36-07:00</updated>
+  <id>http://ratchet.io/blog/</id>
+  <author>
+    <name><![CDATA[Ratchet, Inc.]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Writing a simple deploy script with Fabric and @roles]]></title>
+    <link href="http://ratchet.io/blog/post/2012/08/16/writing-a-simple-deploy-script-with-fabric-and-roles/"/>
+    <updated>2012-08-16T11:52:00-07:00</updated>
+    <id>http://ratchet.io/blog/post/2012/08/16/writing-a-simple-deploy-script-with-fabric-and-roles</id>
+    <content type="html"><![CDATA[<p>I first heard about <a href="http://www.fabfile.org">Fabric</a> a couple years ago while at Lolapps and liked the idea of:</p>
+
+<ul style="margin-left:40px;">
+  <li>writing deployment and sysadmin scripts in a language other than Bash</li>
+  <li>that language being Python, which we used everywhere else</li>
+</ul>
+
+
+<p>but we already had a huge swath of shell scripts that worked well (and truth be told, Bash isn’t really that bad). But now that we have at clean slate for <a href="https://ratchet.io">Ratchet</a>, Fabric it is.</p>
+
+<p>I wanted a simple deployment script that would do the following:</p>
+
+<ol style="margin-left:40px;">
+  <li>check to make sure it’s running as the user "deploy" (since that's the user that has ssh keys set up and owns the code on the remote machines)</li>
+  <li>for each webserver:
+    <ol style="list-style:lower-alpha;margin-left:20px;">
+      <li>git pull</li>
+      <li>pip install -r requirements.txt</li>
+      <li>in series, restart each web process</li>
+    </ol>
+  </li>
+  <li>make an HTTP POST to our <a href="https://ratchet.io/docs/deploys/">deploys api</a> to record that the deploy completed successfully</li>
+</ol>
+
+
+<p>Here’s my first attempt:<!--more--></p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span> (fabfile1.py)</span> <a href='/downloads/code/fabfile1.py'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+</pre></td><td class='code'><pre><code class='py'><span class='line'><span class="kn">import</span> <span class="nn">sys</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">from</span> <span class="nn">fabric.api</span> <span class="kn">import</span> <span class="n">run</span><span class="p">,</span> <span class="n">local</span><span class="p">,</span> <span class="n">cd</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">roles</span><span class="p">,</span> <span class="n">execute</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">requests</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">env</span><span class="o">.</span><span class="n">hosts</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;web1&#39;</span><span class="p">,</span> <span class="s">&#39;web2&#39;</span><span class="p">]</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">deploy</span><span class="p">():</span>
+</span><span class='line'>    <span class="c"># pre-roll checks</span>
+</span><span class='line'>    <span class="n">check_user</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c"># do the roll.</span>
+</span><span class='line'>    <span class="n">update_and_restart</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c"># post-roll tasks</span>
+</span><span class='line'>    <span class="n">ratchet_record_deploy</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">update_and_restart</span><span class="p">():</span>
+</span><span class='line'>    <span class="n">code_dir</span> <span class="o">=</span> <span class="s">&#39;/home/deploy/www/mox&#39;</span>
+</span><span class='line'>    <span class="k">with</span> <span class="n">cd</span><span class="p">(</span><span class="n">code_dir</span><span class="p">):</span>
+</span><span class='line'>        <span class="n">run</span><span class="p">(</span><span class="s">&quot;git pull&quot;</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">run</span><span class="p">(</span><span class="s">&quot;pip install -r requirements.txt&quot;</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">run</span><span class="p">(</span><span class="s">&quot;supervisorctl restart web1&quot;</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">run</span><span class="p">(</span><span class="s">&quot;supervisorctl restart web2&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">check_user</span><span class="p">():</span>
+</span><span class='line'>    <span class="k">if</span> <span class="n">local</span><span class="p">(</span><span class="s">&#39;whoami&#39;</span><span class="p">,</span> <span class="n">capture</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="o">!=</span> <span class="s">&#39;deploy&#39;</span><span class="p">:</span>
+</span><span class='line'>        <span class="k">print</span> <span class="s">&quot;This command should be run as deploy. Run like: sudo -u deploy fab deploy&quot;</span>
+</span><span class='line'>        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">ratchet_record_deploy</span><span class="p">():</span>
+</span><span class='line'>    <span class="c"># read access_token from production.ini</span>
+</span><span class='line'>    <span class="n">access_token</span> <span class="o">=</span> <span class="n">local</span><span class="p">(</span><span class="s">&quot;grep &#39;ratchet.access_token&#39; production.ini | sed &#39;s/^.* = //g&#39;&quot;</span><span class="p">,</span>
+</span><span class='line'>        <span class="n">capture</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">environment</span> <span class="o">=</span> <span class="s">&#39;production&#39;</span>
+</span><span class='line'>    <span class="n">local_username</span> <span class="o">=</span> <span class="n">local</span><span class="p">(</span><span class="s">&#39;whoami&#39;</span><span class="p">,</span> <span class="n">capture</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">revision</span> <span class="o">=</span> <span class="n">local</span><span class="p">(</span><span class="s">&#39;git log -n 1 --pretty=format:&quot;%H&quot;&#39;</span><span class="p">,</span> <span class="n">capture</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s">&#39;https://submit.ratchet.io/api/1/deploy/&#39;</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>        <span class="s">&#39;access_token&#39;</span><span class="p">:</span> <span class="n">access_token</span><span class="p">,</span>
+</span><span class='line'>        <span class="s">&#39;environment&#39;</span><span class="p">:</span> <span class="n">environment</span><span class="p">,</span>
+</span><span class='line'>        <span class="s">&#39;local_username&#39;</span><span class="p">:</span> <span class="n">local_username</span><span class="p">,</span>
+</span><span class='line'>        <span class="s">&#39;revision&#39;</span><span class="p">:</span> <span class="n">revision</span>
+</span><span class='line'>    <span class="p">},</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="n">resp</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+</span><span class='line'>        <span class="k">print</span> <span class="s">&quot;Deploy recorded successfully. Deploy id:&quot;</span><span class="p">,</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="s">&#39;deploy_id&#39;</span><span class="p">]</span>
+</span><span class='line'>    <span class="k">else</span><span class="p">:</span>
+</span><span class='line'>        <span class="k">print</span> <span class="s">&quot;Error recording deploy:&quot;</span><span class="p">,</span> <span class="n">resp</span><span class="o">.</span><span class="n">text</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Looks close-ish, right? It knows which hosts to deploy to, checks that it’s running as deploy, updates and restarts each host, and records the deploy. Here’s the output:</p>
+
+<p>```
+$ sudo -u deploy fab deploy
+(env-mox)[brian@dev mox]$ sudo -u deploy fab deploy
+[sudo] password for brian:
+[web1] Executing task 'deploy'
+[localhost] local: whoami
+[web1] run: git pull
+[web1] out: remote: Counting objects: 8, done.
+[web1] out: remote: Compressing objects: 100% (4/4), done.
+[web1] out: remote: Total 6 (delta 4), reused 4 (delta 2)
+[web1] out: Unpacking objects: 100% (6/6), done.
+[web1] out: From github.com:brianr/mox
+[web1] out:    c731b57..1d365e0  master     -> origin/master
+[web1] out: Updating c731b57..1d365e0
+[web1] out: Fast-forward
+[web1] out:  fabfile.py |    8 ++++----
+[web1] out:  1 file changed, 4 insertions(+), 4 deletions(-)</p>
+
+<p>[web1] run: pip install -r requirements.txt
+[web1] out: Requirement already satisfied (use --upgrade to upgrade): Beaker==1.6.3 in /home/deploy/env-mox/lib/python2.7/site-packages (from -r requirements.txt (line 1))
+<snip>
+[web1] out: Cleaning up...</p>
+
+<p>[web1] run: supervisorctl restart web1
+[web1] out: web1: stopped
+[web1] out: web1: started</p>
+
+<p>[web1] run: supervisorctl restart web2
+[web1] out: web2: stopped
+[web1] out: web2: started</p>
+
+<p>[localhost] local: grep 'ratchet.access_token' production.ini | sed 's/<sup>.*</sup> = //g'
+[localhost] local: whoami
+[localhost] local: git log -n 1 --pretty=format:"%H"
+Deploy recorded successfully. Deploy id: 307
+[web2] Executing task 'deploy'
+[localhost] local: whoami
+[web2] run: git pull
+[web2] out: remote: Counting objects: 8, done.
+[web2] out: remote: Compressing objects: 100% (4/4), done.
+[web2] out: remote: Total 6 (delta 4), reused 4 (delta 2)
+[web2] out: Unpacking objects: 100% (6/6), done.
+[web2] out: From github.com:brianr/mox
+[web2] out:    c731b57..1d365e0  master     -> origin/master
+[web2] out: Updating c731b57..1d365e0
+[web2] out: Fast-forward
+[web2] out:  fabfile.py |    8 ++++----
+[web2] out:  1 file changed, 4 insertions(+), 4 deletions(-)</p>
+
+<p>[web2] run: pip install -r requirements.txt
+[web2] out: Requirement already satisfied (use --upgrade to upgrade): Beaker==1.6.3 in /home/deploy/env-mox/lib/python2.7/site-packages (from -r requirements.txt (line 1))</p>
+
+<p>[web2] out: Cleaning up...</p>
+
+<p>[web2] run: supervisorctl restart web1
+[web2] out: web1: stopped
+[web2] out: web1: started</p>
+
+<p>[web2] run: supervisorctl restart web2
+[web2] out: web2: stopped
+[web2] out: web2: started</p>
+
+<p>[localhost] local: grep 'ratchet.access_token' production.ini | sed 's/<sup>.*</sup> = //g'
+[localhost] local: whoami
+[localhost] local: git log -n 1 --pretty=format:"%H"
+Deploy recorded successfully. Deploy id: 308</p>
+
+<p>Done.
+Disconnecting from web2... done.
+Disconnecting from web1... done.
+```</p>
+
+<p>Lots of good things happening. But there are it's doing the whole process -- <code>check_user</code>, <code>update_and_restart</code>, <code>ratchet_record_deploy</code> -- twice, once for each host. The duplicate <code>check_user</code> just slows things down, but the duplicate <code>ratchet_record_deploy</code> is going to mess with our deploy history, and it's only going to get worse as we add more servers.</p>
+
+<p>Fabric's solution to this, described in their <a href="http://docs.fabfile.org/en/1.4.3/usage/execution.html">docs</a>, is "roles". We can map hosts to roles, then decorate tasks with which roles they apply to. Here we replace the <code>env.hosts</code> declaration with <code>env.roledefs</code>, decorate <code>update_and_restart</code> with <code>@roles</code>, and call <code>update_and_restart</code> with <code>execute</code> so that the <code>@roles</code> decorator is honored:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span> (fabfile2.py)</span> <a href='/downloads/code/fabfile2.py'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+</pre></td><td class='code'><pre><code class='py'><span class='line'><span class="kn">import</span> <span class="nn">sys</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">from</span> <span class="nn">fabric.api</span> <span class="kn">import</span> <span class="n">run</span><span class="p">,</span> <span class="n">local</span><span class="p">,</span> <span class="n">cd</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">roles</span><span class="p">,</span> <span class="n">execute</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">requests</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">env</span><span class="o">.</span><span class="n">roledefs</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="s">&#39;web&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;web1&#39;</span><span class="p">,</span> <span class="s">&#39;web2&#39;</span><span class="p">]</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">deploy</span><span class="p">():</span>
+</span><span class='line'>    <span class="c"># pre-roll checks</span>
+</span><span class='line'>    <span class="n">check_user</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c"># do the roll.</span>
+</span><span class='line'>    <span class="c"># execute() will call the passed-in function, honoring host/role decorators.</span>
+</span><span class='line'>    <span class="n">execute</span><span class="p">(</span><span class="n">update_and_restart</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c"># post-roll tasks</span>
+</span><span class='line'>    <span class="n">ratchet_record_deploy</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@roles</span><span class="p">(</span><span class="s">&#39;web&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="k">def</span> <span class="nf">update_and_restart</span><span class="p">():</span>
+</span><span class='line'>    <span class="n">code_dir</span> <span class="o">=</span> <span class="s">&#39;/home/deploy/www/mox&#39;</span>
+</span><span class='line'>    <span class="k">with</span> <span class="n">cd</span><span class="p">(</span><span class="n">code_dir</span><span class="p">):</span>
+</span><span class='line'>        <span class="n">run</span><span class="p">(</span><span class="s">&quot;git pull&quot;</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">run</span><span class="p">(</span><span class="s">&quot;pip install -r requirements.txt&quot;</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">run</span><span class="p">(</span><span class="s">&quot;supervisorctl restart web1&quot;</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">run</span><span class="p">(</span><span class="s">&quot;supervisorctl restart web2&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">check_user</span><span class="p">():</span>
+</span><span class='line'>    <span class="k">if</span> <span class="n">local</span><span class="p">(</span><span class="s">&#39;whoami&#39;</span><span class="p">,</span> <span class="n">capture</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="o">!=</span> <span class="s">&#39;deploy&#39;</span><span class="p">:</span>
+</span><span class='line'>        <span class="k">print</span> <span class="s">&quot;This command should be run as deploy. Run like: sudo -u deploy fab deploy&quot;</span>
+</span><span class='line'>        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">ratchet_record_deploy</span><span class="p">():</span>
+</span><span class='line'>    <span class="c"># read access_token from production.ini</span>
+</span><span class='line'>    <span class="n">access_token</span> <span class="o">=</span> <span class="n">local</span><span class="p">(</span><span class="s">&quot;grep &#39;ratchet.access_token&#39; production.ini | sed &#39;s/^.* = //g&#39;&quot;</span><span class="p">,</span>
+</span><span class='line'>        <span class="n">capture</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">environment</span> <span class="o">=</span> <span class="s">&#39;production&#39;</span>
+</span><span class='line'>    <span class="n">local_username</span> <span class="o">=</span> <span class="n">local</span><span class="p">(</span><span class="s">&#39;whoami&#39;</span><span class="p">,</span> <span class="n">capture</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">revision</span> <span class="o">=</span> <span class="n">local</span><span class="p">(</span><span class="s">&#39;git log -n 1 --pretty=format:&quot;%H&quot;&#39;</span><span class="p">,</span> <span class="n">capture</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s">&#39;https://submit.ratchet.io/api/1/deploy/&#39;</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>        <span class="s">&#39;access_token&#39;</span><span class="p">:</span> <span class="n">access_token</span><span class="p">,</span>
+</span><span class='line'>        <span class="s">&#39;environment&#39;</span><span class="p">:</span> <span class="n">environment</span><span class="p">,</span>
+</span><span class='line'>        <span class="s">&#39;local_username&#39;</span><span class="p">:</span> <span class="n">local_username</span><span class="p">,</span>
+</span><span class='line'>        <span class="s">&#39;revision&#39;</span><span class="p">:</span> <span class="n">revision</span>
+</span><span class='line'>    <span class="p">},</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="n">resp</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+</span><span class='line'>        <span class="k">print</span> <span class="s">&quot;Deploy recorded successfully. Deploy id:&quot;</span><span class="p">,</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="s">&#39;deploy_id&#39;</span><span class="p">]</span>
+</span><span class='line'>    <span class="k">else</span><span class="p">:</span>
+</span><span class='line'>        <span class="k">print</span> <span class="s">&quot;Error recording deploy:&quot;</span><span class="p">,</span> <span class="n">resp</span><span class="o">.</span><span class="n">text</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Here's the output:</p>
+
+<p>```
+(env-mox)[brian@dev mox]$ sudo -u deploy fab deploy
+[sudo] password for brian:
+[localhost] local: whoami
+[web1] Executing task 'update_and_restart'
+[web1] run: git pull
+[web1] out: Already up-to-date.</p>
+
+<p>[web1] run: pip install -r requirements.txt
+[web1] out: Requirement already satisfied (use --upgrade to upgrade): Beaker==1.6.3 in /home/deploy/env-mox/lib/python2.7/site-packages (from -r requirements.txt (line 1))
+<snip>
+[web1] out: Cleaning up...</p>
+
+<p>[web1] run: supervisorctl restart web1
+[web1] out: web1: stopped
+[web1] out: web1: started</p>
+
+<p>[web1] run: supervisorctl restart web2
+[web1] out: web2: stopped
+[web1] out: web2: started</p>
+
+<p>[web2] Executing task 'update_and_restart'
+[web2] run: git pull
+[web2] out: Already up-to-date.</p>
+
+<p>[web2] run: pip install -r requirements.txt
+[web2] out: Requirement already satisfied (use --upgrade to upgrade): Beaker==1.6.3 in /home/deploy/env-mox/lib/python2.7/site-packages (from -r requirements.txt (line 1))</p>
+
+<p>[web2] out: Cleaning up...</p>
+
+<p>[web2] run: supervisorctl restart web1
+[web2] out: web1: stopped
+[web2] out: web1: started</p>
+
+<p>[web2] run: supervisorctl restart web2
+[web2] out: web2: stopped
+[web2] out: web2: started</p>
+
+<p>[localhost] local: grep 'ratchet.access_token' production.ini | sed 's/<sup>.*</sup> = //g'
+[localhost] local: whoami
+[localhost] local: git log -n 1 --pretty=format:"%H"
+Deploy recorded successfully. Deploy id: 309</p>
+
+<p>Done.
+Disconnecting from web2... done.
+Disconnecting from web1... done.
+```</p>
+
+<p>That's more like it. Since <code>env.hosts</code> is not set, the undecorated tasks just run locally (and only once), and the <code>@roles('web')</code>-decorated task runs for each web host.</p>
+]]></content>
+  </entry>
+  
+</feed>
