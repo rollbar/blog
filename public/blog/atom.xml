@@ -4,7 +4,7 @@
   <title><![CDATA[Ratchet.io blog]]></title>
   <link href="http://ratchet.io/blog/atom.xml" rel="self"/>
   <link href="http://ratchet.io/blog/"/>
-  <updated>2012-08-16T14:05:25-07:00</updated>
+  <updated>2012-08-16T14:20:25-07:00</updated>
   <id>http://ratchet.io/blog/</id>
   <author>
     <name><![CDATA[Ratchet, Inc.]]></name>
@@ -299,7 +299,7 @@
 </span><span class='line'>Disconnecting from web1... done.</span></code></pre></td></tr></table></div></figure>
 
 
-<p>Lots of good things happening. But there are it&#8217;s doing the whole process &#8211; <code>check_user</code>, <code>update_and_restart</code>, <code>ratchet_record_deploy</code> &#8211; twice, once for each host. The duplicate <code>check_user</code> just slows things down, but the duplicate <code>ratchet_record_deploy</code> is going to mess with our deploy history, and it&#8217;s only going to get worse as we add more servers.</p>
+<p>Lots of good things happening. But it&#8217;s doing the whole process &#8211; <code>check_user</code>, <code>update_and_restart</code>, <code>ratchet_record_deploy</code> &#8211; twice, once for each host. The duplicate <code>check_user</code> just slows things down, but the duplicate <code>ratchet_record_deploy</code> is going to mess with our deploy history, and it&#8217;s only going to get worse as we add more servers.</p>
 
 <p>Fabric&#8217;s solution to this, described in their <a href="http://docs.fabfile.org/en/1.4.3/usage/execution.html">docs</a>, is &#8220;roles&#8221;. We can map hosts to roles, then decorate tasks with which roles they apply to. Here we replace the <code>env.hosts</code> declaration with <code>env.roledefs</code>, decorate <code>update_and_restart</code> with <code>@roles</code>, and call <code>update_and_restart</code> with <code>execute</code> so that the <code>@roles</code> decorator is honored:</p>
 

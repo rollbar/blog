@@ -108,7 +108,7 @@ Disconnecting from web2... done.
 Disconnecting from web1... done.
 ```
 
-Lots of good things happening. But there are it's doing the whole process -- `check_user`, `update_and_restart`, `ratchet_record_deploy` -- twice, once for each host. The duplicate `check_user` just slows things down, but the duplicate `ratchet_record_deploy` is going to mess with our deploy history, and it's only going to get worse as we add more servers.
+Lots of good things happening. But it's doing the whole process -- `check_user`, `update_and_restart`, `ratchet_record_deploy` -- twice, once for each host. The duplicate `check_user` just slows things down, but the duplicate `ratchet_record_deploy` is going to mess with our deploy history, and it's only going to get worse as we add more servers.
 
 Fabric's solution to this, described in their [docs](http://docs.fabfile.org/en/1.4.3/usage/execution.html), is "roles". We can map hosts to roles, then decorate tasks with which roles they apply to. Here we replace the `env.hosts` declaration with `env.roledefs`, decorate `update_and_restart` with `@roles`, and call `update_and_restart` with `execute` so that the `@roles` decorator is honored:
 
