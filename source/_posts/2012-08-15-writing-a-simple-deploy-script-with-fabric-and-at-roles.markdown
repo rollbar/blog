@@ -27,7 +27,7 @@ I wanted a simple deployment script that would do the following:
       <li>in series, restart each web process</li>
     </ol>
   </li>
-  <li>make an HTTP POST to our deploys api to record that the deploy completed successfully</li>
+  <li>make an HTTP POST to our <a href="https://ratchet.io/docs/deploys/">deploys api</a> to record that the deploy completed successfully</li>
 </ol>
 
 Here’s my first attempt:
