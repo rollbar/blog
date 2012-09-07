@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: pyramid | Ratchet.io blog]]></title>
+  <link href="http://ratchet.io/blog/blog/categories/pyramid/atom.xml" rel="self"/>
+  <link href="http://ratchet.io/blog/"/>
+  <updated>2012-09-07T10:28:52-07:00</updated>
+  <id>http://ratchet.io/blog/</id>
+  <author>
+    <name><![CDATA[Ratchet, Inc.]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Using a Request Factory in Pyramid to write a little less code]]></title>
+    <link href="http://ratchet.io/blog/post/2012/09/07/using-pyramid-request-factory-to-write-less-code/"/>
+    <updated>2012-09-07T11:00:00-07:00</updated>
+    <id>http://ratchet.io/blog/post/2012/09/07/using-pyramid-request-factory-to-write-less-code</id>
+    <content type="html"><![CDATA[<p>At <a href="http://ratchet.io/">Ratchet.io</a>, we've been using <a href="http://www.pylonsproject.org/">Pyramid</a> as our web framework and have been pretty happy with it. It's lightweight and mostly stays out of our way.</p>
+
+<p>Pyramid doesn't have a global request object that you can just import [1], so it makes you pass around <code>request</code> wherever you need it. That results in a lot of library code that looks like this:</p>
+
+<p>```python</p>
+
+<h1>lib/helpers.py</h1>
+
+<p>def flash_success(request, body, title=''):</p>
+
+<pre><code>request.session.flash({'body': body, 'title': title'})
+</code></pre>
+
+<p>```</p>
+
+<p>and a lot of view code that looks like this:</p>
+
+<p>```python</p>
+
+<h1>views/auth.py</h1>
+
+<p>@view_config(route_name='auth/login')
+def login(request):</p>
+
+<pre><code># (do the login...)
+helpers.flash_success(request, "You're now logged in.")
+# (redirect...)
+</code></pre>
+
+<p>```</p>
+
+<p>That is, there ends up being a lot of function calls that pass <code>request</code> as their first argument. Wouldn't it be nicer if we could attach these functions as methods on <code>request</code> itself? That would save a few characters every time we call them, and let us stop thinking about whether <code>request</code> is the first or last argument. Pyramid facilitates this by letting us provide our own <a href="http://pyramid.readthedocs.org/en/latest/narr/hooks.html#changing-the-request-factory">Request Factory</a>:</p>
+
+<p>```python
+from pyramid.request import Request</p>
+
+<p>class MyRequest(Request):</p>
+
+<pre><code>def hello(self):
+    print "hello!"
+</code></pre>
+
+<p>def main(global_config, **settings):</p>
+
+<pre><code>config = Configurator(settings=settings, request_factory=MyRequest)
+# ...
+</code></pre>
+
+<p>```</p>
+
+<p>Now the <code>request</code> passed to our view methods, and everwhere else in our app, has our <code>hello</code> method.</p>
+
+<p>So, what can we do with this that's actually useful? In our codebase, we have a few convenience methods to get data about the logged-in user, flash messages, and check if features are enabled.</p>
+
+<p>Here it is, unedited, in its entirety:</p>
+
+<p>```
+class MoxRequest(pyramid.request.Request):</p>
+
+<pre><code># logged-in-user access
+@util.CachedAttribute
+def user_id(self):
+    from pyramid.security import authenticated_userid
+    user_id = authenticated_userid(self)
+    log.debug('authenticated user id: %r', user_id)
+    return user_id
+
+@util.CachedAttribute
+def user(self):
+    user_id = self.user_id
+    if user_id:
+        return model.User.get(user_id)
+    return None
+
+@util.CachedAttribute
+def username(self):
+    if self.user:
+        return self.user.username
+    else:
+        return None
+
+def gater_check(self, feature_name):
+    return self.registry.settings.get('gater.%s' % feature_name) == 'on'
+
+# flash methods
+def flash_success(self, body, title=''):
+    self._flash_message(body, title=title, queue='success')
+
+def flash_info(self, body, title=''):
+    self._flash_message(body, title=title, queue='info')
+
+def flash_warning(self, body, title=''):
+    self._flash_message(body, title=title, queue='warning')
+
+def flash_error(self, body, title=''):
+    self._flash_message(body, title=title, queue='error')
+
+def _flash_message(self, body, title='', queue=''):
+    self.session.flash({'title': title, 'body': body}, queue=queue)
+</code></pre>
+
+<p>```</p>
+
+<p>This just sits in our top-level <code>__init__.py</code>, along with the <code>main()</code> entry point.</p>
+
+<p>Notes: <code>@util.CachedAttribute</code> contains <a href="http://code.activestate.com/recipes/276643-caching-and-aliasing-with-descriptors/">this recipe</a>. "Mox" is an easy-to-type codename, named after <a href="http://www.summitpost.org/mox-peaks-from-red-face-mountain/690027">these mountains</a>.</p>
+
+<p>[1] I'm still not sold on this, but I'm getting by. It arguably causes problems with testing and such, but it <em>is</em> pretty nice to magically <code>from flask import request</code>.</p>
+]]></content>
+  </entry>
+  
+</feed>

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: deployment | Ratchet.io blog]]></title>
   <link href="http://ratchet.io/blog/blog/categories/deployment/atom.xml" rel="self"/>
   <link href="http://ratchet.io/blog/"/>
-  <updated>2012-09-04T22:06:38-07:00</updated>
+  <updated>2012-09-07T10:28:52-07:00</updated>
   <id>http://ratchet.io/blog/</id>
   <author>
     <name><![CDATA[Ratchet, Inc.]]></name>
@@ -43,7 +43,7 @@
 </ol>
 
 
-<p>Here’s my first attempt:<!--more--></p>
+<p>Here’s my first attempt:</p>
 
 <p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span> (fabfile1.py)</span> <a href='/downloads/code/fabfile1.py'>download</a></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
