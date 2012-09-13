@@ -12,17 +12,20 @@
       <div id="content">
         {{ content | expand_urls: root_url }}
       </div>
-      
-      <hr/>
-      <footer>
-        <p>
-          &copy; 2012 Ratchet, LLC
+    </div>
+    
+    <footer class="footer">
+      <div class="container" style="text-align:center;">
+        <div>
+          <strong>Email:</strong> founders@ratchet.io
+          &middot;
+          <strong>Phone:</strong> 1.415.857.0548
+        </div>
+        <div>
+          &copy; 2012 Ratchet, Inc.
           &nbsp;
           &nbsp;
-          <a href="/contact">Contact</a>
-          &nbsp;
-          &nbsp;
-          <a href="/support">Support</a>
+          <a href="/about">About Us</a>
           &nbsp;
           &nbsp;
           <a href="/blog/">Blog</a>
@@ -35,9 +38,9 @@
           &nbsp;
           &nbsp;
           <a href="/privacy">Privacy</a>
-        </p>
-      </footer>
-    </div>
+        </div>
+      </div>
+    </footer>
     
     {% include after_footer.html %}
 </body>

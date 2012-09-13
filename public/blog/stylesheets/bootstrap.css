@@ -4401,3 +4401,8 @@ div.documentation h3 a {
 .levellabel-info[href] {
   background-color: #2d6987;
 }
+.footer {
+  padding: 24px 0px;
+  border-top: 1px solid #e5e5e5;
+  background-color: whiteSmoke;
+}
