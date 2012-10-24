@@ -4,7 +4,7 @@
   <title><![CDATA[Ratchet.io blog]]></title>
   <link href="http://ratchet.io/blog/atom.xml" rel="self"/>
   <link href="http://ratchet.io/blog/"/>
-  <updated>2012-10-18T11:57:32-07:00</updated>
+  <updated>2012-10-24T13:22:28-07:00</updated>
   <id>http://ratchet.io/blog/</id>
   <author>
     <name><![CDATA[Ratchet, Inc.]]></name>
@@ -12,6 +12,35 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Real-time Search for Exceptions and Errors]]></title>
+    <link href="http://ratchet.io/blog/post/2012/10/24/real-time-search-for-exceptions-and-errors/"/>
+    <updated>2012-10-24T11:24:00-07:00</updated>
+    <id>http://ratchet.io/blog/post/2012/10/24/real-time-search-for-exceptions-and-errors</id>
+    <content type="html"><![CDATA[<p>We&#8217;re happy today to announce the release of real-time search. You can now search your exceptions, errors, and log messages by title:</p>
+
+<p><img src="http://brian.ratchetdev.com/static/img/blog/realtimesearch1.png"></p>
+
+<p>For exceptions, the title contains the exception class and message. For errors and log messages, it contains the entire message. It’s a full-text search that works best on whole words; we also do a few tricks with camelCase and underscore_separated terms.</p>
+
+<p>The search index is kept up-to-date in real-time as new items are added to the system (that&#8217;s the &#8220;real-time&#8221; part). Typically the delay is ~2 seconds from receiving the input at our API to being in the index and searchable.</p>
+
+<p>Current customers can try it out now; let us know if you run into any issues. What else would you like to see indexed?</p>
+
+<p>If you don&#8217;t have an account yet, <a href="https://ratchet.io/">sign up here for early access</a>.</p>
+
+<h2>Under the hood</h2>
+
+<p>We&#8217;re using <a href="http://sphinxsearch.com/">Sphinx</a> for indexing and querying. It&#8217;s currently running on a single dedicated machine (1 core, 2GB ram, 100GB local disk).</p>
+
+<p>New items are indexed by a long-running script that indexes new items as they are inserted. (It keeps track of its location in the table and polls every second for new rows.) The index includes two full-text <em>fields</em>, <code>title</code> and <code>environment</code>, and two scalar <em>attributes</em>, <code>status</code> and <code>level</code>.</p>
+
+<p>Title and environment don&#8217;t change, so we don&#8217;t need to update them. But status (active/resolved) and level (critical/error/warning/info/debug) do. We keep these in sync by simply writing an to the search server whenever we update the primary database.</p>
+
+<p>Queries are routed through our API server, which returns the paged list of matching items. This list is then used for a database query where we re-filter the results (in case the search results are out of date) and fetch the other data necessary for the results page (last occurrence, etc.).</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Using a Request Factory in Pyramid to write a little less code]]></title>

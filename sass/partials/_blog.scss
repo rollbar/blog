@@ -1,4 +1,7 @@
 article {
+  font-size: 14px;
+  line-height: 1.6;
+  li { line-height: 1.6; }
   a { @extend .force-wrap; }
   header {
     position: relative;

@@ -4,7 +4,7 @@ title: "Using a Request Factory in Pyramid to write a little less code"
 date: 2012-09-07 11:00
 comments: true
 author: Brian Rue
-categories: pyramid
+categories: pyramid articles
 ---
 
 At [Ratchet.io](http://ratchet.io/), we've been using [Pyramid](http://www.pylonsproject.org/) as our web framework and have been pretty happy with it. It's lightweight and mostly stays out of our way. 

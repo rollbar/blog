@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Category: deployment - Ratchet.io blog</title>
+  <title>Real-time Search for Exceptions and Errors - Ratchet.io blog</title>
   <meta name="author" content="Ratchet, Inc.">
 
   
-  <meta name="description" content="Category: deployment">
+  <meta name="description" content="We&#8217;re happy today to announce the release of real-time search. You can now search your exceptions, errors, and log messages by title: For &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://ratchet.io/blogblog/categories/deployment/">
+  <link rel="canonical" href="http://ratchet.io/blog/post/2012/10/24/real-time-search-for-exceptions-and-errors/">
   <link href="/static/img/favicon.png" rel="icon" type="image/png">
   <link href="/blog/stylesheets/bootstrap.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/blog/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
@@ -89,36 +89,111 @@
     <div id="main-stage" class="container">
       <div id="content">
         <div>
-<article role="article">
+<article class="hentry" role="article">
   
   <header>
-    <h1 class="entry-title">Category: deployment</h1>
+    
+      <h1 class="entry-title">Real-time Search for Exceptions and Errors</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-24T11:24:00-07:00" pubdate data-updated="true">Oct 24<span>th</span>, 2012</time>
+        
+      </p>
     
   </header>
-  
-  <div id="blog-archives" class="category">
 
 
+<div class="entry-content"><p>We&#8217;re happy today to announce the release of real-time search. You can now search your exceptions, errors, and log messages by title:</p>
 
-  
-  <h2>2012</h2>
+<p><img src="http://brian.ratchetdev.com/static/img/blog/realtimesearch1.png"></p>
 
-<article>
-  
-<h1><a href="/blog/post/2012/08/16/writing-a-simple-deploy-script-with-fabric-and-roles/">Writing a simple deploy script with Fabric and @roles</a></h1>
-<time datetime="2012-08-16T11:52:00-07:00" pubdate><span class='month'>Aug</span> <span class='day'>16</span> <span class='year'>2012</span></time>
+<p>For exceptions, the title contains the exception class and message. For errors and log messages, it contains the entire message. It’s a full-text search that works best on whole words; we also do a few tricks with camelCase and underscore_separated terms.</p>
 
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/blog/categories/articles/'>articles</a>, <a class='category' href='/blog/blog/categories/deployment/'>deployment</a></span>
-</footer>
+<p>The search index is kept up-to-date in real-time as new items are added to the system (that&#8217;s the &#8220;real-time&#8221; part). Typically the delay is ~2 seconds from receiving the input at our API to being in the index and searchable.</p>
 
+<p>Current customers can try it out now; let us know if you run into any issues. What else would you like to see indexed?</p>
 
-</article>
+<p>If you don&#8217;t have an account yet, <a href="https://ratchet.io/">sign up here for early access</a>.</p>
 
+<h2>Under the hood</h2>
+
+<p>We&#8217;re using <a href="http://sphinxsearch.com/">Sphinx</a> for indexing and querying. It&#8217;s currently running on a single dedicated machine (1 core, 2GB ram, 100GB local disk).</p>
+
+<p>New items are indexed by a long-running script that indexes new items as they are inserted. (It keeps track of its location in the table and polls every second for new rows.) The index includes two full-text <em>fields</em>, <code>title</code> and <code>environment</code>, and two scalar <em>attributes</em>, <code>status</code> and <code>level</code>.</p>
+
+<p>Title and environment don&#8217;t change, so we don&#8217;t need to update them. But status (active/resolved) and level (critical/error/warning/info/debug) do. We keep these in sync by simply writing an to the search server whenever we update the primary database.</p>
+
+<p>Queries are routed through our API server, which returns the paged list of matching items. This list is then used for a database query where we re-filter the results (in case the search results are out of date) and fetch the other data necessary for the results page (last occurrence, etc.).</p>
 </div>
 
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">Brian Rue and Cory Virok</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-24T11:24:00-07:00" pubdate data-updated="true">Oct 24<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/blog/categories/releases/'>releases</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ratchet.io/blog/post/2012/10/24/real-time-search-for-exceptions-and-errors/" data-via="ratchetio" data-counturl="http://ratchet.io/blog/post/2012/10/24/real-time-search-for-exceptions-and-errors/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/post/2012/09/07/using-pyramid-request-factory-to-write-less-code/" title="Previous Post: Using a Request Factory in Pyramid to write a little less code">&laquo; Using a Request Factory in Pyramid to write a little less code</a>
+      
+      
+    </p>
+  </footer>
 </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
 
 </div>
 
@@ -186,7 +261,10 @@
       var disqus_shortname = 'ratchetio';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://ratchet.io/blog/post/2012/10/24/real-time-search-for-exceptions-and-errors/';
+        var disqus_url = 'http://ratchet.io/blog/post/2012/10/24/real-time-search-for-exceptions-and-errors/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
