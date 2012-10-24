@@ -4,7 +4,7 @@
   <title><![CDATA[Category: releases | Ratchet.io blog]]></title>
   <link href="http://ratchet.io/blog/blog/categories/releases/atom.xml" rel="self"/>
   <link href="http://ratchet.io/blog/"/>
-  <updated>2012-10-24T13:22:28-07:00</updated>
+  <updated>2012-10-24T14:52:23-07:00</updated>
   <id>http://ratchet.io/blog/</id>
   <author>
     <name><![CDATA[Ratchet, Inc.]]></name>
@@ -20,7 +20,7 @@
     <id>http://ratchet.io/blog/post/2012/10/24/real-time-search-for-exceptions-and-errors</id>
     <content type="html"><![CDATA[<p>We're happy today to announce the release of real-time search. You can now search your exceptions, errors, and log messages by title:</p>
 
-<p><img src="http://brian.ratchetdev.com/static/img/blog/realtimesearch1.png"></p>
+<p><img src="https://d2tf6sbdgil6xr.cloudfront.net/static/img/blog/realtimesearch1.png"></p>
 
 <p>For exceptions, the title contains the exception class and message. For errors and log messages, it contains the entire message. It’s a full-text search that works best on whole words; we also do a few tricks with camelCase and underscore_separated terms.</p>
 
@@ -32,13 +32,39 @@
 
 <h2>Under the hood</h2>
 
-<p>We're using <a href="http://sphinxsearch.com/">Sphinx</a> for indexing and querying. It's currently running on a single dedicated machine (1 core, 2GB ram, 100GB local disk).</p>
+<p>We're using the new <a href="http://sphinxsearch.com/">Sphinx</a> realtime features for indexing and querying. It's currently running on a single dedicated machine (1 core, 2GB ram, 100GB local disk).</p>
 
 <p>New items are indexed by a long-running script that indexes new items as they are inserted. (It keeps track of its location in the table and polls every second for new rows.) The index includes two full-text <em>fields</em>, <code>title</code> and <code>environment</code>, and two scalar <em>attributes</em>, <code>status</code> and <code>level</code>.</p>
 
-<p>Title and environment don't change, so we don't need to update them. But status (active/resolved) and level (critical/error/warning/info/debug) do. We keep these in sync by simply writing an to the search server whenever we update the primary database.</p>
+<p>Title and environment don't change, so we don't need to update them. But status (active/resolved) and level (critical/error/warning/info/debug) do. We keep these in sync by simply writing to the search server whenever we update the primary database and whenever we modify our tokenizing algorithm.</p>
 
-<p>Queries are routed through our API server, which returns the paged list of matching items. This list is then used for a database query where we re-filter the results (in case the search results are out of date) and fetch the other data necessary for the results page (last occurrence, etc.).</p>
+<p>Queries are routed through our API server, which returns the paged list of matching item ids that we can then use to filter with on our primary database, (in case the search results are out of date) and fetch the other data necessary for the results page (last occurrence, etc.)</p>
+
+<p>Although our setup is straightforward, there were a few gotchas and lessons learned.</p>
+
+<h3>Infix queries</h3>
+
+<p>Sphinx's realtime index does not currently support infix queries. That means that if you’re searching for "Error" then exceptions with titles like "ReferenceError" or "not_found_error" or even "(Error)" would not be found. To get around this, we index both the original title as well as another set of tokens that we’ve determined are useful for the lookup.</p>
+
+<p>e.g. "#462 UnicodeEncodeError: 'latin-1' codec can't encode character u'\u0441' in position 71: ordinal not in range(256)"</p>
+
+<p>gets tokenized and becomes</p>
+
+<p>"#462 UnicodeEncodeError: 'latin-1' codec can't encode character u'\u0441' in position 71: ordinal not in range(256) can’t u0441 71 256 Unicode Encode Error latin-1'"</p>
+
+<p>By tacking on these extra tokens, we are able to support most of the relevant infix searches our users are likely to make.</p>
+
+<h3>Sphinx + MySQL</h3>
+
+<p>Sphinx search comes with a super-handy feature that lets you connect, add and query the search index using a vanilla MySQL protocol. This is great for debugging and testing but comes with some caveats.</p>
+
+<p>There are a lot of operations that SphinxQL does not yet support. One of the major ones is the lack of support for "OR" where_conditions and another is lack of a "COUNT(*)" method.</p>
+
+<p>Since our API server is written in node, we were able to use the <a href="https://github.com/felixge/node-mysql">node-mysql</a> library from Felix Geisendörfer. After plugging in the library, we noticed that the Sphinx server drops client connections fairly rigorously so we implemented a layer on top of the node-mysql library to handle reconnects, disconnects, etc... This has been great since it lets us perform maintenance on the Sphinx server without taking down our API server.</p>
+
+<h3>REPLACE</h3>
+
+<p>Lastly, we made sure that we were able to re-index our entire database into our Sphinx server by only using the REPLACE command when inserting new items. The docs mention that this can cause memory issues but since it's so infrequent for our use-case, we haven't run into any trouble and the benefit of re-indexing whenever we want more than makes up for it.</p>
 ]]></content>
   </entry>
   
