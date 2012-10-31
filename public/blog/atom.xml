@@ -4,7 +4,7 @@
   <title><![CDATA[Ratchet.io blog]]></title>
   <link href="http://ratchet.io/blog/atom.xml" rel="self"/>
   <link href="http://ratchet.io/blog/"/>
-  <updated>2012-10-30T14:47:16-07:00</updated>
+  <updated>2012-10-31T12:56:02-07:00</updated>
   <id>http://ratchet.io/blog/</id>
   <author>
     <name><![CDATA[Ratchet, Inc.]]></name>
@@ -12,6 +12,21 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Happy Halloween]]></title>
+    <link href="http://ratchet.io/blog/post/2012/10/31/happy-halloween/"/>
+    <updated>2012-10-31T12:40:00-07:00</updated>
+    <id>http://ratchet.io/blog/post/2012/10/31/happy-halloween</id>
+    <content type="html"><![CDATA[<h1>Y U No Use Ratchet?</h1>
+
+<p><img src="https://d2tf6sbdgil6xr.cloudfront.net/static/img/blog/halloween-2012.jpg"></p>
+
+<p>&#8211; Happy Halloween from <a href="http://ratchet.io/">Ratchet.io</a>!</p>
+
+<p>If you don&#8217;t have an account yet, <a href="https://ratchet.io/">sign up here for early access</a>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Real-time Search for Exceptions and Errors]]></title>

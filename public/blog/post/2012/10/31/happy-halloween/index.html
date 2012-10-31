@@ -5,11 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Real-time Search for Exceptions and Errors - Ratchet.io blog</title>
+  <title>Happy Halloween - Ratchet.io blog</title>
   <meta name="author" content="Ratchet, Inc.">
 
   
-  <meta name="description" content="We&#8217;re happy today to announce the release of real-time search. You can now search your exceptions, errors, and log messages by title: For &hellip;">
+  <meta name="description" content="Y U No Use Ratchet? &#8211; Happy Halloween from Ratchet.io! If you don&#8217;t have an account yet, sign up here for early access.
+">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +19,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://ratchet.io/blog/post/2012/10/24/real-time-search-for-exceptions-and-errors/">
+  <link rel="canonical" href="http://ratchet.io/blog/post/2012/10/31/happy-halloween/">
   <link href="/static/img/favicon.png" rel="icon" type="image/png">
   <link href="/blog/stylesheets/bootstrap.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/blog/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
@@ -94,7 +95,7 @@
   
   <header>
     
-      <h1 class="entry-title">Real-time Search for Exceptions and Errors</h1>
+      <h1 class="entry-title">Happy Halloween</h1>
     
     
       <p class="meta">
@@ -110,60 +111,20 @@
   
 
 
-<time datetime="2012-10-24T11:24:00-07:00" pubdate data-updated="true">Oct 24<span>th</span>, 2012</time>
+<time datetime="2012-10-31T12:40:00-07:00" pubdate data-updated="true">Oct 31<span>st</span>, 2012</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>We&#8217;re happy today to announce the release of real-time search. You can now search your exceptions, errors, and log messages by title:</p>
+<div class="entry-content"><h1>Y U No Use Ratchet?</h1>
 
-<p><img src="https://d2tf6sbdgil6xr.cloudfront.net/static/img/blog/realtimesearch1.png"></p>
+<p><img src="https://d2tf6sbdgil6xr.cloudfront.net/static/img/blog/halloween-2012.jpg"></p>
 
-<p>For exceptions, the title contains the exception class and message. For errors and log messages, it contains the entire message. It’s a full-text search that works best on whole words; we also do a few tricks with camelCase and underscore_separated terms.</p>
-
-<p>The search index is kept up-to-date in real-time as new items are added to the system (that&#8217;s the &#8220;real-time&#8221; part). Typically the delay is ~2 seconds from receiving the input at our API to being in the index and searchable.</p>
-
-<p>Current customers can try it out now; let us know if you run into any issues. What else would you like to see indexed?</p>
+<p>&#8211; Happy Halloween from <a href="http://ratchet.io/">Ratchet.io</a>!</p>
 
 <p>If you don&#8217;t have an account yet, <a href="https://ratchet.io/">sign up here for early access</a>.</p>
-
-<h2>Under the hood</h2>
-
-<p>We&#8217;re using the new <a href="http://sphinxsearch.com/">Sphinx</a> realtime features for indexing and querying. It&#8217;s currently running on a single dedicated machine (1 core, 2GB ram, 100GB local disk).</p>
-
-<p>New items are indexed by a long-running script that indexes new items as they are inserted. (It keeps track of its location in the table and polls every second for new rows.) The index includes two full-text <em>fields</em>, <code>title</code> and <code>environment</code>, and two scalar <em>attributes</em>, <code>status</code> and <code>level</code>.</p>
-
-<p>Title and environment don&#8217;t change, so we don&#8217;t need to update them. But status (active/resolved) and level (critical/error/warning/info/debug) do. We keep these in sync by simply writing to the search server whenever we update the primary database and whenever we modify our tokenizing algorithm.</p>
-
-<p>Queries are routed through our API server, which returns the paged list of matching item ids that we can then use to filter with on our primary database, (in case the search results are out of date) and fetch the other data necessary for the results page (last occurrence, etc.)</p>
-
-<p>Although our setup is straightforward, there were a few gotchas and lessons learned.</p>
-
-<h3>Infix queries</h3>
-
-<p>Sphinx&#8217;s realtime index does not currently support infix queries. That means that if you’re searching for &#8220;Error&#8221; then exceptions with titles like &#8220;ReferenceError&#8221; or &#8220;not_found_error&#8221; or even &#8220;(Error)&#8221; would not be found. To get around this, we index both the original title as well as another set of tokens that we’ve determined are useful for the lookup.</p>
-
-<p>e.g. &#8220;#462 UnicodeEncodeError: &#8216;latin-1&#8217; codec can&#8217;t encode character u&#8217;\u0441&#8217; in position 71: ordinal not in range(256)&#8221;</p>
-
-<p>gets tokenized and becomes</p>
-
-<p>&#8220;#462 UnicodeEncodeError: &#8216;latin-1&#8217; codec can&#8217;t encode character u&#8217;\u0441&#8217; in position 71: ordinal not in range(256) can’t u0441 71 256 Unicode Encode Error latin-1&#8217;&#8221;</p>
-
-<p>By tacking on these extra tokens, we are able to support most of the relevant infix searches our users are likely to make.</p>
-
-<h3>Sphinx + MySQL</h3>
-
-<p>Sphinx search comes with a super-handy feature that lets you connect, add and query the search index using a vanilla MySQL protocol. This is great for debugging and testing but comes with some caveats.</p>
-
-<p>There are a lot of operations that SphinxQL does not yet support. One of the major ones is the lack of support for &#8220;OR&#8221; where_conditions and another is lack of a &#8220;COUNT(*)&#8221; method.</p>
-
-<p>Since our API server is written in node, we were able to use the <a href="https://github.com/felixge/node-mysql">node-mysql</a> library from Felix Geisendörfer. After plugging in the library, we noticed that the Sphinx server drops client connections fairly rigorously so we implemented a layer on top of the node-mysql library to handle reconnects, disconnects, etc&#8230; This has been great since it lets us perform maintenance on the Sphinx server without taking down our API server.</p>
-
-<h3>REPLACE</h3>
-
-<p>Lastly, we made sure that we were able to re-index our entire database into our Sphinx server by only using the REPLACE command when inserting new items. The docs mention that this can cause memory issues but since it&#8217;s so infrequent for our use-case, we haven&#8217;t run into any trouble and the benefit of re-indexing whenever we want more than makes up for it.</p>
 </div>
 
 
@@ -172,7 +133,7 @@
       
   
 
-<span class="byline author vcard">Posted by <span class="fn">Brian Rue and Cory Virok</span></span>
+<span class="byline author vcard">Posted by <span class="fn">Cory Virok</span></span>
 
       
 
@@ -186,12 +147,12 @@
   
 
 
-<time datetime="2012-10-24T11:24:00-07:00" pubdate data-updated="true">Oct 24<span>th</span>, 2012</time>
+<time datetime="2012-10-31T12:40:00-07:00" pubdate data-updated="true">Oct 31<span>st</span>, 2012</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/blog/categories/releases/'>releases</a>
+    <a class='category' href='/blog/blog/categories/fun/'>Fun</a>
   
 </span>
 
@@ -200,7 +161,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ratchet.io/blog/post/2012/10/24/real-time-search-for-exceptions-and-errors/" data-via="ratchetio" data-counturl="http://ratchet.io/blog/post/2012/10/24/real-time-search-for-exceptions-and-errors/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ratchet.io/blog/post/2012/10/31/happy-halloween/" data-via="ratchetio" data-counturl="http://ratchet.io/blog/post/2012/10/31/happy-halloween/" >Tweet</a>
   
   
   
@@ -209,10 +170,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/post/2012/09/07/using-pyramid-request-factory-to-write-less-code/" title="Previous Post: Using a Request Factory in Pyramid to write a little less code">&laquo; Using a Request Factory in Pyramid to write a little less code</a>
+        <a class="basic-alignment left" href="/blog/post/2012/10/24/real-time-search-for-exceptions-and-errors/" title="Previous Post: Real-time Search for Exceptions and Errors">&laquo; Real-time Search for Exceptions and Errors</a>
       
-      
-        <a class="basic-alignment right" href="/blog/post/2012/10/31/happy-halloween/" title="Next Post: Happy Halloween">Happy Halloween &raquo;</a>
       
     </p>
   </footer>
@@ -295,8 +254,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://ratchet.io/blog/post/2012/10/24/real-time-search-for-exceptions-and-errors/';
-        var disqus_url = 'http://ratchet.io/blog/post/2012/10/24/real-time-search-for-exceptions-and-errors/';
+        var disqus_identifier = 'http://ratchet.io/blog/post/2012/10/31/happy-halloween/';
+        var disqus_url = 'http://ratchet.io/blog/post/2012/10/31/happy-halloween/';
         var disqus_script = 'embed.js';
       
     (function () {
