@@ -3,6 +3,7 @@
 .sass-cache
 .gist-cache
 .pygments-cache
+*.pyc
 _deploy
 sass.old
 source.old
