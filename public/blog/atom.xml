@@ -4,7 +4,7 @@
   <title><![CDATA[Ratchet.io blog]]></title>
   <link href="http://ratchet.io/blog/atom.xml" rel="self"/>
   <link href="http://ratchet.io/blog/"/>
-  <updated>2013-01-11T16:36:23-08:00</updated>
+  <updated>2013-01-11T16:38:04-08:00</updated>
   <id>http://ratchet.io/blog/</id>
   <author>
     <name><![CDATA[Ratchet, Inc.]]></name>
@@ -172,6 +172,21 @@
 <p>We hope this was, if nothing else, an interesting look into our infrastructure, and to the journey of building a highly-available we service.</p>
 
 <p>If you have any questions about the outage or otherwise, let us know in the comments or email us at support@ratchet.io</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Happy Halloween]]></title>
+    <link href="http://ratchet.io/blog/post/2012/10/31/happy-halloween/"/>
+    <updated>2012-10-31T12:40:00-07:00</updated>
+    <id>http://ratchet.io/blog/post/2012/10/31/happy-halloween</id>
+    <content type="html"><![CDATA[<h1>Y U No Use Ratchet?</h1>
+
+<p><img src="https://d2tf6sbdgil6xr.cloudfront.net/static/img/blog/halloween-2012.jpg"></p>
+
+<p>&#8211; Happy Halloween from <a href="http://ratchet.io/">Ratchet.io</a>!</p>
+
+<p>If you don&#8217;t have an account yet, <a href="https://ratchet.io/">sign up here for early access</a>.</p>
 ]]></content>
   </entry>
   
