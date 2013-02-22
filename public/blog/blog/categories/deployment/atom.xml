@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: deployment | Ratchet.io blog]]></title>
-  <link href="http://ratchet.io/blog/blog/categories/deployment/atom.xml" rel="self"/>
-  <link href="http://ratchet.io/blog/"/>
+  <title><![CDATA[Category: deployment | Rollbar.com blog]]></title>
+  <link href="http://rollbar.com/blog/blog/categories/deployment/atom.xml" rel="self"/>
+  <link href="http://rollbar.com/blog/"/>
   <updated>2013-01-11T16:38:04-08:00</updated>
-  <id>http://ratchet.io/blog/</id>
+  <id>http://rollbar.com/blog/</id>
   <author>
-    <name><![CDATA[Ratchet, Inc.]]></name>
+    <name><![CDATA[Rollbar, Inc.]]></name>
     
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Writing a simple deploy script with Fabric and @roles]]></title>
-    <link href="http://ratchet.io/blog/post/2012/08/16/writing-a-simple-deploy-script-with-fabric-and-roles/"/>
+    <link href="http://rollbar.com/blog/post/2012/08/16/writing-a-simple-deploy-script-with-fabric-and-roles/"/>
     <updated>2012-08-16T11:52:00-07:00</updated>
-    <id>http://ratchet.io/blog/post/2012/08/16/writing-a-simple-deploy-script-with-fabric-and-roles</id>
+    <id>http://rollbar.com/blog/post/2012/08/16/writing-a-simple-deploy-script-with-fabric-and-roles</id>
     <content type="html"><![CDATA[<p>I first heard about <a href="http://www.fabfile.org">Fabric</a> a couple years ago while at Lolapps and liked the idea of:</p>
 
 <ul style="margin-left:40px;">
@@ -26,7 +26,7 @@
 </ul>
 
 
-<p>but we already had a huge swath of shell scripts that worked well (and truth be told, Bash isn’t really that bad). But now that we have at clean slate for <a href="https://ratchet.io">Ratchet</a>, Fabric it is.</p>
+<p>but we already had a huge swath of shell scripts that worked well (and truth be told, Bash isn’t really that bad). But now that we have at clean slate for <a href="https://rollbar.com">Rollbar</a>, Fabric it is.</p>
 
 <p>I wanted a simple deployment script that would do the following:</p>
 
@@ -39,7 +39,7 @@
       <li>in series, restart each web process</li>
     </ol>
   </li>
-  <li>make an HTTP POST to our <a href="https://ratchet.io/docs/deploys/">deploys api</a> to record that the deploy completed successfully</li>
+  <li>make an HTTP POST to our <a href="https://rollbar.com/docs/deploys/">deploys api</a> to record that the deploy completed successfully</li>
 </ol>
 
 
@@ -116,7 +116,7 @@
 </span><span class='line'>    <span class="n">update_and_restart</span><span class="p">()</span>
 </span><span class='line'>
 </span><span class='line'>    <span class="c"># post-roll tasks</span>
-</span><span class='line'>    <span class="n">ratchet_record_deploy</span><span class="p">()</span>
+</span><span class='line'>    <span class="n">rollbar_record_deploy</span><span class="p">()</span>
 </span><span class='line'>
 </span><span class='line'>
 </span><span class='line'><span class="k">def</span> <span class="nf">update_and_restart</span><span class="p">():</span>
@@ -134,16 +134,16 @@
 </span><span class='line'>        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </span><span class='line'>
 </span><span class='line'>
-</span><span class='line'><span class="k">def</span> <span class="nf">ratchet_record_deploy</span><span class="p">():</span>
+</span><span class='line'><span class="k">def</span> <span class="nf">rollbar_record_deploy</span><span class="p">():</span>
 </span><span class='line'>    <span class="c"># read access_token from production.ini</span>
-</span><span class='line'>    <span class="n">access_token</span> <span class="o">=</span> <span class="n">local</span><span class="p">(</span><span class="s">&quot;grep &#39;ratchet.access_token&#39; production.ini | sed &#39;s/^.* = //g&#39;&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">access_token</span> <span class="o">=</span> <span class="n">local</span><span class="p">(</span><span class="s">&quot;grep &#39;rollbar.access_token&#39; production.ini | sed &#39;s/^.* = //g&#39;&quot;</span><span class="p">,</span>
 </span><span class='line'>        <span class="n">capture</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </span><span class='line'>
 </span><span class='line'>    <span class="n">environment</span> <span class="o">=</span> <span class="s">&#39;production&#39;</span>
 </span><span class='line'>    <span class="n">local_username</span> <span class="o">=</span> <span class="n">local</span><span class="p">(</span><span class="s">&#39;whoami&#39;</span><span class="p">,</span> <span class="n">capture</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </span><span class='line'>    <span class="n">revision</span> <span class="o">=</span> <span class="n">local</span><span class="p">(</span><span class="s">&#39;git log -n 1 --pretty=format:&quot;%H&quot;&#39;</span><span class="p">,</span> <span class="n">capture</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </span><span class='line'>
-</span><span class='line'>    <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s">&#39;https://submit.ratchet.io/api/1/deploy/&#39;</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s">&#39;https://api.rollbar.com/api/1/deploy/&#39;</span><span class="p">,</span> <span class="p">{</span>
 </span><span class='line'>        <span class="s">&#39;access_token&#39;</span><span class="p">:</span> <span class="n">access_token</span><span class="p">,</span>
 </span><span class='line'>        <span class="s">&#39;environment&#39;</span><span class="p">:</span> <span class="n">environment</span><span class="p">,</span>
 </span><span class='line'>        <span class="s">&#39;local_username&#39;</span><span class="p">:</span> <span class="n">local_username</span><span class="p">,</span>
@@ -189,7 +189,7 @@ $ sudo -u deploy fab deploy
 [web1] out: web2: stopped
 [web1] out: web2: started</p>
 
-<p>[localhost] local: grep 'ratchet.access_token' production.ini | sed 's/<sup>.*</sup> = //g'
+<p>[localhost] local: grep 'rollbar.access_token' production.ini | sed 's/<sup>.*</sup> = //g'
 [localhost] local: whoami
 [localhost] local: git log -n 1 --pretty=format:"%H"
 Deploy recorded successfully. Deploy id: 307
@@ -220,7 +220,7 @@ Deploy recorded successfully. Deploy id: 307
 [web2] out: web2: stopped
 [web2] out: web2: started</p>
 
-<p>[localhost] local: grep 'ratchet.access_token' production.ini | sed 's/<sup>.*</sup> = //g'
+<p>[localhost] local: grep 'rollbar.access_token' production.ini | sed 's/<sup>.*</sup> = //g'
 [localhost] local: whoami
 [localhost] local: git log -n 1 --pretty=format:"%H"
 Deploy recorded successfully. Deploy id: 308</p>
@@ -230,7 +230,7 @@ Disconnecting from web2... done.
 Disconnecting from web1... done.
 ```</p>
 
-<p>Lots of good things happening. But it's doing the whole process -- <code>check_user</code>, <code>update_and_restart</code>, <code>ratchet_record_deploy</code> -- twice, once for each host. The duplicate <code>check_user</code> just slows things down, but the duplicate <code>ratchet_record_deploy</code> is going to mess with our deploy history, and it's only going to get worse as we add more servers.</p>
+<p>Lots of good things happening. But it's doing the whole process -- <code>check_user</code>, <code>update_and_restart</code>, <code>rollbar_record_deploy</code> -- twice, once for each host. The duplicate <code>check_user</code> just slows things down, but the duplicate <code>rollbar_record_deploy</code> is going to mess with our deploy history, and it's only going to get worse as we add more servers.</p>
 
 <p>Fabric's solution to this, described in their <a href="http://docs.fabfile.org/en/1.4.3/usage/execution.html">docs</a>, is "roles". We can map hosts to roles, then decorate tasks with which roles they apply to. Here we replace the <code>env.hosts</code> declaration with <code>env.roledefs</code>, decorate <code>update_and_restart</code> with <code>@roles</code>, and call <code>update_and_restart</code> with <code>execute</code> so that the <code>@roles</code> decorator is honored:</p>
 
@@ -312,7 +312,7 @@ Disconnecting from web1... done.
 </span><span class='line'>    <span class="n">execute</span><span class="p">(</span><span class="n">update_and_restart</span><span class="p">)</span>
 </span><span class='line'>
 </span><span class='line'>    <span class="c"># post-roll tasks</span>
-</span><span class='line'>    <span class="n">ratchet_record_deploy</span><span class="p">()</span>
+</span><span class='line'>    <span class="n">rollbar_record_deploy</span><span class="p">()</span>
 </span><span class='line'>
 </span><span class='line'>
 </span><span class='line'><span class="nd">@roles</span><span class="p">(</span><span class="s">&#39;web&#39;</span><span class="p">)</span>
@@ -331,16 +331,16 @@ Disconnecting from web1... done.
 </span><span class='line'>        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </span><span class='line'>
 </span><span class='line'>
-</span><span class='line'><span class="k">def</span> <span class="nf">ratchet_record_deploy</span><span class="p">():</span>
+</span><span class='line'><span class="k">def</span> <span class="nf">rollbar_record_deploy</span><span class="p">():</span>
 </span><span class='line'>    <span class="c"># read access_token from production.ini</span>
-</span><span class='line'>    <span class="n">access_token</span> <span class="o">=</span> <span class="n">local</span><span class="p">(</span><span class="s">&quot;grep &#39;ratchet.access_token&#39; production.ini | sed &#39;s/^.* = //g&#39;&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">access_token</span> <span class="o">=</span> <span class="n">local</span><span class="p">(</span><span class="s">&quot;grep &#39;rollbar.access_token&#39; production.ini | sed &#39;s/^.* = //g&#39;&quot;</span><span class="p">,</span>
 </span><span class='line'>        <span class="n">capture</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </span><span class='line'>
 </span><span class='line'>    <span class="n">environment</span> <span class="o">=</span> <span class="s">&#39;production&#39;</span>
 </span><span class='line'>    <span class="n">local_username</span> <span class="o">=</span> <span class="n">local</span><span class="p">(</span><span class="s">&#39;whoami&#39;</span><span class="p">,</span> <span class="n">capture</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </span><span class='line'>    <span class="n">revision</span> <span class="o">=</span> <span class="n">local</span><span class="p">(</span><span class="s">&#39;git log -n 1 --pretty=format:&quot;%H&quot;&#39;</span><span class="p">,</span> <span class="n">capture</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </span><span class='line'>
-</span><span class='line'>    <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s">&#39;https://submit.ratchet.io/api/1/deploy/&#39;</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s">&#39;https://api.rollbar.com/api/1/deploy/&#39;</span><span class="p">,</span> <span class="p">{</span>
 </span><span class='line'>        <span class="s">&#39;access_token&#39;</span><span class="p">:</span> <span class="n">access_token</span><span class="p">,</span>
 </span><span class='line'>        <span class="s">&#39;environment&#39;</span><span class="p">:</span> <span class="n">environment</span><span class="p">,</span>
 </span><span class='line'>        <span class="s">&#39;local_username&#39;</span><span class="p">:</span> <span class="n">local_username</span><span class="p">,</span>
@@ -393,7 +393,7 @@ Disconnecting from web1... done.
 [web2] out: web2: stopped
 [web2] out: web2: started</p>
 
-<p>[localhost] local: grep 'ratchet.access_token' production.ini | sed 's/<sup>.*</sup> = //g'
+<p>[localhost] local: grep 'rollbar.access_token' production.ini | sed 's/<sup>.*</sup> = //g'
 [localhost] local: whoami
 [localhost] local: git log -n 1 --pretty=format:"%H"
 Deploy recorded successfully. Deploy id: 309</p>

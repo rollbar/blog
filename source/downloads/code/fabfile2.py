@@ -17,7 +17,7 @@ def deploy():
     execute(update_and_restart)
 
     # post-roll tasks
-    ratchet_record_deploy()
+    rollbar_record_deploy()
 
 
 @roles('web')
@@ -36,16 +36,16 @@ def check_user():
         sys.exit(1)
 
 
-def ratchet_record_deploy():
+def rollbar_record_deploy():
     # read access_token from production.ini
-    access_token = local("grep 'ratchet.access_token' production.ini | sed 's/^.* = //g'", 
+    access_token = local("grep 'rollbar.access_token' production.ini | sed 's/^.* = //g'", 
         capture=True)
 
     environment = 'production'
     local_username = local('whoami', capture=True)
     revision = local('git log -n 1 --pretty=format:"%H"', capture=True)
 
-    resp = requests.post('https://submit.ratchet.io/api/1/deploy/', {
+    resp = requests.post('https://api.rollbar.com/api/1/deploy/', {
         'access_token': access_token,
         'environment': environment,
         'local_username': local_username,
@@ -53,6 +53,6 @@ def ratchet_record_deploy():
     }, timeout=3)
 
     if resp.status_code == 200:
-        print "Deploy recorded successfully. Deploy id:", resp.json['data']['deploy_id']
+        print "Deploy recorded successfully"
     else:
         print "Error recording deploy:", resp.text

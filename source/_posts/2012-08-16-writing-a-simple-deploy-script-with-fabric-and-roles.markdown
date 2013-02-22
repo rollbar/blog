@@ -14,7 +14,7 @@ I first heard about [Fabric](http://www.fabfile.org) a couple years ago while at
   <li>that language being Python, which we used everywhere else</li>
 </ul>
 
-but we already had a huge swath of shell scripts that worked well (and truth be told, Bash isn’t really that bad). But now that we have at clean slate for [Ratchet](https://ratchet.io), Fabric it is.
+but we already had a huge swath of shell scripts that worked well (and truth be told, Bash isn’t really that bad). But now that we have at clean slate for [Rollbar](https://rollbar.com), Fabric it is.
 
 I wanted a simple deployment script that would do the following:
   
@@ -27,7 +27,7 @@ I wanted a simple deployment script that would do the following:
       <li>in series, restart each web process</li>
     </ol>
   </li>
-  <li>make an HTTP POST to our <a href="https://ratchet.io/docs/deploys/">deploys api</a> to record that the deploy completed successfully</li>
+  <li>make an HTTP POST to our <a href="https://rollbar.com/docs/deploys/">deploys api</a> to record that the deploy completed successfully</li>
 </ol>
 
 Here’s my first attempt:
@@ -67,7 +67,7 @@ $ sudo -u deploy fab deploy
 [web1] out: web2: stopped
 [web1] out: web2: started
 
-[localhost] local: grep 'ratchet.access_token' production.ini | sed 's/^.* = //g'
+[localhost] local: grep 'rollbar.access_token' production.ini | sed 's/^.* = //g'
 [localhost] local: whoami
 [localhost] local: git log -n 1 --pretty=format:"%H"
 Deploy recorded successfully. Deploy id: 307
@@ -98,7 +98,7 @@ Deploy recorded successfully. Deploy id: 307
 [web2] out: web2: stopped
 [web2] out: web2: started
 
-[localhost] local: grep 'ratchet.access_token' production.ini | sed 's/^.* = //g'
+[localhost] local: grep 'rollbar.access_token' production.ini | sed 's/^.* = //g'
 [localhost] local: whoami
 [localhost] local: git log -n 1 --pretty=format:"%H"
 Deploy recorded successfully. Deploy id: 308
@@ -108,7 +108,7 @@ Disconnecting from web2... done.
 Disconnecting from web1... done.
 ```
 
-Lots of good things happening. But it's doing the whole process -- `check_user`, `update_and_restart`, `ratchet_record_deploy` -- twice, once for each host. The duplicate `check_user` just slows things down, but the duplicate `ratchet_record_deploy` is going to mess with our deploy history, and it's only going to get worse as we add more servers.
+Lots of good things happening. But it's doing the whole process -- `check_user`, `update_and_restart`, `rollbar_record_deploy` -- twice, once for each host. The duplicate `check_user` just slows things down, but the duplicate `rollbar_record_deploy` is going to mess with our deploy history, and it's only going to get worse as we add more servers.
 
 Fabric's solution to this, described in their [docs](http://docs.fabfile.org/en/1.4.3/usage/execution.html), is "roles". We can map hosts to roles, then decorate tasks with which roles they apply to. Here we replace the `env.hosts` declaration with `env.roledefs`, decorate `update_and_restart` with `@roles`, and call `update_and_restart` with `execute` so that the `@roles` decorator is honored:
 
@@ -154,7 +154,7 @@ Here's the output:
 [web2] out: web2: stopped
 [web2] out: web2: started
 
-[localhost] local: grep 'ratchet.access_token' production.ini | sed 's/^.* = //g'
+[localhost] local: grep 'rollbar.access_token' production.ini | sed 's/^.* = //g'
 [localhost] local: whoami
 [localhost] local: git log -n 1 --pretty=format:"%H"
 Deploy recorded successfully. Deploy id: 309

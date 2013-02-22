@@ -17,7 +17,7 @@ The search index is kept up-to-date in real-time as new items are added to the s
 
 Current customers can try it out now; let us know if you run into any issues. What else would you like to see indexed?
 
-If you don't have an account yet, [sign up here for early access](https://ratchet.io/).
+If you don't have an account yet, [sign up here for early access](https://rollbar.com/).
 
 ## Under the hood
 

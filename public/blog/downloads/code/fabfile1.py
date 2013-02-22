@@ -14,7 +14,7 @@ def deploy():
     update_and_restart()
 
     # post-roll tasks
-    ratchet_record_deploy()
+    rollbar_record_deploy()
 
 
 def update_and_restart():
@@ -32,16 +32,16 @@ def check_user():
         sys.exit(1)
 
 
-def ratchet_record_deploy():
+def rollbar_record_deploy():
     # read access_token from production.ini
-    access_token = local("grep 'ratchet.access_token' production.ini | sed 's/^.* = //g'", 
+    access_token = local("grep 'rollbar.access_token' production.ini | sed 's/^.* = //g'", 
         capture=True)
 
     environment = 'production'
     local_username = local('whoami', capture=True)
     revision = local('git log -n 1 --pretty=format:"%H"', capture=True)
 
-    resp = requests.post('https://submit.ratchet.io/api/1/deploy/', {
+    resp = requests.post('https://api.rollbar.com/api/1/deploy/', {
         'access_token': access_token,
         'environment': environment,
         'local_username': local_username,

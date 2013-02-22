@@ -7,7 +7,7 @@ author: Brian Rue
 categories: pyramid articles
 ---
 
-At [Ratchet.io](http://ratchet.io/), we've been using [Pyramid](http://www.pylonsproject.org/) as our web framework and have been pretty happy with it. It's lightweight and mostly stays out of our way. 
+At [Rollbar.com](http://rollbar.com/), we've been using [Pyramid](http://www.pylonsproject.org/) as our web framework and have been pretty happy with it. It's lightweight and mostly stays out of our way. 
 
 Pyramid doesn't have a global request object that you can just import [1], so it makes you pass around `request` wherever you need it. That results in a lot of library code that looks like this:
 
