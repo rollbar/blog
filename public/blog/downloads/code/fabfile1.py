@@ -49,6 +49,6 @@ def rollbar_record_deploy():
     }, timeout=3)
 
     if resp.status_code == 200:
-        print "Deploy recorded successfully. Deploy id:", resp.json['data']['deploy_id']
+        print "Deploy recorded successfully"
     else:
         print "Error recording deploy:", resp.text

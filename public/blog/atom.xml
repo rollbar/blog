@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Rollbar.com blog]]></title>
+  <title><![CDATA[Rollbar - Blog - real-time error monitoring]]></title>
   <link href="http://rollbar.com/blog/atom.xml" rel="self"/>
   <link href="http://rollbar.com/blog/"/>
-  <updated>2013-01-11T16:38:04-08:00</updated>
+  <updated>2013-02-25T01:54:23-08:00</updated>
   <id>http://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
@@ -540,7 +540,7 @@
 </span><span class='line'>    <span class="p">},</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </span><span class='line'>
 </span><span class='line'>    <span class="k">if</span> <span class="n">resp</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
-</span><span class='line'>        <span class="k">print</span> <span class="s">&quot;Deploy recorded successfully. Deploy id:&quot;</span><span class="p">,</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="s">&#39;deploy_id&#39;</span><span class="p">]</span>
+</span><span class='line'>        <span class="k">print</span> <span class="s">&quot;Deploy recorded successfully&quot;</span>
 </span><span class='line'>    <span class="k">else</span><span class="p">:</span>
 </span><span class='line'>        <span class="k">print</span> <span class="s">&quot;Error recording deploy:&quot;</span><span class="p">,</span> <span class="n">resp</span><span class="o">.</span><span class="n">text</span>
 </span></code></pre></td></tr></table></div></figure>
@@ -806,7 +806,7 @@
 </span><span class='line'>    <span class="p">},</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </span><span class='line'>
 </span><span class='line'>    <span class="k">if</span> <span class="n">resp</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
-</span><span class='line'>        <span class="k">print</span> <span class="s">&quot;Deploy recorded successfully. Deploy id:&quot;</span><span class="p">,</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="s">&#39;deploy_id&#39;</span><span class="p">]</span>
+</span><span class='line'>        <span class="k">print</span> <span class="s">&quot;Deploy recorded successfully&quot;</span>
 </span><span class='line'>    <span class="k">else</span><span class="p">:</span>
 </span><span class='line'>        <span class="k">print</span> <span class="s">&quot;Error recording deploy:&quot;</span><span class="p">,</span> <span class="n">resp</span><span class="o">.</span><span class="n">text</span>
 </span></code></pre></td></tr></table></div></figure>

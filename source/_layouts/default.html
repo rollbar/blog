@@ -1,7 +1,6 @@
 {% capture root_url %}{{ site.root | strip_slash }}{% endcapture %}
 {% include head.html %}
 <body {% if page.body_id %} id="{{ page.body_id }}" {% endif %} {% if page.sidebar == false %} class="no-sidebar" {% endif %} {% if page.sidebar == 'collapse' or site.sidebar == 'collapse' %} class="collapse-sidebar sidebar-footer" {% endif %}>
-  <div class="main-content">
     {% include header.html %}
 
     {% comment %}
@@ -14,30 +13,65 @@
       </div>
     </div>
     
-    <footer class="footer">
-      <div class="container" style="text-align:center;">
-        <div>
-          <strong>Email:</strong> founders@rollbar.com
-          &middot;
-          <strong>Phone:</strong> 1.415.857.0548
+    <footer class="row-fluid">
+      <div class="container">
+        <div class="row-fluid footer-content">
+          <div class="left-col pull-left"><a class="logo-footer" href="${request.route_path('root/index')}"></a></div>
+            <div class="right-col pull-left">
+              <div class="item pull-left">
+              <strong>Rollbar</strong>
+              <ul>
+                <li><a href="/home/">Home</a></li>
+                <li><a href="/about">About us</a></li>
+                <li><a href="/pricing">Pricing</a></li>
+                <li><a href="mailto:jobs@rollbar.com?Subject=I+am+awesome,+hire+me!">Jobs</a></li>
+                <li><a href="/blog/">Blog</a></li>
+              </ul>
+            </div>
+            <div class="item pull-left">
+              <strong>Features</strong>
+              <ul>
+                <li><a href="/features/multiplatform/">Monitor errors</a></li>
+                <li><a href="/features/alerts/">Real-time Alerts</a></li>
+                <li><a href="/features/dashboard/">Dashboard</a></li>
+                <li><a href="/features/deploys/">Track Deploys</a></li>
+                <li><a href="/features/people/">Person Tracking</a></li>
+                <li><a href="/features/hosts/">Host Tracking</a></li>
+                <li><a href="/features/bugtrackers/">Bug Tracker Integration</a></li>
+                <li><a href="/features/github/">Github Integration</a></li>
+                <li><a href="/features/">Other Features</a></li>
+              </ul>
+            </div>
+            <div class="item pull-left">
+              <strong>Resources</strong>
+              <ul>
+                <li><a href="/blog/">Blog</a></li>
+                <li><a href="/docs/">Docs</a></li>
+                <li><a href="/changelog">Change Log</a></li>
+              </ul>
+            </div>
+            <div class="item pull-left">
+              <strong>Support</strong>
+              <ul>
+                <li><a href="/docs/">Help Center</a></li>
+                <li><a href="/tos">Terms of Service</a></li>
+                <li><a href="/privacy">Privacy Policy</a></li>
+                <li><a href="/contact">Contact Us</a></li>
+              </ul>
+              
+              <div class="social">
+                <strong>Share via</strong>
+                <ul>
+                  <li class="twitter"><a href="https://twitter.com/share?url=http://rollbar.com/"></a></li>
+                  <li class="facebook"><a href="https://www.facebook.com/dialog/feed?app_id=516762375041550&link=http%3A%2F%2Frollbar.com%2F&picture=http%3A%2F%2Frollbar.com%2Fstatic%2Fimg2%2Flogo.png&name=Rollbar&caption=Monitor and analyze your application's errors and deploys in real-time.&redirect_uri=http%3A%2F%2Frollbar.com%2F" target="_blank"></a></li>
+                  <li class="email last"><a href="mailto:?Subject=Rollbar" target="_blank"></a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
-        <div>
-          &copy; 2012 Rollbar, Inc.
-          &nbsp;
-          &nbsp;
-          <a href="/about">About Us</a>
-          &nbsp;
-          &nbsp;
-          <a href="/blog/">Blog</a>
-          &nbsp;
-          &nbsp;
-          <a href="/docs/">Documentation</a>
-          &nbsp;
-          &nbsp;
-          <a href="/tos">TOS</a>
-          &nbsp;
-          &nbsp;
-          <a href="/privacy">Privacy</a>
+        <div class="row-fluid footer-content-bottom">
+          <p>&copy; 2013 Rollbar, Inc.</p>
         </div>
       </div>
     </footer>

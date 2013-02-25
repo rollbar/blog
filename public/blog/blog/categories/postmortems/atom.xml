@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: postmortems | Ratchet.io blog]]></title>
-  <link href="http://ratchet.io/blog/blog/categories/postmortems/atom.xml" rel="self"/>
-  <link href="http://ratchet.io/blog/"/>
-  <updated>2013-01-11T16:38:04-08:00</updated>
-  <id>http://ratchet.io/blog/</id>
+  <title><![CDATA[Category: postmortems | Rollbar - Blog - real-time error monitoring]]></title>
+  <link href="http://rollbar.com/blog/blog/categories/postmortems/atom.xml" rel="self"/>
+  <link href="http://rollbar.com/blog/"/>
+  <updated>2013-02-25T01:54:23-08:00</updated>
+  <id>http://rollbar.com/blog/</id>
   <author>
-    <name><![CDATA[Ratchet, Inc.]]></name>
+    <name><![CDATA[Rollbar, Inc.]]></name>
     
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
@@ -15,12 +15,12 @@
   
   <entry>
     <title type="html"><![CDATA[Post-mortem from last night's outage]]></title>
-    <link href="http://ratchet.io/blog/post/2013/01/11/post-mortem-from-last-nights-outage/"/>
+    <link href="http://rollbar.com/blog/post/2013/01/11/post-mortem-from-last-nights-outage/"/>
     <updated>2013-01-11T15:57:00-08:00</updated>
-    <id>http://ratchet.io/blog/post/2013/01/11/post-mortem-from-last-nights-outage</id>
+    <id>http://rollbar.com/blog/post/2013/01/11/post-mortem-from-last-nights-outage</id>
     <content type="html"><![CDATA[<blockquote><p><em>Tl;dr: from about 9:30pm to 12:30am last night, our website was unreachable and we weren't sending out any notifications. Our API stayed up nearly the whole time thanks to an automatic failover.</em></p></blockquote>
 
-<p>We had our first major outage last night. We want to apologize to all of our customers for this outage, and we're going to continue to work to make the <a href="http://ratchet.io">Ratchet.io</a> service stable, reliable, and performant.</p>
+<p>We had our first major outage last night. We want to apologize to all of our customers for this outage, and we're going to continue to work to make the <a href="http://rollbar.com">Rollbar.com</a> service stable, reliable, and performant.</p>
 
 <p>What follows is a timeline of events, and a summary of what went wrong, what went right, and what we're doing to address what went wrong.</p>
 
@@ -34,8 +34,8 @@
 
 <ul>
 <li>our primary cluster of servers is in San Jose</li>
-<li>all web traffic (ratchet.io / www.ratchet.io) is handled by lb2</li>
-<li>all API traffic (submit.ratchet.io) is handled by lb1</li>
+<li>all web traffic (rollbar.com / www.rollbar.com) is handled by lb2</li>
+<li>all API traffic (api.rollbar.com) is handled by lb1</li>
 <li>lb3 (in Singapore) and lb4 (Amsterdam) are ready to go but not in use yet (more on this below), providing failover and faster API response times to customers outside of the Americas.</li>
 </ul>
 
@@ -57,9 +57,9 @@
 <p>Now the (abbreviated) timeline. All times are PST.</p>
 
 <div style="padding-left:2em;">
-<p>9:30pm: Cory got an alert from Pingdom that our website (ratchet.io) was down. He tried visiting it but it wouldn't load (just hung). Remembering the pending DNS change, he immediately checked DNS propagation and saw that ratchet.io was pointing at the wrong load balancer -- lb1 (the API tier), not lb2.
+<p>9:30pm: Cory got an alert from Pingdom that our website (rollbar.com) was down. He tried visiting it but it wouldn't load (just hung). Remembering the pending DNS change, he immediately checked DNS propagation and saw that rollbar.com was pointing at the wrong load balancer -- lb1 (the API tier), not lb2.
 
-<p>Cory and Sergei investigated. The A record for ratchet.io showed as correct in Dyn, but DNS was resolving incorrectly.
+<p>Cory and Sergei investigated. The A record for rollbar.com showed as correct in Dyn, but DNS was resolving incorrectly.
 
 <p>9:47pm: Cory and Sergei looked at <a href="http://twitter.com/SoftlayerNotify" target="_blank">@SoftlayerNotify</a> and saw that there was an issue underway with one of the routers in the San Jose data center.
 
@@ -69,7 +69,7 @@
 
 <p>10:05pm: Twitter search for "softlayer outage" shows other people being affected.
 
-<p>10:05pm: API tier (submit.ratchet.io) appears to be working. Sergei verifies that it's hitting lb3 (in Singapore).
+<p>10:05pm: API tier (api.rollbar.com) appears to be working. Sergei verifies that it's hitting lb3 (in Singapore).
 </div>
 
 
@@ -86,9 +86,9 @@
 
 <p>11:54pm: @SoftlayerNotify posts that "all servers are online however some intermittent problems remain"
 
-<p>11:55pm: Sergei notices that the A record for ratchet.io in the Dyn interface appears to have been deleted, and he can't add it back.
+<p>11:55pm: Sergei notices that the A record for rollbar.com in the Dyn interface appears to have been deleted, and he can't add it back.
 
-<p>12:00am: Brian sees that ratchet.io is working again. Cory notices that API calls are hitting lb2, causing them to hit the old, non-optimized API handling code on our web tier, overloading them and causing the website to hang. Frequent process restarts minimize the impact.
+<p>12:00am: Brian sees that rollbar.com is working again. Cory notices that API calls are hitting lb2, causing them to hit the old, non-optimized API handling code on our web tier, overloading them and causing the website to hang. Frequent process restarts minimize the impact.
 
 <p>12:19am: Sergei gets an email back from Dyn saying that they're still looking into the problem.
 
@@ -98,7 +98,7 @@
 
 <p>2:58am: Softlayer tweets that they're about to run some code upgrades on the troubled router, which will cause some public network disruption.
 
-<p>4:00am:- A customer reports connectivity issues to ratchet.io
+<p>4:00am:- A customer reports connectivity issues to rollbar.com
 
 <p>4:10am: Softlayer tweets that the troubled router is finally stable.
 </div>
@@ -125,7 +125,7 @@
 </ul>
 
 
-<p>As a bonus, our Singapore and Amsterdam servers are <a href="http://www.whatsmydns.net/#A/submit.ratchet.io">now in service</a>.</p>
+<p>As a bonus, our Singapore and Amsterdam servers are <a href="http://www.whatsmydns.net/#A/api.rollbar.com">now in service</a>.</p>
 
 <h2>What went wrong</h2>
 
@@ -135,7 +135,7 @@
 <ul>
 <li>Notifications for new errors, etc. weren't sent</li>
 <li>The web app didn't load, and there was no maintenance page.</li>
-<li><a href="http://status.ratchet.io">status.ratchet.io</a> didn't show useful information</li>
+<li><a href="http://status.rollbar.com">status.rollbar.com</a> didn't show useful information</li>
 </ul>
 </li>
 <li>Even though the Softlayer private network was at least partially accessible, we couldn't access it because we only had one way in ('dev', in San Jose).</li>
@@ -150,7 +150,7 @@
 <div style="padding-left:2em;">
 <p><i>1b.</i> Set up a web server in a separate datacenter to serve a maintenance page.
 
-<p><i>1c.</i> Add meta-level checks to status.ratchet.io. It currently gets data pushed from Nagios, but this isn't helpful when San Jose is entirely unreachable.
+<p><i>1c.</i> Add meta-level checks to status.rollbar.com. It currently gets data pushed from Nagios, but this isn't helpful when San Jose is entirely unreachable.
 
 <p><i>2.</i> Add another 'dev'-like machine that we can use to administer servers, deploy code, etc. if San Jose is unreachable
 
@@ -171,7 +171,7 @@
 
 <p>We hope this was, if nothing else, an interesting look into our infrastructure, and to the journey of building a highly-available we service.</p>
 
-<p>If you have any questions about the outage or otherwise, let us know in the comments or email us at support@ratchet.io</p>
+<p>If you have any questions about the outage or otherwise, let us know in the comments or email us at support@rollbar.com</p>
 ]]></content>
   </entry>
   

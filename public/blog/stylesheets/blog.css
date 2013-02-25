@@ -1,0 +1,30 @@
+h2 {
+    text-align: left;
+}
+
+#content {
+    overflow: visible;
+    margin-right: 300px;
+    position: relative;
+}
+.blog-index {
+    float: left;
+}
+.blog-archives {
+    float: left;
+}
+.blog-post {
+    float: left;
+}
+.line-numbers {
+    width: 20px;
+}
+.sidebar {
+    width: 260px;
+    padding: 1.2em 20px 20px;
+    background: none;
+    clear: none;
+    float: left;
+    margin: 0 -100% 0 0;
+    display: block;
+}
