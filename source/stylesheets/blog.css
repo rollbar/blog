@@ -28,3 +28,22 @@ h2 {
     margin: 0 -100% 0 0;
     display: block;
 }
+.sidebar .well {
+    background-color: #fff;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+#blog-archives h1 {
+    margin-top: 0px;
+}
+#blog-archives h2 {
+    padding-top: 4px !important;
+    font-size: 24px;
+    color: #000;
+}
+#blog-archives time {
+    margin-top: 4px;
+}
+#blog-archives footer {
+    background: none;
+}
