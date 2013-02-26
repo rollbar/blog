@@ -8,7 +8,7 @@ import requests
 CODE_DIR = '/home/deploy/www/blog'
 
 env.roledefs = {
-    'web': ['web1', 'web2', 'web3'],
+    'web': ['web8'],
 }
 
 
