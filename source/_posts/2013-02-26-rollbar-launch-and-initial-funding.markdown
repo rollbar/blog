@@ -11,7 +11,7 @@ Today we’re excited to announce the public launch of Rollbar. Rollbar tracks a
 
 ### Platform-agnostic API
 
-Anything that can speak JSON and HTTP can talk to Rollbar. Our API accepts raw "items" (errors, exceptions, and log messages) and deploys as inputs, and aggregated items, occurrences, and deploys as outputs. We provide official libraries for Ruby, Python, PHP, Node.js, Javascript, and Flash; or you can roll your own.
+Anything that can speak JSON and HTTP can talk to Rollbar. Our API accepts raw "items" (errors, exceptions, and log messages) and deploys as inputs, and aggregated items, occurrences, and deploys as outputs. We provide official libraries for Ruby, Python, PHP, Node.js, Javascript, and Flash; or you can [roll your own](https://rollbar.com/docs/api_items/).
 
 ### Severity levels
 
@@ -25,7 +25,7 @@ Person tracking helps you provide great customer support by emailing affected us
 
 API endpoints on 3 continents. Resolving and reactivations. Real-time notifications for new issues. Graphs everywhere. Deploy tracking. Search by title, host, file, context, date, severity, status. Replay an issue by pressing a button. SSL everywhere. Github, Asana, and Pivotal Tracker integration. 
 
-We've built many of the pieces our beta customers have needed, and we really think you're going to like it. Start a free trial now, or see pricing, features, or docs.
+We've built many of the pieces our beta customers have needed, and we really think you're going to like it. [Start a free trial now](https://rollbar.com/signup/), or see [pricing](https://rollbar.com/pricing), [features](https://rollbar.com/features/), or [docs](https://rollbar.com/docs/).
 
 ### More firepower
 
