@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: notifiers | Rollbar - Blog - real-time error monitoring]]></title>
+  <link href="http://rollbar.com/blog/blog/categories/notifiers/atom.xml" rel="self"/>
+  <link href="http://rollbar.com/blog/"/>
+  <updated>2013-02-26T17:14:08-08:00</updated>
+  <id>http://rollbar.com/blog/</id>
+  <author>
+    <name><![CDATA[Rollbar, Inc.]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Upgrading to the new Rollbar notifier libraries]]></title>
+    <link href="http://rollbar.com/blog/post/2013/02/26/rollbar-notifier-upgrades/"/>
+    <updated>2013-02-26T17:00:00-08:00</updated>
+    <id>http://rollbar.com/blog/post/2013/02/26/rollbar-notifier-upgrades</id>
+    <content type="html"><![CDATA[<p>We've updated all of our notifier library repositories to match the name change to Rollbar today. The old Ratchet.io repos have been deprecated and all further development will continue on the respective Rollbar versions.</p>
+
+<p>Please note that the <code>submit.ratchet.io</code> endpoint and the existing libraries will continue to work for the indefinite future, so you don't have to do anything right now. But we do recommend upgrading to take advantage of future updates.</p>
+
+<p>Upgrading <em>should</em> be seamless and quick. Please contact <a href="mailto:support@rollbar.com">support@rollbar.com</a> if you run into any issues.</p>
+
+<p>Here are links to the upgrade instructions for each:</p>
+
+<ul>
+<li><p>Browser JS - update the JS snippet used on your site to the version shown <a href="http://rollbar.com/docs/">here</a></p></li>
+<li><p><a href="https://github.com/rollbar/pyrollbar/blob/master/UPGRADE_FROM_RATCHET.md">pyratchet</a></p></li>
+<li><p><a href="https://github.com/rollbar/rollbar-gem/blob/master/UPGRADE_FROM_RATCHET.md">ratchetio-gem</a></p></li>
+<li><p><a href="https://github.com/rollbar/rollbar-php/blob/master/UPGRADE_FROM_RATCHET.md">ratchetio-php</a></p></li>
+<li><p><a href="https://github.com/rollbar/rollbar-agent/blob/master/UPGRADE_FROM_RATCHET.md">ratchet-agent</a></p></li>
+<li><p><a href="https://github.com/rollbar/node_rollbar/blob/master/UPGRADE_FROM_RATCHET.md">node_ratchet</a></p></li>
+<li><p><a href="https://github.com/rollbar/flash_rollbar/blob/master/UPGRADE_FROM_RATCHET.md">flash_ratchet</a></p></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>
