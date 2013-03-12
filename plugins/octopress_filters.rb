@@ -118,6 +118,14 @@ module OctopressLiquidFilters
     input
   end
 
+  # Removes a leading forward slash
+  def strip_leading_slash(input)
+    if input.match(/^\//)
+      input = input[1..-1]
+    end
+    input
+  end
+
   # Returns a url without the protocol (http://)
   def shorthand_url(input)
     input.gsub /(https?:\/\/)(\S+)/ do
