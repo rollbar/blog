@@ -4,6 +4,7 @@ title: "Post-mortem from last night's outage"
 date: 2013-01-11 15:57
 comments: true
 author: Brian Rue
+authorlink: https://plus.google.com/u/1/103254942254370049907/posts
 categories: postmortems infrastructure
 ---
 

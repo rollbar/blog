@@ -4,6 +4,7 @@ title: "Using a Request Factory in Pyramid to write a little less code"
 date: 2012-09-07 11:00
 comments: true
 author: Brian Rue
+authorlink: https://plus.google.com/u/1/103254942254370049907/posts
 categories: pyramid articles
 ---
 

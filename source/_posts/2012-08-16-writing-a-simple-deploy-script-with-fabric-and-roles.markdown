@@ -4,6 +4,7 @@ title: "Writing a simple deploy script with Fabric and @roles"
 date: 2012-08-16 11:52
 comments: true
 author: Brian Rue
+authorlink: https://plus.google.com/u/1/103254942254370049907/posts
 categories: deployment articles
 ---
 

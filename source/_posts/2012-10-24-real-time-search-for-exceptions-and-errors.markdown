@@ -4,6 +4,7 @@ title: "Real-time Search for Exceptions and Errors"
 date: 2012-10-24 11:24
 comments: true
 author: Brian Rue and Cory Virok
+authorlink: https://plus.google.com/u/1/103254942254370049907/posts
 categories: releases
 ---
 

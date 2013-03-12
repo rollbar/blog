@@ -4,6 +4,7 @@ title: "Rollbar launches, raises initial funding"
 date: 2013-02-26 12:15
 comments: true
 author: Brian Rue
+authorlink: https://plus.google.com/u/1/103254942254370049907/posts
 categories: announcements
 ---
 
