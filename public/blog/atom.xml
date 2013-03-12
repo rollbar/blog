@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Rollbar - Blog - real-time error monitoring]]></title>
+  <title><![CDATA[Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
   <link href="http://rollbar.com/blog/atom.xml" rel="self"/>
   <link href="http://rollbar.com/blog/"/>
-  <updated>2013-02-26T17:14:08-08:00</updated>
+  <updated>2013-03-11T17:24:07-07:00</updated>
   <id>http://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Upgrading to the new Rollbar notifier libraries]]></title>
     <link href="http://rollbar.com/blog/post/2013/02/26/rollbar-notifier-upgrades/"/>
-    <updated>2013-02-26T17:00:00-08:00</updated>
+    <updated>2013-02-26T17:25:00-08:00</updated>
     <id>http://rollbar.com/blog/post/2013/02/26/rollbar-notifier-upgrades</id>
     <content type="html"><![CDATA[<p>We&#8217;ve updated all of our notifier library repositories to match the name change to Rollbar today. The old Ratchet.io repos have been deprecated and all further development will continue on the respective Rollbar versions.</p>
 
