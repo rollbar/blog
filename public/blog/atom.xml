@@ -4,7 +4,7 @@
   <title><![CDATA[Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
   <link href="http://rollbar.com/blog/atom.xml" rel="self"/>
   <link href="http://rollbar.com/blog/"/>
-  <updated>2013-03-21T15:55:45-07:00</updated>
+  <updated>2013-03-21T16:12:34-07:00</updated>
   <id>http://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Improved grouping for Javascript errors]]></title>
     <link href="http://rollbar.com/blog/post/2013/03/21/improved-grouping-for-javascript-errors/"/>
-    <updated>2013-03-21T16:00:00-07:00</updated>
+    <updated>2013-03-21T16:14:00-07:00</updated>
     <id>http://rollbar.com/blog/post/2013/03/21/improved-grouping-for-javascript-errors</id>
     <content type="html"><![CDATA[<p>We&#8217;ve released an updated to how Javascript errors are grouped in Rollbar. The new update does a better job of separating different errors into different groups (&#8220;Items&#8221; in Rollbar parlance) while still recognizing the same issue in different browsers as the same. It&#8217;s now enabled for all new projects. Existing projects can enable it on the Migrations tab in Settings.</p>
 

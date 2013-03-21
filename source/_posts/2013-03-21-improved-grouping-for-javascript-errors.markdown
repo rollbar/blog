@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Improved grouping for Javascript errors"
-date: 2013-03-21 16:00
+date: 2013-03-21 16:14
 comments: true
 author: Brian Rue
 authorlink: https://plus.google.com/u/1/103254942254370049907/posts
