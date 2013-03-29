@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Using Unique Indexes for Fun and Profit"
+title: "Taking UNIQUE indexes to the next level"
 date: 2013-03-29 09:15
 comments: true
 categories: articles

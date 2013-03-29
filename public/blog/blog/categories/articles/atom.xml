@@ -4,7 +4,7 @@
   <title><![CDATA[Category: articles | Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
   <link href="http://rollbar.com/blog/blog/categories/articles/atom.xml" rel="self"/>
   <link href="http://rollbar.com/blog/"/>
-  <updated>2013-03-29T09:04:26-07:00</updated>
+  <updated>2013-03-29T09:21:27-07:00</updated>
   <id>http://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Using Unique Indexes for Fun and Profit]]></title>
+    <title type="html"><![CDATA[Taking UNIQUE indexes to the next level]]></title>
     <link href="http://rollbar.com/blog/post/2013/03/29/using-unique-indexes-for-fun-and-profit/"/>
     <updated>2013-03-29T09:15:00-07:00</updated>
     <id>http://rollbar.com/blog/post/2013/03/29/using-unique-indexes-for-fun-and-profit</id>
