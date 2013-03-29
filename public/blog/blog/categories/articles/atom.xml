@@ -4,7 +4,7 @@
   <title><![CDATA[Category: articles | Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
   <link href="http://rollbar.com/blog/blog/categories/articles/atom.xml" rel="self"/>
   <link href="http://rollbar.com/blog/"/>
-  <updated>2013-03-22T11:56:16-07:00</updated>
+  <updated>2013-03-29T09:04:26-07:00</updated>
   <id>http://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
@@ -12,6 +12,202 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Using Unique Indexes for Fun and Profit]]></title>
+    <link href="http://rollbar.com/blog/post/2013/03/29/using-unique-indexes-for-fun-and-profit/"/>
+    <updated>2013-03-29T09:15:00-07:00</updated>
+    <id>http://rollbar.com/blog/post/2013/03/29/using-unique-indexes-for-fun-and-profit</id>
+    <content type="html"><![CDATA[<p>You've probably seen unique constraints somewhere -- either in Rails' <a href="http://guides.rubyonrails.org/active_record_validations_callbacks.html#uniqueness"><code>validates :uniqueness</code></a>, Django's <a href="https://docs.djangoproject.com/en/dev/ref/models/fields/#unique"><code>Field.unique</code></a>, or a raw SQL <a href="http://dev.mysql.com/doc/refman/5.5/en/create-index.html">table definition</a>. The basic function of unique constraints (preventing duplicate data from being inserted) is nice, but they're so much more powerful than that. When you write INSERT or REPLACE statements that rely on them, you can do some pretty cool (and efficient) things that you would've had to do multiple queries for otherwise.</p>
+
+<p>This post covers unique indexes in MySQL 5.5. Other versions of MySQL are similar. I'm not sure about Postgres or other relational databases but presume they're similar-ish as well.</p>
+
+<h2>Primer: what is a unique index?</h2>
+
+<p>Pre-primer: data in a database is stored on disk somewhere. In a SQL database, the data is organized into tables which have rows and columns. An index is a way to look up particular rows, based on the values of one or more columns, without having to scan through the whole table. Instead, you look up those values in the index, which tells you where to find the matching rows.</p>
+
+<p>Index lookups are typically faster than full table scans because they're organized for fast searches on the indexed columns (usually using binary trees), and they're also generally smaller than the original data.</p>
+
+<p>A unique index is an index that also imposes a constraint: that no two entries in the index can have the same values. It can be comprised of one column or many columns. If many columns, then the entire tuple of columns is used for determining uniqueness. There can be other columns in the table that are not part of the index; these don't affect the constraint.</p>
+
+<p>Primary keys are a special case of unique index; we'll cover this in more detail later.</p>
+
+<p>Unique indexes can be created in a CREATE TABLE statement like this 123123:</p>
+
+<p><code>sql
+CREATE TABLE user (
+  username varchar(32),
+  password char(32),
+  unique (username)
+);
+</code></p>
+
+<p>or using an ALTER TABLE statement like this:</p>
+
+<p><code>sql
+ALTER TABLE users ADD unique (username);
+</code></p>
+
+<h2>What does a unique constraint affect?</h2>
+
+<p>A unique constraint prevents you from changing your data in a way that would result in having duplicate data in the index. For example, given the above 'user' table, the following will happen if we try to insert duplicate data:</p>
+
+<p>```
+mysql> INSERT INTO user VALUES ('brian', PASSWORD('asdf'));
+Query OK, 1 row affected, 1 warning (0.04 sec)</p>
+
+<p>mysql> INSERT INTO user VALUES ('brian', PASSWORD('asdfjkl'));
+ERROR 1062 (23000): Duplicate entry 'brian' for key 'username'
+```</p>
+
+<p>or if we try to get duplicate data with an update:</p>
+
+<p>```
+mysql> INSERT INTO user VALUES('sherlock', PASSWORD('123456'));
+Query OK, 1 row affected, 1 warning (0.00 sec)</p>
+
+<p>mysql> UPDATE user SET username = 'brian' WHERE username = 'sherlock';
+ERROR 1062 (23000): Duplicate entry 'brian' for key 'username'
+```</p>
+
+<p>So we can see that unique indexes are a great way to maintain consistency of our data at the database level. If two people try to sign up with the same username, for example, the database will reject it and return a duplicate key error.</p>
+
+<h2>Taking it to the next level</h2>
+
+<p>MySQL provides several commands, all variations of INSERT, that can take advantage of unique indexes by specifying what to do (instead of erroring) when the insert would result in a duplicate. These are best illustrated by example.</p>
+
+<h3>INSERT ... ON DUPLICATE KEY UPDATE</h3>
+
+<p>Let's say we're building a simple ad impression tracking system. Ads are served by web servers and the impression counts are tracked in a database. We just want to know the number of ad impressions each hour. So we make a table like this:</p>
+
+<p><code>
+CREATE TABLE hour_impression (
+  hour int unsigned not null,  -- number of hours since unix epoch
+  impressions int unsigned not null default 0,
+  primary key(hour)
+);
+</code></p>
+
+<p>Side note: here we're using <code>hour</code> as the primary key, rather than having an auto-increment primary key like before in the 'user' table. This guarantees that <code>hour</code> is unique (since primary keys are a subset of unique keys), and has a nice property of laying out the data on disk in hour-order.</p>
+
+<p>A naive algorithm for recording each impression would be to:</p>
+
+<ol>
+<li>Check if a row already exists for the hour</li>
+<li>If not: <code>INSERT INTO hour_impression (hour, impressions) VALUES (:hour, 1)</code></li>
+<li>If so: <code>UPDATE hour_impression SET impressions = impressions + 1 WHERE hour = :hour</code></li>
+</ol>
+
+
+<p>But this exposes a race condition: what happens if two impressions happen at approximately the same time, on two different web servers? It's possible that both will try to INSERT, and the second one is going to fail (because of the unique constraint).</p>
+
+<p>What we want to do is combine the above algorithm into a single step. This is what INSERT … ON DUPLICATE KEY UPDATE is for:</p>
+
+<p><code>
+INSERT INTO hour_impression (hour, impressions)
+VALUES (379015, 1)
+ON DUPLICATE KEY UPDATE impressions = impressions + 1
+</code></p>
+
+<p>Now that it's a single step, we can run as many of these statements in parallel as we want, and the database will take care of the concurrency issues for us. Sweet!</p>
+
+<h3>INSERT IGNORE</h3>
+
+<p>Now let's say instead of counting the number of impressions in each hour, we just want to know which minutes any impressions at all were shown. So we create a table like this:</p>
+
+<p><code>
+CREATE TABLE minute_impression (
+  minute int unsigned not null,  -- number of minutes since the unix epoch
+  primary key (minute)
+);
+</code></p>
+
+<p>Similar to before, a naive algorithm for recording which minutes had any impressions would be to:</p>
+
+<ol>
+<li>Check if a row already exists for the minute</li>
+<li>If so, do nothing</li>
+<li>If not, <code>INSERT INTO minute_impression (minute) VALUES (:minute)</code></li>
+</ol>
+
+
+<p>This has the same kind of race condition as in the previous example. INSERT IGNORE exists to combine all of this into a single step:</p>
+
+<p><code>
+INSERT IGNORE INTO minute_impression (minute) VALUES (22740922)
+</code></p>
+
+<p>And as before, now we can run as many of these in parallel as we want and let the database take care of the concurrency.</p>
+
+<h2>More tricks</h2>
+
+<h3>REPLACE</h3>
+
+<p>The opposite of INSERT IGNORE. Overwrites matching rows with the new data instead of discarding it.</p>
+
+<h3>Nullable unique indexes</h3>
+
+<p>Values in a unique index have to be unique, but there's an exception: NULLs don't count. For example, let's say you let people pick their username after signup. You might have table like:</p>
+
+<p><code>
+CREATE TABLE user (
+  id int unsigned not null auto_increment,
+  username varchar(32) default null,
+  unique (username),
+  primary key (id)
+);
+</code></p>
+
+<p>You can have as many users as you like who haven't chosen a username (it'll be NULL) while still preventing multiple users from having the same username.</p>
+
+<h3>VALUES() in the ON DUPLICATE KEY UPDATE clause</h3>
+
+<p>You can insert multiple rows in a single INSERT … ON DUPLICATE KEY UPDATE statement, and the UPDATE rule will apply for each row that would've been a duplicate. In some cases you'll want the update statement to reflect the values of each particular row, and that's not possible to do by hardcoding them in the statement.</p>
+
+<p>For example, let's return to the ad impression tracking problem from before, with this hour_impression table:</p>
+
+<p><code>
+CREATE TABLE hour_impression (
+  hour int unsigned not null,  -- number of hours since unix epoch
+  impressions int unsigned not null default 0,
+  primary key(hour)
+);
+</code></p>
+
+<p>But now instead of recording impressions one at a time, we're batching them so that each INSERT increments <code>impressions</code> by a value 1 or higher. If we insert one of these batches at a time, we can do:</p>
+
+<p><code>
+INSERT INTO hour_impression (hour, impressions)
+VALUES (379015, 23)  -- 23 impressions during 12am 3/28/2013
+ON DUPLICATE KEY UPDATE
+impressions = impressions + 23
+</code></p>
+
+<p>If we want to insert multiple rows in the same statement, there's a problem -- the amount in the UPDATE clause is hardcoded. We can fix this using VALUES() to reference the value from the would-have-been-inserted row:</p>
+
+<p><code>
+INSERT INTO hour_impression (hour, impressions)
+VALUES (379015, 23), (379015, 55)
+ON DUPLICATE KEY UPDATE
+impressions = impressions + VALUES(impressions)
+</code></p>
+
+<h2>Conclusion</h2>
+
+<p>Unique indexes are useful when used alone and become incredibly powerful when used in combination with INSERT ... ON DUPLICATE KEY UPDATE and its variants. We make heavy use of this at <a href="https://rollbar.com">Rollbar</a> and it works great.</p>
+
+<p>Questions? Corrections? Let me know in the comments.</p>
+
+<h3>References</h3>
+
+<ol>
+<li><a href="http://dev.mysql.com/doc/refman/5.0/en/insert-on-duplicate.html">INSERT ... ON DUPLICATE KEY UPDATE syntax</a></li>
+<li><a href="http://dev.mysql.com/doc/refman/5.0/en/insert.html">INSERT IGNORE syntax</a> (ctrl+f on the page)</li>
+<li><a href="http://dev.mysql.com/doc/refman/5.0/en/replace.html">REPLACE syntax</a></li>
+</ol>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Using a Request Factory in Pyramid to write a little less code]]></title>

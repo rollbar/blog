@@ -9,8 +9,10 @@ body {
 	background:url(/static/img2/logo.png) no-repeat;
 }
 header {
-	padding:20px 0;
+	padding: 20px 0 0 0;
+  margin-bottom: 10px;
 	border-bottom:1px solid #ebebeb;
+
 }
 header .nav-pills > li > a,
 header .nav-pills > li > a:hover{
