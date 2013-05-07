@@ -4,7 +4,7 @@
   <title><![CDATA[Category: releases | Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
   <link href="http://rollbar.com/blog/blog/categories/releases/atom.xml" rel="self"/>
   <link href="http://rollbar.com/blog/"/>
-  <updated>2013-05-06T21:30:42-07:00</updated>
+  <updated>2013-05-06T21:41:54-07:00</updated>
   <id>http://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
@@ -18,7 +18,7 @@
     <link href="http://rollbar.com/blog/post/2013/05/06/rules-engine-for-notifications-campfire-hipchat-jira-trello/"/>
     <updated>2013-05-06T21:30:00-07:00</updated>
     <id>http://rollbar.com/blog/post/2013/05/06/rules-engine-for-notifications-campfire-hipchat-jira-trello</id>
-    <content type="html"><![CDATA[<p>Tonight we're revamping the model for defining what you want to be notified about from Rollbar. Rollbar now integrates with Asana, Campfire, Github Issues, Hipchat, JIRA, Pivotal Tracker, and Trello, as well as any arbitrary system via our Webhook.</p>
+    <content type="html"><![CDATA[<p>Today we're revamping the model for defining what you want to be notified about from <a href="https://rollbar.com">Rollbar</a>. Rollbar now integrates with <a href="http://asana.com">Asana</a>, <a href="http://campfirenow.com/">Campfire</a>, <a href="https://github.com/features/projects/issues">Github Issues</a>, <a href="http://hipchat.com">Hipchat</a>, <a href="http://jira.com">JIRA</a>, <a href="http://pivotaltracker.com">Pivotal Tracker</a>, and <a href="http://trello.com">Trello</a>, as well as any arbitrary system via a <a href="http://www.webhooks.org/">Webhook</a>.</p>
 
 <h2>New Integration Channels</h2>
 
@@ -46,7 +46,7 @@
 
 <h2>Migration for existing customers</h2>
 
-<p>We've migrated existing customers' settings to the new system, but there were a few aspects that didn't map very well (i.e. per-user-per-project settings). We hope the new system will work better more most use-cases, but let us know if there's something you are having trouble setting up.</p>
+<p>We've migrated existing customers' settings to the new system, but there were a few aspects that didn't map very well (i.e. per-user-per-project settings). We hope the new system is easier to use for most use-cases and still workable for complex setups, but let us know if there's something you are having trouble doing.</p>
 
 <h2>Questions? Feedback?</h2>
 
