@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: annoucements | Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
+  <link href="http://rollbar.com/blog/blog/categories/annoucements/atom.xml" rel="self"/>
+  <link href="http://rollbar.com/blog/"/>
+  <updated>2013-05-06T21:14:58-07:00</updated>
+  <id>http://rollbar.com/blog/</id>
+  <author>
+    <name><![CDATA[Rollbar, Inc.]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Rules Engine for Notifications, Plus Integrations with Campfire, Hipchat, JIRA, and Trello]]></title>
+    <link href="http://rollbar.com/blog/post/2013/05/06/rules-engine-for-notifications-campfire-hipchat-jira-trello/"/>
+    <updated>2013-05-06T21:30:00-07:00</updated>
+    <id>http://rollbar.com/blog/post/2013/05/06/rules-engine-for-notifications-campfire-hipchat-jira-trello</id>
+    <content type="html"><![CDATA[<p>Tonight we're revamping the model for defining what you want to be notified about from Rollbar. Rollbar now integrates with Asana, Campfire, Github Issues, Hipchat, JIRA, Pivotal Tracker, and Trello, as well as any arbitrary system via our Webhook.</p>
+
+<h2>New Integration Channels</h2>
+
+<p>In addition to our existing channels (Email, Asana, Github Issues, Pivotal Tracker, and Webhook), we're launching support for four more: Campfire, Hipchat, JIRA, and Trello. You can set up all of this in Settings -> Notifications.</p>
+
+<h2>Notification Rules Engine</h2>
+
+<p>Notifications are now configured per-project (instead of per-user-per-project), using a trigger-action model. There are triggers for the following events:</p>
+
+<ul>
+<li>New Item (first occurrence of a new issue)</li>
+<li>Reactivated Item (a previously resolved issue has occurred again)</li>
+<li>10<sup>nth</sup> Occurrence (an issue has occurred for the 10th, 100th, etc. time)</li>
+<li>Resolved Item (an item has been resolved by hand)</li>
+<li>Reopened Item (an item has been reopened by hand)</li>
+<li>Post-deploy (you've notified us that you deployed a new release)</li>
+</ul>
+
+
+<p>Corresponding actions are available for most actions in most channels. If it would make sense, it probably exists.</p>
+
+<p>Most actions can be configured as you'd expect (i.e. set which teams should receive an email, or which user to assign JIRA issues to).</p>
+
+<p>Item-related triggers can be filtered by environment, level, title (exception class+message), and filename. Deploy triggers can be filtered by environment and comment. Our underlying tech supports much more than the UI exposes, so let us know what other filters you'd like to see.</p>
+
+<h2>Migration for existing customers</h2>
+
+<p>We've migrated existing customers' settings to the new system, but there were a few aspects that didn't map very well (i.e. per-user-per-project settings). We hope the new system will work better more most use-cases, but let us know if there's something you are having trouble setting up.</p>
+
+<h2>Questions? Feedback?</h2>
+
+<p>Let us know if you have any questions about how to get the notifications you want. We look forward to your feedback. What other integrations do you want? Let us know in the comments.</p>
+]]></content>
+  </entry>
+  
+</feed>
