@@ -4,7 +4,7 @@
   <title><![CDATA[Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
   <link href="http://rollbar.com/blog/atom.xml" rel="self"/>
   <link href="http://rollbar.com/blog/"/>
-  <updated>2013-05-06T21:41:54-07:00</updated>
+  <updated>2013-05-06T22:12:23-07:00</updated>
   <id>http://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
@@ -24,6 +24,8 @@
 
 <p>In addition to our existing channels (Email, Asana, Github Issues, Pivotal Tracker, and Webhook), we&#8217;re launching support for four more: Campfire, Hipchat, JIRA, and Trello. You can set up all of this in Settings -> Notifications.</p>
 
+<p><img src="https://d2tf6sbdgil6xr.cloudfront.net/static/img/blog/integration-channels.png"></p>
+
 <h2>Notification Rules Engine</h2>
 
 <p>Notifications are now configured per-project (instead of per-user-per-project), using a trigger-action model. There are triggers for the following events:</p>
@@ -40,6 +42,8 @@
 
 <p>Corresponding actions are available for most actions in most channels. If it would make sense, it probably exists.</p>
 
+<p><img src="https://d2tf6sbdgil6xr.cloudfront.net/static/img/blog/rules-engine.png"></p>
+
 <p>Most actions can be configured as you&#8217;d expect (i.e. set which teams should receive an email, or which user to assign JIRA issues to).</p>
 
 <p>Item-related triggers can be filtered by environment, level, title (exception class+message), and filename. Deploy triggers can be filtered by environment and comment. Our underlying tech supports much more than the UI exposes, so let us know what other filters you&#8217;d like to see.</p>
@@ -50,7 +54,7 @@
 
 <h2>Questions? Feedback?</h2>
 
-<p>Let us know if you have any questions about how to get the notifications you want. We look forward to your feedback. What other integrations do you want? Let us know in the comments.</p>
+<p>Let us know if you have any questions about how to get the notifications you want. We look forward to your feedback. What other integrations do you want? Let us know in the comments, or email us at <a href="mailto:team@rollbar.com">team@rollbar.com</a>.</p>
 ]]></content>
   </entry>
   
