@@ -3,7 +3,7 @@ layout: post
 title: "Rules Engine for Notifications, Plus Integrations with Campfire, Hipchat, JIRA, and Trello"
 date: 2013-05-06 21:30
 comments: true
-categories: annoucements
+categories: releases
 ---
 
 Tonight we're revamping the model for defining what you want to be notified about from Rollbar. Rollbar now integrates with Asana, Campfire, Github Issues, Hipchat, JIRA, Pivotal Tracker, and Trello, as well as any arbitrary system via our Webhook.
