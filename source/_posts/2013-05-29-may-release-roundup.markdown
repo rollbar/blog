@@ -22,7 +22,7 @@ We revamped our notifications system, and added integrations with a bunch of new
   
   <img src="https://d2tf6sbdgil6xr.cloudfront.net/static/img/blog/download-csv.png">
 
-- You can now sort the Item page by Total Occurrences or Unique Users, in additon to Last Occurrence. Click on the column headers to change the sort.
+- You can now sort the Items page by Total Occurrences or Unique Users, in additon to Last Occurrence. Click on the column headers to change the sort.
   
   <img src="https://d2tf6sbdgil6xr.cloudfront.net/static/img/blog/item-list-sort.png">
 
