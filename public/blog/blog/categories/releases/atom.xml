@@ -4,7 +4,7 @@
   <title><![CDATA[Category: releases | Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
   <link href="http://rollbar.com/blog/blog/categories/releases/atom.xml" rel="self"/>
   <link href="http://rollbar.com/blog/"/>
-  <updated>2013-05-29T15:37:05-07:00</updated>
+  <updated>2013-07-02T18:06:01-07:00</updated>
   <id>http://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
@@ -30,10 +30,10 @@
 <li><p>You can now customize how occurrences are grouped. This first release allows you to define rules of things that should always be grouped together. See the documentation: <a href="https://rollbar.com/docs/guides_custom_grouping/">Custom Grouping Rules</a>. An in-depth post on how to use this is coming soon.</p></li>
 <li><p>There's now a "Download CSV" link at the bottom of the Items page, which will let you download a CSV of what you see on the page. Note that this information is also available via our <a href="https://rollbar.com/docs/test_console/">API</a>.</p>
 
-<p><img src="https://d2tf6sbdgil6xr.cloudfront.net/static/img/blog/download-csv.png"></p></li>
+<p><img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/download-csv.png"></p></li>
 <li><p>You can now sort the Items page by Total Occurrences or Unique Users, in additon to Last Occurrence. Click on the column headers to change the sort.</p>
 
-<p><img src="https://d2tf6sbdgil6xr.cloudfront.net/static/img/blog/item-list-sort.png"></p></li>
+<p><img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/item-list-sort.png"></p></li>
 <li><p>Links to files in Github are now linked to the appropriate revision, when this information is available. We'll use one of the following (trying each in order):</p>
 
 <ul>
@@ -92,7 +92,7 @@ gem 'rollbar', '~&gt; 0.9.14'
 
 <p>In addition to our existing channels (Email, Asana, Github Issues, Pivotal Tracker, and Webhook), we're launching support for four more: Campfire, Hipchat, JIRA, and Trello. You can set up all of this in Settings -> Notifications.</p>
 
-<p><img src="https://d2tf6sbdgil6xr.cloudfront.net/static/img/blog/integration-channels.png"></p>
+<p><img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/integration-channels.png"></p>
 
 <h2>Notification Rules Engine</h2>
 
@@ -110,7 +110,7 @@ gem 'rollbar', '~&gt; 0.9.14'
 
 <p>Corresponding actions are available for most actions in most channels. If it would make sense, it probably exists.</p>
 
-<p><img src="https://d2tf6sbdgil6xr.cloudfront.net/static/img/blog/rules-engine.png"></p>
+<p><img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/rules-engine.png"></p>
 
 <p>Most actions can be configured as you'd expect (i.e. set which teams should receive an email, or which user to assign JIRA issues to).</p>
 
@@ -133,7 +133,7 @@ gem 'rollbar', '~&gt; 0.9.14'
     <id>http://rollbar.com/blog/post/2012/10/24/real-time-search-for-exceptions-and-errors</id>
     <content type="html"><![CDATA[<p>We're happy today to announce the release of real-time search. You can now search your exceptions, errors, and log messages by title:</p>
 
-<p><img src="https://d2tf6sbdgil6xr.cloudfront.net/static/img/blog/realtimesearch1.png"></p>
+<p><img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/realtimesearch1.png"></p>
 
 <p>For exceptions, the title contains the exception class and message. For errors and log messages, it contains the entire message. It’s a full-text search that works best on whole words; we also do a few tricks with camelCase and underscore_separated terms.</p>
 
