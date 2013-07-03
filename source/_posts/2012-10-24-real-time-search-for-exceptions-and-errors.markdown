@@ -10,7 +10,7 @@ categories: releases
 
 We're happy today to announce the release of real-time search. You can now search your exceptions, errors, and log messages by title:
 
-<img src="https://d2tf6sbdgil6xr.cloudfront.net/static/img/blog/realtimesearch1.png">
+<img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/realtimesearch1.png">
 
 For exceptions, the title contains the exception class and message. For errors and log messages, it contains the entire message. It’s a full-text search that works best on whole words; we also do a few tricks with camelCase and underscore\_separated terms.
 

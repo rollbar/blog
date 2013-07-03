@@ -14,7 +14,7 @@ Today we're revamping the model for defining what you want to be notified about 
 
 In addition to our existing channels (Email, Asana, Github Issues, Pivotal Tracker, and Webhook), we're launching support for four more: Campfire, Hipchat, JIRA, and Trello. You can set up all of this in Settings -> Notifications.
 
-<img src="https://d2tf6sbdgil6xr.cloudfront.net/static/img/blog/integration-channels.png">
+<img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/integration-channels.png">
 
 ## Notification Rules Engine
 
@@ -29,7 +29,7 @@ Notifications are now configured per-project (instead of per-user-per-project), 
 
 Corresponding actions are available for most actions in most channels. If it would make sense, it probably exists.
 
-<img src="https://d2tf6sbdgil6xr.cloudfront.net/static/img/blog/rules-engine.png">
+<img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/rules-engine.png">
 
 Most actions can be configured as you'd expect (i.e. set which teams should receive an email, or which user to assign JIRA issues to).
 

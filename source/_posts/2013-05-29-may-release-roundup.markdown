@@ -20,11 +20,11 @@ We revamped our notifications system, and added integrations with a bunch of new
 
 - There's now a "Download CSV" link at the bottom of the Items page, which will let you download a CSV of what you see on the page. Note that this information is also available via our [API](https://rollbar.com/docs/test_console/).
   
-  <img src="https://d2tf6sbdgil6xr.cloudfront.net/static/img/blog/download-csv.png">
+  <img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/download-csv.png">
 
 - You can now sort the Items page by Total Occurrences or Unique Users, in additon to Last Occurrence. Click on the column headers to change the sort.
   
-  <img src="https://d2tf6sbdgil6xr.cloudfront.net/static/img/blog/item-list-sort.png">
+  <img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/item-list-sort.png">
 
 - Links to files in Github are now linked to the appropriate revision, when this information is available. We'll use one of the following (trying each in order):
 

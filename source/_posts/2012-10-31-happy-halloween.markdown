@@ -8,7 +8,7 @@ categories: [Fun]
 ---
 
 # Y U No Use Rollbar?
-<img src="https://d2tf6sbdgil6xr.cloudfront.net/static/img/blog/halloween-2012.jpg">
+<img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/halloween-2012.jpg">
 
 -- Happy Halloween from [Rollbar.com](http://rollbar.com/)!
 

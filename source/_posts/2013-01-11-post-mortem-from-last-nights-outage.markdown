@@ -18,7 +18,7 @@ What follows is a timeline of events, and a summary of what went wrong, what wen
 
 First some background: our infrastructure is currently hosted at Softlayer and layed out like this (simplified):
 
-<img src="https://d2tf6sbdgil6xr.cloudfront.net/static/img/blog/infrastructurediagram.png">
+<img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/infrastructurediagram.png">
 
 That is:
 
