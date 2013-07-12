@@ -8,13 +8,13 @@ authorlink: https://plus.google.com/u/1/103254942254370049907/posts
 categories: api testing javascript nodejs articles
 ---
 
-Testing is super important. I'm not going to try and work that idea into your head anymore than that. If you don't want to test, this probably won't be very helpful/interesting. If you want to learn how to test your API server, read on.
+This post is about how we built our test suite for our API server at [Rollbar](http://rollbar.com/) and some of the tricks and gotchas we ran into along the way. We wanted to build a test suite that not only tested the API logic, but also the underlying code, namely the [Express](http://expressjs.com/) and the [Connect](http://www.senchalabs.org/connect/) middlewares we use. If our API server was going to break, we wanted to know before we deployed it to thousands of customers and millions of requests per day.
 
-This blog post is about how we built our test suite for our API server at [Rollbar](http://rollbar.com/) and some of the tricks and gotchas we ran into along the way. I'll try not to write too much and provide code wherever possible.
+Testing is super important. I'm not going to try and work that idea into your head anymore than that. If you don't want to test, this probably won't be very helpful/interesting. If you want to learn how to test your API server, read on.
 
 ## We use Vows. Why not Mocha?
 
-[Mocha](http://visionmedia.github.io/mocha/) is by far the most widely used testing framework for Node.js apps. So, why didn't we use it? The two main reasons were that Vows was the first thing I found when Googling "nodejs async testing" and the other is that I didn't like the syntax of the Mocha tests.
+[Mocha](http://visionmedia.github.io/mocha/) is, by far, the most widely used testing framework for Node.js apps. So, why didn't we use it? The two main reasons were that Vows was the first thing I found when Googling "nodejs async testing" and the other is that I didn't like the syntax of the Mocha tests.
 
 ``` javascript
 //Mocha
@@ -30,7 +30,7 @@ assert.equal([1,2,3].indexOf(5), -1);
 
 There's something that bothered me about the former. I didn't like how the library used a bunch of magic to enable something this small/strange.
 
-Mocha has a lot of awesome features but none that are important enough for me to switch.
+Mocha has a lot of awesome features but none that were important enough for me to switch.
 
 ## A simple Vows test
 

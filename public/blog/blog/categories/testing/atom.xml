@@ -4,7 +4,7 @@
   <title><![CDATA[Category: testing | Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
   <link href="http://rollbar.com/blog/blog/categories/testing/atom.xml" rel="self"/>
   <link href="http://rollbar.com/blog/"/>
-  <updated>2013-07-12T14:04:30-07:00</updated>
+  <updated>2013-07-12T16:31:06-07:00</updated>
   <id>http://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
@@ -18,13 +18,13 @@
     <link href="http://rollbar.com/blog/post/2013/07/12/Async-nodejs-API-server-testing/"/>
     <updated>2013-07-12T01:20:00-07:00</updated>
     <id>http://rollbar.com/blog/post/2013/07/12/Async-nodejs-API-server-testing</id>
-    <content type="html"><![CDATA[<p>Testing is super important. I'm not going to try and work that idea into your head anymore than that. If you don't want to test, this probably won't be very helpful/interesting. If you want to learn how to test your API server, read on.</p>
+    <content type="html"><![CDATA[<p>This post is about how we built our test suite for our API server at <a href="http://rollbar.com/">Rollbar</a> and some of the tricks and gotchas we ran into along the way. We wanted to build a test suite that not only tested the API logic, but also the underlying code, namely the <a href="http://expressjs.com/">Express</a> and the <a href="http://www.senchalabs.org/connect/">Connect</a> middlewares we use. If our API server was going to break, we wanted to know before we deployed it to thousands of customers and millions of requests per day.</p>
 
-<p>This blog post is about how we built our test suite for our API server at <a href="http://rollbar.com/">Rollbar</a> and some of the tricks and gotchas we ran into along the way. I'll try not to write too much and provide code wherever possible.</p>
+<p>Testing is super important. I'm not going to try and work that idea into your head anymore than that. If you don't want to test, this probably won't be very helpful/interesting. If you want to learn how to test your API server, read on.</p>
 
 <h2>We use Vows. Why not Mocha?</h2>
 
-<p><a href="http://visionmedia.github.io/mocha/">Mocha</a> is by far the most widely used testing framework for Node.js apps. So, why didn't we use it? The two main reasons were that Vows was the first thing I found when Googling "nodejs async testing" and the other is that I didn't like the syntax of the Mocha tests.</p>
+<p><a href="http://visionmedia.github.io/mocha/">Mocha</a> is, by far, the most widely used testing framework for Node.js apps. So, why didn't we use it? The two main reasons were that Vows was the first thing I found when Googling "nodejs async testing" and the other is that I didn't like the syntax of the Mocha tests.</p>
 
 <p><code>javascript
 //Mocha
@@ -40,7 +40,7 @@ assert.equal([1,2,3].indexOf(5), -1);
 
 <p>There's something that bothered me about the former. I didn't like how the library used a bunch of magic to enable something this small/strange.</p>
 
-<p>Mocha has a lot of awesome features but none that are important enough for me to switch.</p>
+<p>Mocha has a lot of awesome features but none that were important enough for me to switch.</p>
 
 <h2>A simple Vows test</h2>
 
