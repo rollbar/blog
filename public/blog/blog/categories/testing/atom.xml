@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: testing | Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
+  <link href="http://rollbar.com/blog/blog/categories/testing/atom.xml" rel="self"/>
+  <link href="http://rollbar.com/blog/"/>
+  <updated>2013-07-12T14:04:30-07:00</updated>
+  <id>http://rollbar.com/blog/</id>
+  <author>
+    <name><![CDATA[Rollbar, Inc.]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Async node.js API server testing]]></title>
+    <link href="http://rollbar.com/blog/post/2013/07/12/Async-nodejs-API-server-testing/"/>
+    <updated>2013-07-12T01:20:00-07:00</updated>
+    <id>http://rollbar.com/blog/post/2013/07/12/Async-nodejs-API-server-testing</id>
+    <content type="html"><![CDATA[<p>Testing is super important. I'm not going to try and work that idea into your head anymore than that. If you don't want to test, this probably won't be very helpful/interesting. If you want to learn how to test your API server, read on.</p>
+
+<p>This blog post is about how we built our test suite for our API server at <a href="http://rollbar.com/">Rollbar</a> and some of the tricks and gotchas we ran into along the way. I'll try not to write too much and provide code wherever possible.</p>
+
+<h2>We use Vows. Why not Mocha?</h2>
+
+<p><a href="http://visionmedia.github.io/mocha/">Mocha</a> is by far the most widely used testing framework for Node.js apps. So, why didn't we use it? The two main reasons were that Vows was the first thing I found when Googling "nodejs async testing" and the other is that I didn't like the syntax of the Mocha tests.</p>
+
+<p><code>javascript
+//Mocha
+[1,2,3].indexOf(5).should.equal(-1);
+</code></p>
+
+<p>vs</p>
+
+<p><code>javascript
+//Vows
+assert.equal([1,2,3].indexOf(5), -1);
+</code></p>
+
+<p>There's something that bothered me about the former. I didn't like how the library used a bunch of magic to enable something this small/strange.</p>
+
+<p>Mocha has a lot of awesome features but none that are important enough for me to switch.</p>
+
+<h2>A simple Vows test</h2>
+
+<p>Vows works just as you'd expect it to, except when it doesn't. More on that later...</p>
+
+<p>``` javascript
+var vows = require('vows');
+var assert = require('assert');
+vows.describe('testmodule').addBatch({
+  "call username() with a valid user id": {</p>
+
+<pre><code>topic: function() {
+  var callback = this.callback;
+  return username(42, this.callback);
+},
+"and verify username is correct": function(err, username) {
+  assert.isNull(err);
+  assert.isString(username);
+  assert.equal(username, "cory");
+}
+</code></pre>
+
+<p>  }
+}).export(module, {error: false});
+```</p>
+
+<p>The above test will make sure that the function <code>username()</code> calls its callback with <code>(null, "cory")</code>.</p>
+
+<p>Note that we use this.callback since everything is assumed to be async and we use <code>{error: false}</code> when we export the batch. More on those later.</p>
+
+<p>Check out the Vows <a href="http://vowsjs.org/">website</a> for better examples.</p>
+
+<h2>Useful design patterns, (I swear this will be short)</h2>
+
+<p>I won't talk much about architecture or design patterns but we've found a few useful idioms that we follow pretty strictly. Doing so has made writing tests super-easy... almost enjoyable, almost.</p>
+
+<h3>Separate your view logic from your API business logic</h3>
+
+<p>Your server's views should have one job, to marshall data from the request/socket/carrier pigeon and provide it to your API library.</p>
+
+<p>Any error checking done in your views should be to make sure the types provided to your API library are correct.</p>
+
+<h3>Make every function you write use a callback.</h3>
+
+<p>This is super-important for refactoring and adding new features. If you find yourself wanting to add a feature that requires i/o into a code path that was assumed to be completely synchonous, you'll need to refactor the hell our of your code to make it work. Don't bother. Make everything take a callback. Embrace async!</p>
+
+<h3>Make the first argument to <em>every</em> callback be an optional error.</h3>
+
+<p>This is how the Node.js developers do it and I agree. It makes for a lot more boiler-plate code but it forces you to keep error handling in-mind when developing. Writing defensive code is more important than writing fewer lines of code.</p>
+
+<p>This will also make testing much, much easier with Vows. How? Read on...</p>
+
+<h2>Testing the API server, for reals</h2>
+
+<p>Don't just test your API library; that's kind of lame. Fork a process, start your API server up in it and start firing requests at it using Vows.</p>
+
+<p>testcommon.js:</p>
+
+<p>``` javascript
+exports.initTestingAppChildProc = function(config, promise) {
+  // ... Setup temporary config file
+  // ... Get path to your main app.js
+  // ... Initialize the api library</p>
+
+<p>  // fork a child process to start the api server
+  var args = [configPath, 'test'];
+  var appProc = fork(appJsPath, args);</p>
+
+<p>  // This is used to tell if our API server died during its
+  // initialization.
+  var pendingCallback = true;</p>
+
+<p>  appProc.on('message', function(message) {</p>
+
+<pre><code>if (message == 'ready') {
+  pendingCallback = false;
+
+  // This is how we know our API server is ready to 
+  // receive requests. The message is emitted in the
+  // API server once it's ready to receive requests.
+  promise.emit('success', null, appProc);
+}
+</code></pre>
+
+<p>  });
+  appProc.on('exit', function(code, signal) {</p>
+
+<pre><code>if (pendingCallback) {
+  var msg = 'child process exited before callback';
+  console.error(msg);
+  promise.emit('error', new Error(msg));
+}
+</code></pre>
+
+<p>  });
+  appProc.on('SIGTERM', function() {</p>
+
+<pre><code>process.exit();
+</code></pre>
+
+<p>  });
+};
+```</p>
+
+<p>In our API server:</p>
+
+<p>``` javascript
+// initialize the API and start the web server when it's ready
+api.init(config, function(err) {
+  if (err) {</p>
+
+<pre><code>log.error('Could not initialize API: ' + err);
+process.exit(1);
+</code></pre>
+
+<p>  } else {</p>
+
+<pre><code>// Start up the server
+var httpServer = app.listen(port, host, function() {
+  log.info('API server is ready.');
+  log.info('Listening on ' + host + ':' + port);
+
+  // Use the "ready" message to signal that the server is ready.
+  // This is used by the test suite to wait for the api server
+  // process to start up before sending requests.
+  if (process.send) {
+    process.send('ready');
+  }
+});
+</code></pre>
+
+<p>  }
+});
+```</p>
+
+<p>tests/routes.project.js:</p>
+
+<p>``` javascript
+vows.describe('routes.project').addBatch({
+  // Provides a reference to the api server child process
+  'Start up an API server': {</p>
+
+<pre><code>topic: function() {
+  var promise = new events.EventEmitter();
+  common.initTestingAppChildProc(config, promise);
+  return promise;
+},
+teardown: function(err, childProc) {
+  var callback = this.callback;
+  var shutdown = function() {
+    api.shutdown(callback);
+  };
+  if (childProc) {
+    childProc.on('exit', function(code, sig) {
+      shutdown();
+    });
+    childProc.kill();
+  } else {
+    shutdown();
+  }
+},
+'and get a valid project': {
+  topic: function(err, childProc) {
+    common.apiGet(url('api/1/project/',
+        {access_token: config.test.validEnabledReadAccessToken}), this.callback);
+  },
+  'returns 200 OK': common.assertStatus(200),
+  'returns JSON': common.assertJsonContentType(),
+  'fast local response time': common.assertMaxResponseTime(20),
+  "returns a valid api response": common.assertValidApiResponse(),
+  "has a result key in the JSON response": common.assertJsonHasFields(['result']),
+  "there's no api error": common.assertNoApiError(),
+  'all of the deploy fields are available': common.assertJsonHasFields(db.projectFields(),
+      'result'),
+  'cross-check account id with api.getAccount': {
+    topic: function(err, resp, body) {
+      var project = body.result;
+      api.getAccount(body.result.account_id, this.callback);
+    },
+    'verify the account is not null': function(err, account) {
+      assert.isNull(err);      
+      assert.isObject(account);         
+    }       
+  }
+}
+</code></pre>
+
+<p>}).export(module, {error: false});
+```</p>
+
+<p>There is a lot happening in these tests.</p>
+
+<ul>
+<li>We use promises to notify our test when the API server is ready.
+
+<ul>
+<li>Documentation for using promises with Vows can be found <a href="http://vowsjs.org/#-writing-asynchronous-tests">here</a>.</li>
+</ul>
+</li>
+<li>We use a Vows teardown function to shut down the API server process.</li>
+<li>We use our API library to help test our API server.
+
+<ul>
+<li>We cross-check our API server's response by using our API library directly.</li>
+</ul>
+</li>
+<li>We use Vows macros for reusable tests on all API requests.
+
+<ul>
+<li>We also make use of Vows contexts even though there are none in this example.</li>
+<li>Documentation for macros and contexts are <a href="http://vowsjs.org/#-macros">here</a>.</li>
+</ul>
+</li>
+</ul>
+
+
+<h2>Gotchas</h2>
+
+<p>Never, ever, ever throw an uncaught exception in a Vows topic. It makes debugging impossible. I've wasted hours looking through my API library for a bug only to find that I had a silly bug in my topic.</p>
+
+<p>Always use <code>export(module, {error: false})</code> in your Vows batches. This option is not really described in the Vows docs. I had to find it in the source. Basically, if you don't have this, Vows will inspect the first argument to each test to see if it's an error. Vows will potentially call your test functions with a different set of arguments depending on if the first parameter to the topic's callback is an Error or not. It's completely strange and magical and <a href="https://github.com/cloudhead/vows/pull/263">confusing</a>.</p>
+
+<p>Testing without mock objects means that you need a real database which means you probably need real-ish data to test with. This is tough. We chose to maintain a DB SQL fixture that we have to update whenever the schema changes. It's a bit clunky but it works. I'm open to suggestions for this if anyone knows of a better way.</p>
+
+<h2>Wrapping up...</h2>
+
+<p>I didn't really go over our testing process much, (maybe in a subsequent blog post) but we use <a href="http://circleci.com">CircleCI</a> to run all of these tests. It's fast and easy to set up. Also, it has all of the systems that our API server uses like MySQL, Beanstalkd and Memcache pre-installed. This gets us closer to testing in a production environment than we would otherwise be able to get.</p>
+
+<p>Hopefully you were able to glean some useful tips from our experience at <a href="http://rollbar.com/">Rollbar</a>. We love building tools for devs like you!</p>
+
+<p>Add me on Twitter <a href="https://twitter.com/coryvirok">@coryvirok</a>.
+Follow <a href="https://twitter.com/rollbar">@rollbar</a> for more updates.</p>
+
+<h2>Moment of zen</h2>
+
+<p><code>
+✓ OK » 497 honored (33.232s)
+</code></p>
+]]></content>
+  </entry>
+  
+</feed>

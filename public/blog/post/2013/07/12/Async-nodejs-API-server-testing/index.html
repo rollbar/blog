@@ -1,0 +1,728 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Async node.js API server testing - Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash</title>
+  <meta name="author" content="Rollbar, Inc.">
+
+  
+  <meta name="description" content="Async node.js API server testing Jul 12th, 2013 Testing is super important. I&#8217;m not going to try and work that idea into your head anymore &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  
+  <link rel="canonical" href="http://rollbar.com/blog/post/2013/07/12/Async-nodejs-API-server-testing/">
+  
+  
+  <link rel="author" href="https://plus.google.com/u/1/103254942254370049907/posts"/>
+  
+  <link rel="publisher" href="https://plus.google.com/u/1/b/117853246165185436076/117853246165185436076/posts"/>
+  
+  <link href="/static/img/favicon.ico" rel="icon" type="image/png">
+  <link href="/blog/stylesheets/bootstrap.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/blog/stylesheets/custom.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/blog/stylesheets/stylesheet.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/blog/stylesheets/blog.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/blog/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/blog/javascripts/modernizr-2.0.js"></script>
+  <script src="/blog/javascripts/ender.js"></script>
+  <script src="/blog/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/blog/atom.xml" rel="alternate" title="Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash" type="application/atom+xml">
+  <script type="text/javascript">
+    (function(c,a){window.mixpanel=a;var b,d,h,e;b=c.createElement("script");
+    b.type="text/javascript";b.async=!0;b.src=("https:"===c.location.protocol?"https:":"http:")+
+    '//cdn.mxpnl.com/libs/mixpanel-2.0.min.js';d=c.getElementsByTagName("script")[0];
+    d.parentNode.insertBefore(b,d);a._i=[];a.init=function(b,c,f){function d(a,b){
+    var c=b.split(".");2==c.length&&(a=a[c[0]],b=c[1]);a[b]=function(){a.push([b].concat(
+    Array.prototype.slice.call(arguments,0)))}}var g=a;"undefined"!==typeof f?g=a[f]=[]:
+    f="mixpanel";g.people=g.people||[];h=['disable','track','track_pageview','track_links',
+    'track_forms','register','register_once','unregister','identify','name_tag',
+    'set_config','people.set','people.increment'];for(e=0;e<h.length;e++)d(g,h[e]);
+    a._i.push([b,c,f])};a.__SV=1.1;})(document,window.mixpanel||[]);
+    mixpanel.init("00a701b73e44aa932686f370607c338e");
+</script>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-38870420-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+
+</head>
+
+<body   >
+    <div class="container-fluid">
+  <header class="row-fluid">
+    <div class="container">
+      <div class="span3">
+        <h1><a href="/" class="logo"></a></h1>
+      </div>
+      <div class="span9">
+        <ul class="nav nav-pills pull-right">
+          <li><a href="/features/">Features</a></li>
+          <li><a href="/pricing">Pricing</a></li>
+          <li><a href="/docs/">Docs</a></li>
+          <li><span><a href="/login/" class="btn">Log In</a></span></li>
+          <li><span><a href="/signup/" class="btn btn-primary">Free Trial</a></span></li>
+        </ul>
+      </div>
+    </div>
+  </header>
+</div>
+
+
+    
+    
+    <div id="main-stage" class="container">
+      <div id="content">
+        <div class="blog-post">
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Async node.js API server testing</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-07-12T01:20:00-07:00" pubdate data-updated="true">Jul 12<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Testing is super important. I&#8217;m not going to try and work that idea into your head anymore than that. If you don&#8217;t want to test, this probably won&#8217;t be very helpful/interesting. If you want to learn how to test your API server, read on.</p>
+
+<p>This blog post is about how we built our test suite for our API server at <a href="http://rollbar.com/">Rollbar</a> and some of the tricks and gotchas we ran into along the way. I&#8217;ll try not to write too much and provide code wherever possible.</p>
+
+<h2>We use Vows. Why not Mocha?</h2>
+
+<p><a href="http://visionmedia.github.io/mocha/">Mocha</a> is by far the most widely used testing framework for Node.js apps. So, why didn&#8217;t we use it? The two main reasons were that Vows was the first thing I found when Googling &#8220;nodejs async testing&#8221; and the other is that I didn&#8217;t like the syntax of the Mocha tests.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">//Mocha</span>
+</span><span class='line'><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">].</span><span class="nx">indexOf</span><span class="p">(</span><span class="mi">5</span><span class="p">).</span><span class="nx">should</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>vs</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">//Vows</span>
+</span><span class='line'><span class="nx">assert</span><span class="p">.</span><span class="nx">equal</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">].</span><span class="nx">indexOf</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>There&#8217;s something that bothered me about the former. I didn&#8217;t like how the library used a bunch of magic to enable something this small/strange.</p>
+
+<p>Mocha has a lot of awesome features but none that are important enough for me to switch.</p>
+
+<h2>A simple Vows test</h2>
+
+<p>Vows works just as you&#8217;d expect it to, except when it doesn&#8217;t. More on that later&#8230;</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">vows</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;vows&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">assert</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;assert&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="nx">vows</span><span class="p">.</span><span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;testmodule&#39;</span><span class="p">).</span><span class="nx">addBatch</span><span class="p">({</span>
+</span><span class='line'>  <span class="s2">&quot;call username() with a valid user id&quot;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">topic</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="kd">var</span> <span class="nx">callback</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">callback</span><span class="p">;</span>
+</span><span class='line'>      <span class="k">return</span> <span class="nx">username</span><span class="p">(</span><span class="mi">42</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">callback</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="s2">&quot;and verify username is correct&quot;</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">username</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">assert</span><span class="p">.</span><span class="nx">isNull</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
+</span><span class='line'>      <span class="nx">assert</span><span class="p">.</span><span class="nx">isString</span><span class="p">(</span><span class="nx">username</span><span class="p">);</span>
+</span><span class='line'>      <span class="nx">assert</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="s2">&quot;cory&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}).</span><span class="kr">export</span><span class="p">(</span><span class="nx">module</span><span class="p">,</span> <span class="p">{</span><span class="nx">error</span><span class="o">:</span> <span class="kc">false</span><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The above test will make sure that the function <code>username()</code> calls its callback with <code>(null, "cory")</code>.</p>
+
+<p>Note that we use this.callback since everything is assumed to be async and we use <code>{error: false}</code> when we export the batch. More on those later.</p>
+
+<p>Check out the Vows <a href="http://vowsjs.org/">website</a> for better examples.</p>
+
+<h2>Useful design patterns, (I swear this will be short)</h2>
+
+<p>I won&#8217;t talk much about architecture or design patterns but we&#8217;ve found a few useful idioms that we follow pretty strictly. Doing so has made writing tests super-easy&#8230; almost enjoyable, almost.</p>
+
+<h3>Separate your view logic from your API business logic</h3>
+
+<p>Your server&#8217;s views should have one job, to marshall data from the request/socket/carrier pigeon and provide it to your API library.</p>
+
+<p>Any error checking done in your views should be to make sure the types provided to your API library are correct.</p>
+
+<h3>Make every function you write use a callback.</h3>
+
+<p>This is super-important for refactoring and adding new features. If you find yourself wanting to add a feature that requires i/o into a code path that was assumed to be completely synchonous, you&#8217;ll need to refactor the hell our of your code to make it work. Don&#8217;t bother. Make everything take a callback. Embrace async!</p>
+
+<h3>Make the first argument to <em>every</em> callback be an optional error.</h3>
+
+<p>This is how the Node.js developers do it and I agree. It makes for a lot more boiler-plate code but it forces you to keep error handling in-mind when developing. Writing defensive code is more important than writing fewer lines of code.</p>
+
+<p>This will also make testing much, much easier with Vows. How? Read on&#8230;</p>
+
+<h2>Testing the API server, for reals</h2>
+
+<p>Don&#8217;t just test your API library; that&#8217;s kind of lame. Fork a process, start your API server up in it and start firing requests at it using Vows.</p>
+
+<p>testcommon.js:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">exports</span><span class="p">.</span><span class="nx">initTestingAppChildProc</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">config</span><span class="p">,</span> <span class="nx">promise</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="c1">// ... Setup temporary config file</span>
+</span><span class='line'>  <span class="c1">// ... Get path to your main app.js</span>
+</span><span class='line'>  <span class="c1">// ... Initialize the api library</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// fork a child process to start the api server</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">args</span> <span class="o">=</span> <span class="p">[</span><span class="nx">configPath</span><span class="p">,</span> <span class="s1">&#39;test&#39;</span><span class="p">];</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">appProc</span> <span class="o">=</span> <span class="nx">fork</span><span class="p">(</span><span class="nx">appJsPath</span><span class="p">,</span> <span class="nx">args</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// This is used to tell if our API server died during its</span>
+</span><span class='line'>  <span class="c1">// initialization.</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">pendingCallback</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">appProc</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;message&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nx">message</span> <span class="o">==</span> <span class="s1">&#39;ready&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">pendingCallback</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="c1">// This is how we know our API server is ready to </span>
+</span><span class='line'>      <span class="c1">// receive requests. The message is emitted in the</span>
+</span><span class='line'>      <span class="c1">// API server once it&#39;s ready to receive requests.</span>
+</span><span class='line'>      <span class="nx">promise</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;success&#39;</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="nx">appProc</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'>  <span class="nx">appProc</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;exit&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">code</span><span class="p">,</span> <span class="nx">signal</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nx">pendingCallback</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="kd">var</span> <span class="nx">msg</span> <span class="o">=</span> <span class="s1">&#39;child process exited before callback&#39;</span><span class="p">;</span>
+</span><span class='line'>      <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">msg</span><span class="p">);</span>
+</span><span class='line'>      <span class="nx">promise</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="nx">msg</span><span class="p">));</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'>  <span class="nx">appProc</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;SIGTERM&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">process</span><span class="p">.</span><span class="nx">exit</span><span class="p">();</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In our API server:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// initialize the API and start the web server when it&#39;s ready</span>
+</span><span class='line'><span class="nx">api</span><span class="p">.</span><span class="nx">init</span><span class="p">(</span><span class="nx">config</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">log</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="s1">&#39;Could not initialize API: &#39;</span> <span class="o">+</span> <span class="nx">err</span><span class="p">);</span>
+</span><span class='line'>    <span class="nx">process</span><span class="p">.</span><span class="nx">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>    <span class="c1">// Start up the server</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">httpServer</span> <span class="o">=</span> <span class="nx">app</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="nx">port</span><span class="p">,</span> <span class="nx">host</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">log</span><span class="p">.</span><span class="nx">info</span><span class="p">(</span><span class="s1">&#39;API server is ready.&#39;</span><span class="p">);</span>
+</span><span class='line'>      <span class="nx">log</span><span class="p">.</span><span class="nx">info</span><span class="p">(</span><span class="s1">&#39;Listening on &#39;</span> <span class="o">+</span> <span class="nx">host</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span> <span class="o">+</span> <span class="nx">port</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="c1">// Use the &quot;ready&quot; message to signal that the server is ready.</span>
+</span><span class='line'>      <span class="c1">// This is used by the test suite to wait for the api server</span>
+</span><span class='line'>      <span class="c1">// process to start up before sending requests.</span>
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">send</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">process</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="s1">&#39;ready&#39;</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>tests/routes.project.js:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">vows</span><span class="p">.</span><span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;routes.project&#39;</span><span class="p">).</span><span class="nx">addBatch</span><span class="p">({</span>
+</span><span class='line'>  <span class="c1">// Provides a reference to the api server child process</span>
+</span><span class='line'>  <span class="s1">&#39;Start up an API server&#39;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">topic</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="kd">var</span> <span class="nx">promise</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">events</span><span class="p">.</span><span class="nx">EventEmitter</span><span class="p">();</span>
+</span><span class='line'>      <span class="nx">common</span><span class="p">.</span><span class="nx">initTestingAppChildProc</span><span class="p">(</span><span class="nx">config</span><span class="p">,</span> <span class="nx">promise</span><span class="p">);</span>
+</span><span class='line'>      <span class="k">return</span> <span class="nx">promise</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="nx">teardown</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">childProc</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="kd">var</span> <span class="nx">callback</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">callback</span><span class="p">;</span>
+</span><span class='line'>      <span class="kd">var</span> <span class="nx">shutdown</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">api</span><span class="p">.</span><span class="nx">shutdown</span><span class="p">(</span><span class="nx">callback</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">};</span>
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="nx">childProc</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">childProc</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;exit&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">code</span><span class="p">,</span> <span class="nx">sig</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">shutdown</span><span class="p">();</span>
+</span><span class='line'>        <span class="p">});</span>
+</span><span class='line'>        <span class="nx">childProc</span><span class="p">.</span><span class="nx">kill</span><span class="p">();</span>
+</span><span class='line'>      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">shutdown</span><span class="p">();</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="s1">&#39;and get a valid project&#39;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">topic</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">childProc</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">common</span><span class="p">.</span><span class="nx">apiGet</span><span class="p">(</span><span class="nx">url</span><span class="p">(</span><span class="s1">&#39;api/1/project/&#39;</span><span class="p">,</span>
+</span><span class='line'>            <span class="p">{</span><span class="nx">access_token</span><span class="o">:</span> <span class="nx">config</span><span class="p">.</span><span class="nx">test</span><span class="p">.</span><span class="nx">validEnabledReadAccessToken</span><span class="p">}),</span> <span class="k">this</span><span class="p">.</span><span class="nx">callback</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">},</span>
+</span><span class='line'>      <span class="s1">&#39;returns 200 OK&#39;</span><span class="o">:</span> <span class="nx">common</span><span class="p">.</span><span class="nx">assertStatus</span><span class="p">(</span><span class="mi">200</span><span class="p">),</span>
+</span><span class='line'>      <span class="s1">&#39;returns JSON&#39;</span><span class="o">:</span> <span class="nx">common</span><span class="p">.</span><span class="nx">assertJsonContentType</span><span class="p">(),</span>
+</span><span class='line'>      <span class="s1">&#39;fast local response time&#39;</span><span class="o">:</span> <span class="nx">common</span><span class="p">.</span><span class="nx">assertMaxResponseTime</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span>
+</span><span class='line'>      <span class="s2">&quot;returns a valid api response&quot;</span><span class="o">:</span> <span class="nx">common</span><span class="p">.</span><span class="nx">assertValidApiResponse</span><span class="p">(),</span>
+</span><span class='line'>      <span class="s2">&quot;has a result key in the JSON response&quot;</span><span class="o">:</span> <span class="nx">common</span><span class="p">.</span><span class="nx">assertJsonHasFields</span><span class="p">([</span><span class="s1">&#39;result&#39;</span><span class="p">]),</span>
+</span><span class='line'>      <span class="s2">&quot;there&#39;s no api error&quot;</span><span class="o">:</span> <span class="nx">common</span><span class="p">.</span><span class="nx">assertNoApiError</span><span class="p">(),</span>
+</span><span class='line'>      <span class="s1">&#39;all of the deploy fields are available&#39;</span><span class="o">:</span> <span class="nx">common</span><span class="p">.</span><span class="nx">assertJsonHasFields</span><span class="p">(</span><span class="nx">db</span><span class="p">.</span><span class="nx">projectFields</span><span class="p">(),</span>
+</span><span class='line'>          <span class="s1">&#39;result&#39;</span><span class="p">),</span>
+</span><span class='line'>      <span class="s1">&#39;cross-check account id with api.getAccount&#39;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">topic</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">resp</span><span class="p">,</span> <span class="nx">body</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>          <span class="kd">var</span> <span class="nx">project</span> <span class="o">=</span> <span class="nx">body</span><span class="p">.</span><span class="nx">result</span><span class="p">;</span>
+</span><span class='line'>          <span class="nx">api</span><span class="p">.</span><span class="nx">getAccount</span><span class="p">(</span><span class="nx">body</span><span class="p">.</span><span class="nx">result</span><span class="p">.</span><span class="nx">account_id</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">callback</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">},</span>
+</span><span class='line'>        <span class="s1">&#39;verify the account is not null&#39;</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">account</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">assert</span><span class="p">.</span><span class="nx">isNull</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
+</span><span class='line'>          <span class="nx">assert</span><span class="p">.</span><span class="nx">isObject</span><span class="p">(</span><span class="nx">account</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}).</span><span class="kr">export</span><span class="p">(</span><span class="nx">module</span><span class="p">,</span> <span class="p">{</span><span class="nx">error</span><span class="o">:</span> <span class="kc">false</span><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>There is a lot happening in these tests.</p>
+
+<ul>
+<li>We use promises to notify our test when the API server is ready.
+
+<ul>
+<li>Documentation for using promises with Vows can be found <a href="http://vowsjs.org/#-writing-asynchronous-tests">here</a>.</li>
+</ul>
+</li>
+<li>We use a Vows teardown function to shut down the API server process.</li>
+<li>We use our API library to help test our API server.
+
+<ul>
+<li>We cross-check our API server&#8217;s response by using our API library directly.</li>
+</ul>
+</li>
+<li>We use Vows macros for reusable tests on all API requests.
+
+<ul>
+<li>We also make use of Vows contexts even though there are none in this example.</li>
+<li>Documentation for macros and contexts are <a href="http://vowsjs.org/#-macros">here</a>.</li>
+</ul>
+</li>
+</ul>
+
+
+<h2>Gotchas</h2>
+
+<p>Never, ever, ever throw an uncaught exception in a Vows topic. It makes debugging impossible. I&#8217;ve wasted hours looking through my API library for a bug only to find that I had a silly bug in my topic.</p>
+
+<p>Always use <code>export(module, {error: false})</code> in your Vows batches. This option is not really described in the Vows docs. I had to find it in the source. Basically, if you don&#8217;t have this, Vows will inspect the first argument to each test to see if it&#8217;s an error. Vows will potentially call your test functions with a different set of arguments depending on if the first parameter to the topic&#8217;s callback is an Error or not. It&#8217;s completely strange and magical and <a href="https://github.com/cloudhead/vows/pull/263">confusing</a>.</p>
+
+<p>Testing without mock objects means that you need a real database which means you probably need real-ish data to test with. This is tough. We chose to maintain a DB SQL fixture that we have to update whenever the schema changes. It&#8217;s a bit clunky but it works. I&#8217;m open to suggestions for this if anyone knows of a better way.</p>
+
+<h2>Wrapping up&#8230;</h2>
+
+<p>I didn&#8217;t really go over our testing process much, (maybe in a subsequent blog post) but we use <a href="http://circleci.com">CircleCI</a> to run all of these tests. It&#8217;s fast and easy to set up. Also, it has all of the systems that our API server uses like MySQL, Beanstalkd and Memcache pre-installed. This gets us closer to testing in a production environment than we would otherwise be able to get.</p>
+
+<p>Hopefully you were able to glean some useful tips from our experience at <a href="http://rollbar.com/">Rollbar</a>. We love building tools for devs like you!</p>
+
+<p>Add me on Twitter <a href="https://twitter.com/coryvirok">@coryvirok</a>.
+Follow <a href="https://twitter.com/rollbar">@rollbar</a> for more updates.</p>
+
+<h2>Moment of zen</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="err">✓</span> <span class="nx">OK</span> <span class="err">»</span> <span class="mi">497</span> <span class="nx">honored</span> <span class="p">(</span><span class="mf">33.232</span><span class="nx">s</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+
+
+  <hr>
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Cory Virok</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-07-12T01:20:00-07:00" pubdate data-updated="true">Jul 12<span>th</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/blog/categories/api/'>api</a>, <a class='category' href='/blog/blog/categories/articles/'>articles</a>, <a class='category' href='/blog/blog/categories/javascript/'>javascript</a>, <a class='category' href='/blog/blog/categories/nodejs/'>nodejs</a>, <a class='category' href='/blog/blog/categories/testing/'>testing</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://rollbar.com/blog/post/2013/07/12/Async-nodejs-API-server-testing/" data-via="rollbar" data-counturl="http://rollbar.com/blog/post/2013/07/12/Async-nodejs-API-server-testing/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/post/2013/05/29/may-release-roundup/" title="Previous Post: May Release Roundup">&laquo; May Release Roundup</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <ul class="well nav nav-list" id="recent_posts">
+    <li class="nav-header">Recent Posts</li>
+    
+      <li class="post">
+        <a href="/blog/post/2013/07/12/Async-nodejs-API-server-testing/">Async node.js API server testing</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/post/2013/05/29/may-release-roundup/">May Release Roundup</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/post/2013/05/06/rules-engine-for-notifications-campfire-hipchat-jira-trello/">Rules Engine for Notifications, Plus Integrations with Campfire, Hipchat, JIRA, and Trello</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/post/2013/03/29/using-unique-indexes-for-fun-and-profit/">Taking UNIQUE indexes to the next level</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/post/2013/03/21/improved-grouping-for-javascript-errors/">Improved grouping for Javascript errors</a>
+      </li>
+    
+    <li class="divider"></li>
+    <li><a href="/blog/blog/archives">Blog Archives</a></li>
+  </ul>
+</section>
+<section>
+  <div class="well">
+    <!-- Begin MailChimp Signup Form -->
+    <style type="text/css">
+        /* MailChimp Form Embed Code - Slim - 08/17/2011 */
+        #mc_embed_signup form {display:block; position:relative; text-align:left; padding:10px 0 10px 3%}
+        #mc_embed_signup h2 {font-weight:bold; padding:0; margin:15px 0; font-size:1.4em;}
+        #mc_embed_signup input {border:1px solid #999; -webkit-appearance:none;}
+        #mc_embed_signup input[type=checkbox]{-webkit-appearance:checkbox;}
+        #mc_embed_signup input[type=radio]{-webkit-appearance:radio;}
+        #mc_embed_signup input:focus {border-color:#333;}
+        #mc_embed_signup .button {clear:both; background-color: #aaa; border: 0 none; border-radius:4px; color: #FFFFFF; cursor: pointer; display: inline-block; font-size:15px; font-weight: bold; height: 32px; line-height: 32px; margin: 0 5px 10px 0; padding:0; text-align: center; text-decoration: none; vertical-align: top; white-space: nowrap; width: auto;}
+        #mc_embed_signup .button:hover {background-color:#777;}
+        #mc_embed_signup .small-meta {font-size: 11px;}
+        #mc_embed_signup .nowrap {white-space:nowrap;}     
+        #mc_embed_signup .clear {clear:none; display:inline;}
+
+        #mc_embed_signup label {display:block; font-size:16px; padding-bottom:10px; font-weight:bold;}
+        #mc_embed_signup input.email {display:block; padding:8px 0; margin:0 4% 10px 0; text-indent:5px; width:58%; min-width:130px;}
+        #mc_embed_signup input.button {display:block; width:35%; margin:0 0 10px 0; min-width:90px;}
+
+        #mc_embed_signup div#mce-responses {float:left; top:-1.4em; padding:0em .5em 0em .5em; overflow:hidden; width:90%;margin: 0 5%; clear: both;}
+        #mc_embed_signup div.response {margin:1em 0; padding:1em .5em .5em 0; font-weight:bold; float:left; top:-1.5em; z-index:1; width:80%;}
+        #mc_embed_signup #mce-error-response {display:none;}
+        #mc_embed_signup #mce-success-response {color:#529214; display:none;}
+        #mc_embed_signup label.error {display:block; float:none; width:auto; margin-left:1.05em; text-align:left; padding:.5em 0;}
+        #mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; }
+        #mc_embed_signup form { padding-left: 0; }
+        /* Add your own MailChimp form style overrides in your site stylesheet or in this style block.
+           We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+    </style>
+    <div id="mc_embed_signup">
+    <form action="http://rollbar.us7.list-manage.com/subscribe/post?u=7b6a5da2c826ee17fc52ae99e&amp;id=189708f83b" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+        <label for="mce-EMAIL">Subscribe to Updates</label>
+        <p>Get new posts in your inbox:</p>
+        <input style="width:100%;" type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email address" required>
+        <div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </form>
+    </div>
+
+    <!--End mc_embed_signup-->
+  </div>
+</section>
+
+  
+</aside>
+
+
+      </div>
+    </div>
+    
+    <footer class="row-fluid">
+      <div class="container">
+        <div class="row-fluid footer-content">
+          <div class="left-col pull-left"><a class="logo-footer" href="/"></a></div>
+            <div class="right-col pull-left">
+              <div class="item pull-left">
+              <strong>Rollbar</strong>
+              <ul>
+                <li><a href="/home/">Home</a></li>
+                <li><a href="/about">About us</a></li>
+                <li><a href="/pricing">Pricing</a></li>
+                <li><a href="mailto:jobs@rollbar.com?Subject=I+am+awesome,+hire+me!">Jobs</a></li>
+                <li><a href="/blog/">Blog</a></li>
+              </ul>
+            </div>
+            <div class="item pull-left">
+              <strong>Features</strong>
+              <ul>
+                <li><a href="/features/multiplatform/">Monitor errors</a></li>
+                <li><a href="/features/alerts/">Real-time Alerts</a></li>
+                <li><a href="/features/dashboard/">Dashboard</a></li>
+                <li><a href="/features/deploys/">Track Deploys</a></li>
+                <li><a href="/features/people/">Person Tracking</a></li>
+                <li><a href="/features/hosts/">Host Tracking</a></li>
+                <li><a href="/features/bugtrackers/">Bug Tracker Integration</a></li>
+                <li><a href="/features/github/">Github Integration</a></li>
+                <li><a href="/features/">Other Features</a></li>
+              </ul>
+            </div>
+            <div class="item pull-left">
+              <strong>Resources</strong>
+              <ul>
+                <li><a href="/blog/">Blog</a></li>
+                <li><a href="/docs/">Docs</a></li>
+                <li><a href="/changelog">Change Log</a></li>
+              </ul>
+            </div>
+            <div class="item pull-left">
+              <strong>Support</strong>
+              <ul>
+                <li><a href="/docs/">Help Center</a></li>
+                <li><a href="/tos">Terms of Service</a></li>
+                <li><a href="/privacy">Privacy Policy</a></li>
+                <li><a href="/contact">Contact Us</a></li>
+              </ul>
+              
+              <div class="social">
+                <strong>Share via</strong>
+                <ul>
+                  <li class="twitter"><a href="https://twitter.com/share?url=http://rollbar.com/"></a></li>
+                  <li class="facebook"><a href="https://www.facebook.com/dialog/feed?app_id=516762375041550&link=http%3A%2F%2Frollbar.com%2F&picture=http%3A%2F%2Frollbar.com%2Fstatic%2Fimg2%2Flogo.png&name=Rollbar&caption=Monitor and analyze your application's errors and deploys in real-time.&redirect_uri=http%3A%2F%2Frollbar.com%2F" target="_blank"></a></li>
+                  <li class="email last"><a href="mailto:?Subject=Rollbar" target="_blank"></a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row-fluid footer-content-bottom">
+          <p>&copy; 2013 Rollbar, Inc.</p>
+        </div>
+      </div>
+    </footer>
+    
+    
+
+<script type="text/javascript">
+      var disqus_shortname = 'rollbar';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://rollbar.com/blog/post/2013/07/12/Async-nodejs-API-server-testing/';
+        var disqus_url = 'http://rollbar.com/blog/post/2013/07/12/Async-nodejs-API-server-testing/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

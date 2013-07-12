@@ -9,7 +9,7 @@
   <meta name="author" content="Rollbar, Inc.">
 
   
-  <meta name="description" content="Here&#8217;s a roundup of what&#8217;s new at Rollbar in the month of May. Big Features We revamped our notifications system, and added integrations &hellip;">
+  <meta name="description" content="Testing is super important. I&#8217;m not going to try and work that idea into your head anymore than that. If you don&#8217;t want to test, this &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -92,6 +92,403 @@
       <div id="content">
         <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/post/2013/07/12/Async-nodejs-API-server-testing/">Async node.js API server testing</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-07-12T01:20:00-07:00" pubdate data-updated="true">Jul 12<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Testing is super important. I&#8217;m not going to try and work that idea into your head anymore than that. If you don&#8217;t want to test, this probably won&#8217;t be very helpful/interesting. If you want to learn how to test your API server, read on.</p>
+
+<p>This blog post is about how we built our test suite for our API server at <a href="http://rollbar.com/">Rollbar</a> and some of the tricks and gotchas we ran into along the way. I&#8217;ll try not to write too much and provide code wherever possible.</p>
+
+<h2>We use Vows. Why not Mocha?</h2>
+
+<p><a href="http://visionmedia.github.io/mocha/">Mocha</a> is by far the most widely used testing framework for Node.js apps. So, why didn&#8217;t we use it? The two main reasons were that Vows was the first thing I found when Googling &#8220;nodejs async testing&#8221; and the other is that I didn&#8217;t like the syntax of the Mocha tests.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">//Mocha</span>
+</span><span class='line'><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">].</span><span class="nx">indexOf</span><span class="p">(</span><span class="mi">5</span><span class="p">).</span><span class="nx">should</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>vs</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">//Vows</span>
+</span><span class='line'><span class="nx">assert</span><span class="p">.</span><span class="nx">equal</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">].</span><span class="nx">indexOf</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>There&#8217;s something that bothered me about the former. I didn&#8217;t like how the library used a bunch of magic to enable something this small/strange.</p>
+
+<p>Mocha has a lot of awesome features but none that are important enough for me to switch.</p>
+
+<h2>A simple Vows test</h2>
+
+<p>Vows works just as you&#8217;d expect it to, except when it doesn&#8217;t. More on that later&#8230;</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">vows</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;vows&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">assert</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;assert&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="nx">vows</span><span class="p">.</span><span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;testmodule&#39;</span><span class="p">).</span><span class="nx">addBatch</span><span class="p">({</span>
+</span><span class='line'>  <span class="s2">&quot;call username() with a valid user id&quot;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">topic</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="kd">var</span> <span class="nx">callback</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">callback</span><span class="p">;</span>
+</span><span class='line'>      <span class="k">return</span> <span class="nx">username</span><span class="p">(</span><span class="mi">42</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">callback</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="s2">&quot;and verify username is correct&quot;</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">username</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">assert</span><span class="p">.</span><span class="nx">isNull</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
+</span><span class='line'>      <span class="nx">assert</span><span class="p">.</span><span class="nx">isString</span><span class="p">(</span><span class="nx">username</span><span class="p">);</span>
+</span><span class='line'>      <span class="nx">assert</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="s2">&quot;cory&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}).</span><span class="kr">export</span><span class="p">(</span><span class="nx">module</span><span class="p">,</span> <span class="p">{</span><span class="nx">error</span><span class="o">:</span> <span class="kc">false</span><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The above test will make sure that the function <code>username()</code> calls its callback with <code>(null, "cory")</code>.</p>
+
+<p>Note that we use this.callback since everything is assumed to be async and we use <code>{error: false}</code> when we export the batch. More on those later.</p>
+
+<p>Check out the Vows <a href="http://vowsjs.org/">website</a> for better examples.</p>
+
+<h2>Useful design patterns, (I swear this will be short)</h2>
+
+<p>I won&#8217;t talk much about architecture or design patterns but we&#8217;ve found a few useful idioms that we follow pretty strictly. Doing so has made writing tests super-easy&#8230; almost enjoyable, almost.</p>
+
+<h3>Separate your view logic from your API business logic</h3>
+
+<p>Your server&#8217;s views should have one job, to marshall data from the request/socket/carrier pigeon and provide it to your API library.</p>
+
+<p>Any error checking done in your views should be to make sure the types provided to your API library are correct.</p>
+
+<h3>Make every function you write use a callback.</h3>
+
+<p>This is super-important for refactoring and adding new features. If you find yourself wanting to add a feature that requires i/o into a code path that was assumed to be completely synchonous, you&#8217;ll need to refactor the hell our of your code to make it work. Don&#8217;t bother. Make everything take a callback. Embrace async!</p>
+
+<h3>Make the first argument to <em>every</em> callback be an optional error.</h3>
+
+<p>This is how the Node.js developers do it and I agree. It makes for a lot more boiler-plate code but it forces you to keep error handling in-mind when developing. Writing defensive code is more important than writing fewer lines of code.</p>
+
+<p>This will also make testing much, much easier with Vows. How? Read on&#8230;</p>
+
+<h2>Testing the API server, for reals</h2>
+
+<p>Don&#8217;t just test your API library; that&#8217;s kind of lame. Fork a process, start your API server up in it and start firing requests at it using Vows.</p>
+
+<p>testcommon.js:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">exports</span><span class="p">.</span><span class="nx">initTestingAppChildProc</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">config</span><span class="p">,</span> <span class="nx">promise</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="c1">// ... Setup temporary config file</span>
+</span><span class='line'>  <span class="c1">// ... Get path to your main app.js</span>
+</span><span class='line'>  <span class="c1">// ... Initialize the api library</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// fork a child process to start the api server</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">args</span> <span class="o">=</span> <span class="p">[</span><span class="nx">configPath</span><span class="p">,</span> <span class="s1">&#39;test&#39;</span><span class="p">];</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">appProc</span> <span class="o">=</span> <span class="nx">fork</span><span class="p">(</span><span class="nx">appJsPath</span><span class="p">,</span> <span class="nx">args</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// This is used to tell if our API server died during its</span>
+</span><span class='line'>  <span class="c1">// initialization.</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">pendingCallback</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">appProc</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;message&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nx">message</span> <span class="o">==</span> <span class="s1">&#39;ready&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">pendingCallback</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="c1">// This is how we know our API server is ready to </span>
+</span><span class='line'>      <span class="c1">// receive requests. The message is emitted in the</span>
+</span><span class='line'>      <span class="c1">// API server once it&#39;s ready to receive requests.</span>
+</span><span class='line'>      <span class="nx">promise</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;success&#39;</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="nx">appProc</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'>  <span class="nx">appProc</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;exit&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">code</span><span class="p">,</span> <span class="nx">signal</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nx">pendingCallback</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="kd">var</span> <span class="nx">msg</span> <span class="o">=</span> <span class="s1">&#39;child process exited before callback&#39;</span><span class="p">;</span>
+</span><span class='line'>      <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">msg</span><span class="p">);</span>
+</span><span class='line'>      <span class="nx">promise</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="nx">msg</span><span class="p">));</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'>  <span class="nx">appProc</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;SIGTERM&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">process</span><span class="p">.</span><span class="nx">exit</span><span class="p">();</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In our API server:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// initialize the API and start the web server when it&#39;s ready</span>
+</span><span class='line'><span class="nx">api</span><span class="p">.</span><span class="nx">init</span><span class="p">(</span><span class="nx">config</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">log</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="s1">&#39;Could not initialize API: &#39;</span> <span class="o">+</span> <span class="nx">err</span><span class="p">);</span>
+</span><span class='line'>    <span class="nx">process</span><span class="p">.</span><span class="nx">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>    <span class="c1">// Start up the server</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">httpServer</span> <span class="o">=</span> <span class="nx">app</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="nx">port</span><span class="p">,</span> <span class="nx">host</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">log</span><span class="p">.</span><span class="nx">info</span><span class="p">(</span><span class="s1">&#39;API server is ready.&#39;</span><span class="p">);</span>
+</span><span class='line'>      <span class="nx">log</span><span class="p">.</span><span class="nx">info</span><span class="p">(</span><span class="s1">&#39;Listening on &#39;</span> <span class="o">+</span> <span class="nx">host</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span> <span class="o">+</span> <span class="nx">port</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="c1">// Use the &quot;ready&quot; message to signal that the server is ready.</span>
+</span><span class='line'>      <span class="c1">// This is used by the test suite to wait for the api server</span>
+</span><span class='line'>      <span class="c1">// process to start up before sending requests.</span>
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">send</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">process</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="s1">&#39;ready&#39;</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>tests/routes.project.js:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">vows</span><span class="p">.</span><span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;routes.project&#39;</span><span class="p">).</span><span class="nx">addBatch</span><span class="p">({</span>
+</span><span class='line'>  <span class="c1">// Provides a reference to the api server child process</span>
+</span><span class='line'>  <span class="s1">&#39;Start up an API server&#39;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">topic</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="kd">var</span> <span class="nx">promise</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">events</span><span class="p">.</span><span class="nx">EventEmitter</span><span class="p">();</span>
+</span><span class='line'>      <span class="nx">common</span><span class="p">.</span><span class="nx">initTestingAppChildProc</span><span class="p">(</span><span class="nx">config</span><span class="p">,</span> <span class="nx">promise</span><span class="p">);</span>
+</span><span class='line'>      <span class="k">return</span> <span class="nx">promise</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="nx">teardown</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">childProc</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="kd">var</span> <span class="nx">callback</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">callback</span><span class="p">;</span>
+</span><span class='line'>      <span class="kd">var</span> <span class="nx">shutdown</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">api</span><span class="p">.</span><span class="nx">shutdown</span><span class="p">(</span><span class="nx">callback</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">};</span>
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="nx">childProc</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">childProc</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;exit&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">code</span><span class="p">,</span> <span class="nx">sig</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">shutdown</span><span class="p">();</span>
+</span><span class='line'>        <span class="p">});</span>
+</span><span class='line'>        <span class="nx">childProc</span><span class="p">.</span><span class="nx">kill</span><span class="p">();</span>
+</span><span class='line'>      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">shutdown</span><span class="p">();</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="s1">&#39;and get a valid project&#39;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">topic</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">childProc</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">common</span><span class="p">.</span><span class="nx">apiGet</span><span class="p">(</span><span class="nx">url</span><span class="p">(</span><span class="s1">&#39;api/1/project/&#39;</span><span class="p">,</span>
+</span><span class='line'>            <span class="p">{</span><span class="nx">access_token</span><span class="o">:</span> <span class="nx">config</span><span class="p">.</span><span class="nx">test</span><span class="p">.</span><span class="nx">validEnabledReadAccessToken</span><span class="p">}),</span> <span class="k">this</span><span class="p">.</span><span class="nx">callback</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">},</span>
+</span><span class='line'>      <span class="s1">&#39;returns 200 OK&#39;</span><span class="o">:</span> <span class="nx">common</span><span class="p">.</span><span class="nx">assertStatus</span><span class="p">(</span><span class="mi">200</span><span class="p">),</span>
+</span><span class='line'>      <span class="s1">&#39;returns JSON&#39;</span><span class="o">:</span> <span class="nx">common</span><span class="p">.</span><span class="nx">assertJsonContentType</span><span class="p">(),</span>
+</span><span class='line'>      <span class="s1">&#39;fast local response time&#39;</span><span class="o">:</span> <span class="nx">common</span><span class="p">.</span><span class="nx">assertMaxResponseTime</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span>
+</span><span class='line'>      <span class="s2">&quot;returns a valid api response&quot;</span><span class="o">:</span> <span class="nx">common</span><span class="p">.</span><span class="nx">assertValidApiResponse</span><span class="p">(),</span>
+</span><span class='line'>      <span class="s2">&quot;has a result key in the JSON response&quot;</span><span class="o">:</span> <span class="nx">common</span><span class="p">.</span><span class="nx">assertJsonHasFields</span><span class="p">([</span><span class="s1">&#39;result&#39;</span><span class="p">]),</span>
+</span><span class='line'>      <span class="s2">&quot;there&#39;s no api error&quot;</span><span class="o">:</span> <span class="nx">common</span><span class="p">.</span><span class="nx">assertNoApiError</span><span class="p">(),</span>
+</span><span class='line'>      <span class="s1">&#39;all of the deploy fields are available&#39;</span><span class="o">:</span> <span class="nx">common</span><span class="p">.</span><span class="nx">assertJsonHasFields</span><span class="p">(</span><span class="nx">db</span><span class="p">.</span><span class="nx">projectFields</span><span class="p">(),</span>
+</span><span class='line'>          <span class="s1">&#39;result&#39;</span><span class="p">),</span>
+</span><span class='line'>      <span class="s1">&#39;cross-check account id with api.getAccount&#39;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">topic</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">resp</span><span class="p">,</span> <span class="nx">body</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>          <span class="kd">var</span> <span class="nx">project</span> <span class="o">=</span> <span class="nx">body</span><span class="p">.</span><span class="nx">result</span><span class="p">;</span>
+</span><span class='line'>          <span class="nx">api</span><span class="p">.</span><span class="nx">getAccount</span><span class="p">(</span><span class="nx">body</span><span class="p">.</span><span class="nx">result</span><span class="p">.</span><span class="nx">account_id</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">callback</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">},</span>
+</span><span class='line'>        <span class="s1">&#39;verify the account is not null&#39;</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">account</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">assert</span><span class="p">.</span><span class="nx">isNull</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
+</span><span class='line'>          <span class="nx">assert</span><span class="p">.</span><span class="nx">isObject</span><span class="p">(</span><span class="nx">account</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}).</span><span class="kr">export</span><span class="p">(</span><span class="nx">module</span><span class="p">,</span> <span class="p">{</span><span class="nx">error</span><span class="o">:</span> <span class="kc">false</span><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>There is a lot happening in these tests.</p>
+
+<ul>
+<li>We use promises to notify our test when the API server is ready.
+
+<ul>
+<li>Documentation for using promises with Vows can be found <a href="http://vowsjs.org/#-writing-asynchronous-tests">here</a>.</li>
+</ul>
+</li>
+<li>We use a Vows teardown function to shut down the API server process.</li>
+<li>We use our API library to help test our API server.
+
+<ul>
+<li>We cross-check our API server&#8217;s response by using our API library directly.</li>
+</ul>
+</li>
+<li>We use Vows macros for reusable tests on all API requests.
+
+<ul>
+<li>We also make use of Vows contexts even though there are none in this example.</li>
+<li>Documentation for macros and contexts are <a href="http://vowsjs.org/#-macros">here</a>.</li>
+</ul>
+</li>
+</ul>
+
+
+<h2>Gotchas</h2>
+
+<p>Never, ever, ever throw an uncaught exception in a Vows topic. It makes debugging impossible. I&#8217;ve wasted hours looking through my API library for a bug only to find that I had a silly bug in my topic.</p>
+
+<p>Always use <code>export(module, {error: false})</code> in your Vows batches. This option is not really described in the Vows docs. I had to find it in the source. Basically, if you don&#8217;t have this, Vows will inspect the first argument to each test to see if it&#8217;s an error. Vows will potentially call your test functions with a different set of arguments depending on if the first parameter to the topic&#8217;s callback is an Error or not. It&#8217;s completely strange and magical and <a href="https://github.com/cloudhead/vows/pull/263">confusing</a>.</p>
+
+<p>Testing without mock objects means that you need a real database which means you probably need real-ish data to test with. This is tough. We chose to maintain a DB SQL fixture that we have to update whenever the schema changes. It&#8217;s a bit clunky but it works. I&#8217;m open to suggestions for this if anyone knows of a better way.</p>
+
+<h2>Wrapping up&#8230;</h2>
+
+<p>I didn&#8217;t really go over our testing process much, (maybe in a subsequent blog post) but we use <a href="http://circleci.com">CircleCI</a> to run all of these tests. It&#8217;s fast and easy to set up. Also, it has all of the systems that our API server uses like MySQL, Beanstalkd and Memcache pre-installed. This gets us closer to testing in a production environment than we would otherwise be able to get.</p>
+
+<p>Hopefully you were able to glean some useful tips from our experience at <a href="http://rollbar.com/">Rollbar</a>. We love building tools for devs like you!</p>
+
+<p>Add me on Twitter <a href="https://twitter.com/coryvirok">@coryvirok</a>.
+Follow <a href="https://twitter.com/rollbar">@rollbar</a> for more updates.</p>
+
+<h2>Moment of zen</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="err">✓</span> <span class="nx">OK</span> <span class="err">»</span> <span class="mi">497</span> <span class="nx">honored</span> <span class="p">(</span><span class="mf">33.232</span><span class="nx">s</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+    <hr>
   
   
     <article>
@@ -1037,191 +1434,6 @@
     </article>
     <hr>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/post/2012/09/07/using-pyramid-request-factory-to-write-less-code/">Using a Request Factory in Pyramid to write a little less code</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-09-07T11:00:00-07:00" pubdate data-updated="true">Sep 7<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>At <a href="http://rollbar.com/">Rollbar.com</a>, we&#8217;ve been using <a href="http://www.pylonsproject.org/">Pyramid</a> as our web framework and have been pretty happy with it. It&#8217;s lightweight and mostly stays out of our way.</p>
-
-<p>Pyramid doesn&#8217;t have a global request object that you can just import [1], so it makes you pass around <code>request</code> wherever you need it. That results in a lot of library code that looks like this:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c"># lib/helpers.py</span>
-</span><span class='line'><span class="k">def</span> <span class="nf">flash_success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
-</span><span class='line'>    <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">flash</span><span class="p">({</span><span class="s">&#39;body&#39;</span><span class="p">:</span> <span class="n">body</span><span class="p">,</span> <span class="s">&#39;title&#39;</span><span class="p">:</span> <span class="n">title</span><span class="s">&#39;})</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>and a lot of view code that looks like this:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c"># views/auth.py</span>
-</span><span class='line'><span class="nd">@view_config</span><span class="p">(</span><span class="n">route_name</span><span class="o">=</span><span class="s">&#39;auth/login&#39;</span><span class="p">)</span>
-</span><span class='line'><span class="k">def</span> <span class="nf">login</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
-</span><span class='line'>    <span class="c"># (do the login...)</span>
-</span><span class='line'>    <span class="n">helpers</span><span class="o">.</span><span class="n">flash_success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&quot;You&#39;re now logged in.&quot;</span><span class="p">)</span>
-</span><span class='line'>    <span class="c"># (redirect...)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>That is, there ends up being a lot of function calls that pass <code>request</code> as their first argument. Wouldn&#8217;t it be nicer if we could attach these functions as methods on <code>request</code> itself? That would save a few characters every time we call them, and let us stop thinking about whether <code>request</code> is the first or last argument. Pyramid facilitates this by letting us provide our own <a href="http://pyramid.readthedocs.org/en/latest/narr/hooks.html#changing-the-request-factory">Request Factory</a>:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">from</span> <span class="nn">pyramid.request</span> <span class="kn">import</span> <span class="n">Request</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">class</span> <span class="nc">MyRequest</span><span class="p">(</span><span class="n">Request</span><span class="p">):</span>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">hello</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span class='line'>        <span class="k">print</span> <span class="s">&quot;hello!&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">global_config</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="p">):</span>
-</span><span class='line'>    <span class="n">config</span> <span class="o">=</span> <span class="n">Configurator</span><span class="p">(</span><span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">,</span> <span class="n">request_factory</span><span class="o">=</span><span class="n">MyRequest</span><span class="p">)</span>
-</span><span class='line'>    <span class="c"># ...</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now the <code>request</code> passed to our view methods, and everwhere else in our app, has our <code>hello</code> method.</p>
-
-<p>So, what can we do with this that&#8217;s actually useful? In our codebase, we have a few convenience methods to get data about the logged-in user, flash messages, and check if features are enabled.</p>
-
-<p>Here it is, unedited, in its entirety:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">class</span> <span class="nc">MoxRequest</span><span class="p">(</span><span class="n">pyramid</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">Request</span><span class="p">):</span>
-</span><span class='line'>    <span class="c"># logged-in-user access</span>
-</span><span class='line'>    <span class="nd">@util.CachedAttribute</span>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">user_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span class='line'>        <span class="kn">from</span> <span class="nn">pyramid.security</span> <span class="kn">import</span> <span class="n">authenticated_userid</span>
-</span><span class='line'>        <span class="n">user_id</span> <span class="o">=</span> <span class="n">authenticated_userid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-</span><span class='line'>        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;authenticated user id: </span><span class="si">%r</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">user_id</span><span class="p">)</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">user_id</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nd">@util.CachedAttribute</span>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">user</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span class='line'>        <span class="n">user_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_id</span>
-</span><span class='line'>        <span class="k">if</span> <span class="n">user_id</span><span class="p">:</span>
-</span><span class='line'>            <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">User</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span>
-</span><span class='line'>        <span class="k">return</span> <span class="bp">None</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nd">@util.CachedAttribute</span>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">username</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span class='line'>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">:</span>
-</span><span class='line'>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span>
-</span><span class='line'>        <span class="k">else</span><span class="p">:</span>
-</span><span class='line'>            <span class="k">return</span> <span class="bp">None</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">gater_check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature_name</span><span class="p">):</span>
-</span><span class='line'>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;gater.</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">feature_name</span><span class="p">)</span> <span class="o">==</span> <span class="s">&#39;on&#39;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c"># flash methods</span>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">flash_success</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
-</span><span class='line'>        <span class="bp">self</span><span class="o">.</span><span class="n">_flash_message</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">queue</span><span class="o">=</span><span class="s">&#39;success&#39;</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">flash_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
-</span><span class='line'>        <span class="bp">self</span><span class="o">.</span><span class="n">_flash_message</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">queue</span><span class="o">=</span><span class="s">&#39;info&#39;</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">flash_warning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
-</span><span class='line'>        <span class="bp">self</span><span class="o">.</span><span class="n">_flash_message</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">queue</span><span class="o">=</span><span class="s">&#39;warning&#39;</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">flash_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
-</span><span class='line'>        <span class="bp">self</span><span class="o">.</span><span class="n">_flash_message</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">queue</span><span class="o">=</span><span class="s">&#39;error&#39;</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">_flash_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">queue</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
-</span><span class='line'>        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">flash</span><span class="p">({</span><span class="s">&#39;title&#39;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span> <span class="s">&#39;body&#39;</span><span class="p">:</span> <span class="n">body</span><span class="p">},</span> <span class="n">queue</span><span class="o">=</span><span class="n">queue</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This just sits in our top-level <code>__init__.py</code>, along with the <code>main()</code> entry point.</p>
-
-<p>Notes: <code>@util.CachedAttribute</code> contains <a href="http://code.activestate.com/recipes/276643-caching-and-aliasing-with-descriptors/">this recipe</a>. &#8220;Mox&#8221; is an easy-to-type codename, named after <a href="http://www.summitpost.org/mox-peaks-from-red-face-mountain/690027">these mountains</a>.</p>
-
-<p>[1] I&#8217;m still not sold on this, but I&#8217;m getting by. It arguably causes problems with testing and such, but it <em>is</em> pretty nice to magically <code>from flask import request</code>.</p>
-</div>
-  
-  
-
-
-    </article>
-    <hr>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/blog/page/2/">&larr; Older</a>
@@ -1237,6 +1449,10 @@
     <li class="nav-header">Recent Posts</li>
     
       <li class="post">
+        <a href="/blog/post/2013/07/12/Async-nodejs-API-server-testing/">Async node.js API server testing</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/post/2013/05/29/may-release-roundup/">May Release Roundup</a>
       </li>
     
@@ -1250,10 +1466,6 @@
     
       <li class="post">
         <a href="/blog/post/2013/03/21/improved-grouping-for-javascript-errors/">Improved grouping for Javascript errors</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/post/2013/02/26/rollbar-notifier-upgrades/">Upgrading to the new Rollbar notifier libraries</a>
       </li>
     
     <li class="divider"></li>

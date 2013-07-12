@@ -9,7 +9,7 @@
   <meta name="author" content="Rollbar, Inc.">
 
   
-  <meta name="description" content="I first heard about Fabric a couple years ago while at Lolapps and liked the idea of: writing deployment and sysadmin scripts in a language other &hellip;">
+  <meta name="description" content="At Rollbar.com, we&#8217;ve been using Pyramid as our web framework and have been pretty happy with it. It&#8217;s lightweight and mostly stays out &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -92,6 +92,191 @@
       <div id="content">
         <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/post/2012/09/07/using-pyramid-request-factory-to-write-less-code/">Using a Request Factory in Pyramid to write a little less code</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-09-07T11:00:00-07:00" pubdate data-updated="true">Sep 7<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>At <a href="http://rollbar.com/">Rollbar.com</a>, we&#8217;ve been using <a href="http://www.pylonsproject.org/">Pyramid</a> as our web framework and have been pretty happy with it. It&#8217;s lightweight and mostly stays out of our way.</p>
+
+<p>Pyramid doesn&#8217;t have a global request object that you can just import [1], so it makes you pass around <code>request</code> wherever you need it. That results in a lot of library code that looks like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c"># lib/helpers.py</span>
+</span><span class='line'><span class="k">def</span> <span class="nf">flash_success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+</span><span class='line'>    <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">flash</span><span class="p">({</span><span class="s">&#39;body&#39;</span><span class="p">:</span> <span class="n">body</span><span class="p">,</span> <span class="s">&#39;title&#39;</span><span class="p">:</span> <span class="n">title</span><span class="s">&#39;})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>and a lot of view code that looks like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c"># views/auth.py</span>
+</span><span class='line'><span class="nd">@view_config</span><span class="p">(</span><span class="n">route_name</span><span class="o">=</span><span class="s">&#39;auth/login&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="k">def</span> <span class="nf">login</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+</span><span class='line'>    <span class="c"># (do the login...)</span>
+</span><span class='line'>    <span class="n">helpers</span><span class="o">.</span><span class="n">flash_success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&quot;You&#39;re now logged in.&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="c"># (redirect...)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That is, there ends up being a lot of function calls that pass <code>request</code> as their first argument. Wouldn&#8217;t it be nicer if we could attach these functions as methods on <code>request</code> itself? That would save a few characters every time we call them, and let us stop thinking about whether <code>request</code> is the first or last argument. Pyramid facilitates this by letting us provide our own <a href="http://pyramid.readthedocs.org/en/latest/narr/hooks.html#changing-the-request-factory">Request Factory</a>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">from</span> <span class="nn">pyramid.request</span> <span class="kn">import</span> <span class="n">Request</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">MyRequest</span><span class="p">(</span><span class="n">Request</span><span class="p">):</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">hello</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class='line'>        <span class="k">print</span> <span class="s">&quot;hello!&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">global_config</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="p">):</span>
+</span><span class='line'>    <span class="n">config</span> <span class="o">=</span> <span class="n">Configurator</span><span class="p">(</span><span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">,</span> <span class="n">request_factory</span><span class="o">=</span><span class="n">MyRequest</span><span class="p">)</span>
+</span><span class='line'>    <span class="c"># ...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now the <code>request</code> passed to our view methods, and everwhere else in our app, has our <code>hello</code> method.</p>
+
+<p>So, what can we do with this that&#8217;s actually useful? In our codebase, we have a few convenience methods to get data about the logged-in user, flash messages, and check if features are enabled.</p>
+
+<p>Here it is, unedited, in its entirety:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">class</span> <span class="nc">MoxRequest</span><span class="p">(</span><span class="n">pyramid</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">Request</span><span class="p">):</span>
+</span><span class='line'>    <span class="c"># logged-in-user access</span>
+</span><span class='line'>    <span class="nd">@util.CachedAttribute</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">user_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class='line'>        <span class="kn">from</span> <span class="nn">pyramid.security</span> <span class="kn">import</span> <span class="n">authenticated_userid</span>
+</span><span class='line'>        <span class="n">user_id</span> <span class="o">=</span> <span class="n">authenticated_userid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;authenticated user id: </span><span class="si">%r</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">user_id</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">user_id</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@util.CachedAttribute</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">user</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class='line'>        <span class="n">user_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_id</span>
+</span><span class='line'>        <span class="k">if</span> <span class="n">user_id</span><span class="p">:</span>
+</span><span class='line'>            <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">User</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="bp">None</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@util.CachedAttribute</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">username</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class='line'>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">:</span>
+</span><span class='line'>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span>
+</span><span class='line'>        <span class="k">else</span><span class="p">:</span>
+</span><span class='line'>            <span class="k">return</span> <span class="bp">None</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">gater_check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature_name</span><span class="p">):</span>
+</span><span class='line'>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;gater.</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">feature_name</span><span class="p">)</span> <span class="o">==</span> <span class="s">&#39;on&#39;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c"># flash methods</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">flash_success</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+</span><span class='line'>        <span class="bp">self</span><span class="o">.</span><span class="n">_flash_message</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">queue</span><span class="o">=</span><span class="s">&#39;success&#39;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">flash_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+</span><span class='line'>        <span class="bp">self</span><span class="o">.</span><span class="n">_flash_message</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">queue</span><span class="o">=</span><span class="s">&#39;info&#39;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">flash_warning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+</span><span class='line'>        <span class="bp">self</span><span class="o">.</span><span class="n">_flash_message</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">queue</span><span class="o">=</span><span class="s">&#39;warning&#39;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">flash_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+</span><span class='line'>        <span class="bp">self</span><span class="o">.</span><span class="n">_flash_message</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">queue</span><span class="o">=</span><span class="s">&#39;error&#39;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">_flash_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">queue</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+</span><span class='line'>        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">flash</span><span class="p">({</span><span class="s">&#39;title&#39;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span> <span class="s">&#39;body&#39;</span><span class="p">:</span> <span class="n">body</span><span class="p">},</span> <span class="n">queue</span><span class="o">=</span><span class="n">queue</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This just sits in our top-level <code>__init__.py</code>, along with the <code>main()</code> entry point.</p>
+
+<p>Notes: <code>@util.CachedAttribute</code> contains <a href="http://code.activestate.com/recipes/276643-caching-and-aliasing-with-descriptors/">this recipe</a>. &#8220;Mox&#8221; is an easy-to-type codename, named after <a href="http://www.summitpost.org/mox-peaks-from-red-face-mountain/690027">these mountains</a>.</p>
+
+<p>[1] I&#8217;m still not sold on this, but I&#8217;m getting by. It arguably causes problems with testing and such, but it <em>is</em> pretty nice to magically <code>from flask import request</code>.</p>
+</div>
+  
+  
+
+
+    </article>
+    <hr>
   
   
     <article>
@@ -644,6 +829,10 @@
     <li class="nav-header">Recent Posts</li>
     
       <li class="post">
+        <a href="/blog/post/2013/07/12/Async-nodejs-API-server-testing/">Async node.js API server testing</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/post/2013/05/29/may-release-roundup/">May Release Roundup</a>
       </li>
     
@@ -657,10 +846,6 @@
     
       <li class="post">
         <a href="/blog/post/2013/03/21/improved-grouping-for-javascript-errors/">Improved grouping for Javascript errors</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/post/2013/02/26/rollbar-notifier-upgrades/">Upgrading to the new Rollbar notifier libraries</a>
       </li>
     
     <li class="divider"></li>
