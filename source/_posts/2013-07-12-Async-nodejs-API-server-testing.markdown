@@ -10,11 +10,11 @@ categories: api testing javascript nodejs articles
 
 This post is about how we built our test suite for our API server at [Rollbar](http://rollbar.com/) and some of the tricks and gotchas we ran into along the way. We wanted to build a test suite that not only tested the API logic, but also the underlying code, namely the [Express](http://expressjs.com/) and the [Connect](http://www.senchalabs.org/connect/) middlewares we use. If our API server was going to break, we wanted to know before we deployed it to thousands of customers and millions of requests per day.
 
-Testing is super important. I'm not going to try and work that idea into your head anymore than that. If you don't want to test, this probably won't be very helpful/interesting. If you want to learn how to test your API server, read on.
+Testing is super important. I'm not going to try and work that idea into your head any more than that. If you don't want to test, this probably won't be very helpful/interesting. If you want to learn how to test your API server, read on.
 
 ## We use Vows. Why not Mocha?
 
-[Mocha](http://visionmedia.github.io/mocha/) is, by far, the most widely used testing framework for Node.js apps. So, why didn't we use it? The two main reasons were that Vows was the first thing I found when Googling "nodejs async testing" and the other is that I didn't like the syntax of the Mocha tests.
+[Mocha](http://visionmedia.github.io/mocha/) is, by far, the most widely used testing framework for Node.js apps. So, why didn't we use it? The two main reasons were that Vows was the first thing I found when Googling "nodejs async testing" and the other is that I didn't like the syntax of the Mocha tests. Mocha tests are more readble but the benefit of readability was overshadowed by the need to remember all of these new, special-case methods that Mocha injects.
 
 ``` javascript
 //Mocha
@@ -204,6 +204,7 @@ There is a lot happening in these tests.
 
 - We use promises to notify our test when the API server is ready. 
   - Documentation for using promises with Vows can be found [here](http://vowsjs.org/#-writing-asynchronous-tests).
+  - I'm not completely on-board with the Promise design pattern but it seemed like the easiest way to get this working. Mostly, I needed an event to be fired when there was an error that caused the API server process to shut down.
 - We use a Vows teardown function to shut down the API server process.
 - We use our API library to help test our API server.
   - We cross-check our API server's response by using our API library directly.

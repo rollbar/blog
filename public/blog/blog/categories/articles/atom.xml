@@ -4,7 +4,7 @@
   <title><![CDATA[Category: articles | Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
   <link href="http://rollbar.com/blog/blog/categories/articles/atom.xml" rel="self"/>
   <link href="http://rollbar.com/blog/"/>
-  <updated>2013-07-12T16:31:06-07:00</updated>
+  <updated>2013-07-13T12:16:51-07:00</updated>
   <id>http://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
@@ -20,11 +20,11 @@
     <id>http://rollbar.com/blog/post/2013/07/12/Async-nodejs-API-server-testing</id>
     <content type="html"><![CDATA[<p>This post is about how we built our test suite for our API server at <a href="http://rollbar.com/">Rollbar</a> and some of the tricks and gotchas we ran into along the way. We wanted to build a test suite that not only tested the API logic, but also the underlying code, namely the <a href="http://expressjs.com/">Express</a> and the <a href="http://www.senchalabs.org/connect/">Connect</a> middlewares we use. If our API server was going to break, we wanted to know before we deployed it to thousands of customers and millions of requests per day.</p>
 
-<p>Testing is super important. I'm not going to try and work that idea into your head anymore than that. If you don't want to test, this probably won't be very helpful/interesting. If you want to learn how to test your API server, read on.</p>
+<p>Testing is super important. I'm not going to try and work that idea into your head any more than that. If you don't want to test, this probably won't be very helpful/interesting. If you want to learn how to test your API server, read on.</p>
 
 <h2>We use Vows. Why not Mocha?</h2>
 
-<p><a href="http://visionmedia.github.io/mocha/">Mocha</a> is, by far, the most widely used testing framework for Node.js apps. So, why didn't we use it? The two main reasons were that Vows was the first thing I found when Googling "nodejs async testing" and the other is that I didn't like the syntax of the Mocha tests.</p>
+<p><a href="http://visionmedia.github.io/mocha/">Mocha</a> is, by far, the most widely used testing framework for Node.js apps. So, why didn't we use it? The two main reasons were that Vows was the first thing I found when Googling "nodejs async testing" and the other is that I didn't like the syntax of the Mocha tests. Mocha tests are more readble but the benefit of readability was overshadowed by the need to remember all of these new, special-case methods that Mocha injects.</p>
 
 <p><code>javascript
 //Mocha
@@ -238,6 +238,7 @@ teardown: function(err, childProc) {
 
 <ul>
 <li>Documentation for using promises with Vows can be found <a href="http://vowsjs.org/#-writing-asynchronous-tests">here</a>.</li>
+<li>I'm not completely on-board with the Promise design pattern but it seemed like the easiest way to get this working. Mostly, I needed an event to be fired when there was an error that caused the API server process to shut down.</li>
 </ul>
 </li>
 <li>We use a Vows teardown function to shut down the API server process.</li>
