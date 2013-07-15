@@ -4,7 +4,7 @@
   <title><![CDATA[Category: articles | Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
   <link href="http://rollbar.com/blog/blog/categories/articles/atom.xml" rel="self"/>
   <link href="http://rollbar.com/blog/"/>
-  <updated>2013-07-15T11:58:48-07:00</updated>
+  <updated>2013-07-15T12:06:44-07:00</updated>
   <id>http://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
@@ -73,7 +73,7 @@ vows.describe('testmodule').addBatch({
 
 <p>Check out the Vows <a href="http://vowsjs.org/">website</a> for better examples.</p>
 
-<h2>Useful design patterns, (I swear this will be short)</h2>
+<h2>Useful design patterns (I swear this will be short)</h2>
 
 <p>We've found a few idioms and conventions that have been super helpful. Without going too much into design patterns and architecture, here are a few tips that have made writing tests super-easy; almost enjoyable—almost.</p>
 

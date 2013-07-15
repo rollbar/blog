@@ -60,7 +60,7 @@ Note that we use this.callback since everything is assumed to be async and we us
 
 Check out the Vows [website](http://vowsjs.org/) for better examples.
 
-## Useful design patterns, (I swear this will be short)
+## Useful design patterns (I swear this will be short)
 
 We've found a few idioms and conventions that have been super helpful. Without going too much into design patterns and architecture, here are a few tips that have made writing tests super-easy; almost enjoyable—almost.
 
