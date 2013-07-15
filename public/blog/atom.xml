@@ -4,7 +4,7 @@
   <title><![CDATA[Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
   <link href="http://rollbar.com/blog/atom.xml" rel="self"/>
   <link href="http://rollbar.com/blog/"/>
-  <updated>2013-07-13T12:16:51-07:00</updated>
+  <updated>2013-07-15T11:48:51-07:00</updated>
   <id>http://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
@@ -20,11 +20,11 @@
     <id>http://rollbar.com/blog/post/2013/07/12/Async-nodejs-API-server-testing</id>
     <content type="html"><![CDATA[<p>This post is about how we built our test suite for our API server at <a href="http://rollbar.com/">Rollbar</a> and some of the tricks and gotchas we ran into along the way. We wanted to build a test suite that not only tested the API logic, but also the underlying code, namely the <a href="http://expressjs.com/">Express</a> and the <a href="http://www.senchalabs.org/connect/">Connect</a> middlewares we use. If our API server was going to break, we wanted to know before we deployed it to thousands of customers and millions of requests per day.</p>
 
-<p>Testing is super important. I&#8217;m not going to try and work that idea into your head any more than that. If you don&#8217;t want to test, this probably won&#8217;t be very helpful/interesting. If you want to learn how to test your API server, read on.</p>
+<p>Testing is super important. If you don&#8217;t want to test, this probably won&#8217;t be very helpful or interesting.</p>
 
 <h2>We use Vows. Why not Mocha?</h2>
 
-<p><a href="http://visionmedia.github.io/mocha/">Mocha</a> is, by far, the most widely used testing framework for Node.js apps. So, why didn&#8217;t we use it? The two main reasons were that Vows was the first thing I found when Googling &#8220;nodejs async testing&#8221; and the other is that I didn&#8217;t like the syntax of the Mocha tests. Mocha tests are more readble but the benefit of readability was overshadowed by the need to remember all of these new, special-case methods that Mocha injects.</p>
+<p><a href="http://visionmedia.github.io/mocha/">Mocha</a> is, by far, the most widely used testing framework for Node.js apps. So, why didn&#8217;t we use it? The two main reasons were that Vows was the first thing I found when Googling &#8220;nodejs async testing&#8221; and the other is that the syntax of Mocha tests felt like another language and less like code. Mocha tests are more readble but the benefit of readability was overshadowed by the need to remember all of these new, special-case methods that Mocha injects.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -48,7 +48,7 @@
 
 <h2>A simple Vows test</h2>
 
-<p>Vows works just as you&#8217;d expect it to, except when it doesn&#8217;t. More on that later&#8230;</p>
+<p>Vows works just as you&#8217;d expect it to, except when it doesn&#8217;t. More on that later…</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -91,7 +91,7 @@
 
 <h2>Useful design patterns, (I swear this will be short)</h2>
 
-<p>I won&#8217;t talk much about architecture or design patterns but we&#8217;ve found a few useful idioms that we follow pretty strictly. Doing so has made writing tests super-easy&#8230; almost enjoyable, almost.</p>
+<p>I won&#8217;t talk much about architecture or design patterns but we&#8217;ve found a few useful idioms that we follow pretty strictly. Doing so has made writing tests super-easy; almost enjoyable—almost.</p>
 
 <h3>Separate your view logic from your API business logic</h3>
 
@@ -107,7 +107,7 @@
 
 <p>This is how the Node.js developers do it and I agree. It makes for a lot more boiler-plate code but it forces you to keep error handling in-mind when developing. Writing defensive code is more important than writing fewer lines of code.</p>
 
-<p>This will also make testing much, much easier with Vows. How? Read on&#8230;</p>
+<p>This will also make testing much, much easier with Vows. How? Read on…</p>
 
 <h2>Testing the API server, for reals</h2>
 
@@ -365,9 +365,9 @@
 
 <p>Testing without mock objects means that you need a real database which means you probably need real-ish data to test with. This is tough. We chose to maintain a DB SQL fixture that we have to update whenever the schema changes. It&#8217;s a bit clunky but it works. I&#8217;m open to suggestions for this if anyone knows of a better way.</p>
 
-<h2>Wrapping up&#8230;</h2>
+<h2>Wrapping up…</h2>
 
-<p>I didn&#8217;t really go over our testing process much, (maybe in a subsequent blog post) but we use <a href="http://circleci.com">CircleCI</a> to run all of these tests. It&#8217;s fast and easy to set up. Also, it has all of the systems that our API server uses like MySQL, Beanstalkd and Memcache pre-installed. This gets us closer to testing in a production environment than we would otherwise be able to get.</p>
+<p>I didn&#8217;t really go over our testing process much, (maybe in a subsequent blog post) but we use <a href="http://circleci.com">CircleCI</a> to run all of these tests. It&#8217;s fast and easy to set up. Also, it has all of the systems that our API server uses like MySQL, Beanstalkd and Memcache pre-installed. This gets us closer to testing in a production environment than would otherwise be possible.</p>
 
 <p>Hopefully you were able to glean some useful tips from our experience at <a href="http://rollbar.com/">Rollbar</a>. We love building tools for devs like you!</p>
 

@@ -10,11 +10,11 @@ categories: api testing javascript nodejs articles
 
 This post is about how we built our test suite for our API server at [Rollbar](http://rollbar.com/) and some of the tricks and gotchas we ran into along the way. We wanted to build a test suite that not only tested the API logic, but also the underlying code, namely the [Express](http://expressjs.com/) and the [Connect](http://www.senchalabs.org/connect/) middlewares we use. If our API server was going to break, we wanted to know before we deployed it to thousands of customers and millions of requests per day.
 
-Testing is super important. I'm not going to try and work that idea into your head any more than that. If you don't want to test, this probably won't be very helpful/interesting. If you want to learn how to test your API server, read on.
+Testing is super important. If you don't want to test, this probably won't be very helpful or interesting.
 
 ## We use Vows. Why not Mocha?
 
-[Mocha](http://visionmedia.github.io/mocha/) is, by far, the most widely used testing framework for Node.js apps. So, why didn't we use it? The two main reasons were that Vows was the first thing I found when Googling "nodejs async testing" and the other is that I didn't like the syntax of the Mocha tests. Mocha tests are more readble but the benefit of readability was overshadowed by the need to remember all of these new, special-case methods that Mocha injects.
+[Mocha](http://visionmedia.github.io/mocha/) is, by far, the most widely used testing framework for Node.js apps. So, why didn't we use it? The two main reasons were that Vows was the first thing I found when Googling "nodejs async testing" and the other is that the syntax of Mocha tests felt like another language and less like code. Mocha tests are more readble but the benefit of readability was overshadowed by the need to remember all of these new, special-case methods that Mocha injects.
 
 ``` javascript
 //Mocha
@@ -34,7 +34,7 @@ Mocha has a lot of awesome features but none that were important enough for me t
 
 ## A simple Vows test
 
-Vows works just as you'd expect it to, except when it doesn't. More on that later...
+Vows works just as you'd expect it to, except when it doesn't. More on that later…
 
 ``` javascript
 var vows = require('vows'); 
@@ -62,7 +62,7 @@ Check out the Vows [website](http://vowsjs.org/) for better examples.
 
 ## Useful design patterns, (I swear this will be short)
 
-I won't talk much about architecture or design patterns but we've found a few useful idioms that we follow pretty strictly. Doing so has made writing tests super-easy... almost enjoyable, almost.
+I won't talk much about architecture or design patterns but we've found a few useful idioms that we follow pretty strictly. Doing so has made writing tests super-easy; almost enjoyable—almost.
 
 ### Separate your view logic from your API business logic
 
@@ -78,7 +78,7 @@ This is super-important for refactoring and adding new features. If you find you
 
 This is how the Node.js developers do it and I agree. It makes for a lot more boiler-plate code but it forces you to keep error handling in-mind when developing. Writing defensive code is more important than writing fewer lines of code.
 
-This will also make testing much, much easier with Vows. How? Read on...
+This will also make testing much, much easier with Vows. How? Read on…
 
 ## Testing the API server, for reals
 
@@ -220,9 +220,9 @@ Always use ```export(module, {error: false})``` in your Vows batches. This optio
 
 Testing without mock objects means that you need a real database which means you probably need real-ish data to test with. This is tough. We chose to maintain a DB SQL fixture that we have to update whenever the schema changes. It's a bit clunky but it works. I'm open to suggestions for this if anyone knows of a better way.
 
-## Wrapping up...
+## Wrapping up…
 
-I didn't really go over our testing process much, (maybe in a subsequent blog post) but we use [CircleCI](http://circleci.com) to run all of these tests. It's fast and easy to set up. Also, it has all of the systems that our API server uses like MySQL, Beanstalkd and Memcache pre-installed. This gets us closer to testing in a production environment than we would otherwise be able to get.
+I didn't really go over our testing process much, (maybe in a subsequent blog post) but we use [CircleCI](http://circleci.com) to run all of these tests. It's fast and easy to set up. Also, it has all of the systems that our API server uses like MySQL, Beanstalkd and Memcache pre-installed. This gets us closer to testing in a production environment than would otherwise be possible.
 
 Hopefully you were able to glean some useful tips from our experience at [Rollbar](http://rollbar.com/). We love building tools for devs like you!
 
