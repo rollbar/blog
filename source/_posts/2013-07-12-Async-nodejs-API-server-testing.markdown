@@ -62,7 +62,7 @@ Check out the Vows [website](http://vowsjs.org/) for better examples.
 
 ## Useful design patterns, (I swear this will be short)
 
-I won't talk much about architecture or design patterns but we've found a few useful idioms that we follow pretty strictly. Doing so has made writing tests super-easy; almost enjoyable—almost.
+We've found a few idioms and conventions that have been super helpful. Without going too much into design patterns and architecture, here are a few tips that have made writing tests super-easy; almost enjoyable—almost.
 
 ### Separate your view logic from your API business logic
 
@@ -82,7 +82,7 @@ This will also make testing much, much easier with Vows. How? Read on…
 
 ## Testing the API server, for reals
 
-Don't just test your API library; that's kind of lame. Fork a process, start your API server up in it and start firing requests at it using Vows. 
+Definitely write tests and exercise your API library directly but don't stop there. Fork a process, start your API server up in it and start firing requests at it using Vows. 
 
 testcommon.js:
 
@@ -222,7 +222,7 @@ Testing without mock objects means that you need a real database which means you
 
 ## Wrapping up…
 
-I didn't really go over our testing process much, (maybe in a subsequent blog post) but we use [CircleCI](http://circleci.com) to run all of these tests. It's fast and easy to set up. Also, it has all of the systems that our API server uses like MySQL, Beanstalkd and Memcache pre-installed. This gets us closer to testing in a production environment than would otherwise be possible.
+We use [CircleCI](http://circleci.com) to run all of these tests and are really happy with their service. It's fast and easy to set up. Also, it has all of the systems that our API server uses like MySQL, Beanstalkd and Memcache pre-installed. This gets us closer to testing in a production environment than would otherwise be possible.
 
 Hopefully you were able to glean some useful tips from our experience at [Rollbar](http://rollbar.com/). We love building tools for devs like you!
 

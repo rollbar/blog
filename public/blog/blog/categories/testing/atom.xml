@@ -4,7 +4,7 @@
   <title><![CDATA[Category: testing | Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
   <link href="http://rollbar.com/blog/blog/categories/testing/atom.xml" rel="self"/>
   <link href="http://rollbar.com/blog/"/>
-  <updated>2013-07-15T11:48:51-07:00</updated>
+  <updated>2013-07-15T11:58:48-07:00</updated>
   <id>http://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
@@ -75,7 +75,7 @@ vows.describe('testmodule').addBatch({
 
 <h2>Useful design patterns, (I swear this will be short)</h2>
 
-<p>I won't talk much about architecture or design patterns but we've found a few useful idioms that we follow pretty strictly. Doing so has made writing tests super-easy; almost enjoyable—almost.</p>
+<p>We've found a few idioms and conventions that have been super helpful. Without going too much into design patterns and architecture, here are a few tips that have made writing tests super-easy; almost enjoyable—almost.</p>
 
 <h3>Separate your view logic from your API business logic</h3>
 
@@ -95,7 +95,7 @@ vows.describe('testmodule').addBatch({
 
 <h2>Testing the API server, for reals</h2>
 
-<p>Don't just test your API library; that's kind of lame. Fork a process, start your API server up in it and start firing requests at it using Vows.</p>
+<p>Definitely write tests and exercise your API library directly but don't stop there. Fork a process, start your API server up in it and start firing requests at it using Vows.</p>
 
 <p>testcommon.js:</p>
 
@@ -268,7 +268,7 @@ teardown: function(err, childProc) {
 
 <h2>Wrapping up…</h2>
 
-<p>I didn't really go over our testing process much, (maybe in a subsequent blog post) but we use <a href="http://circleci.com">CircleCI</a> to run all of these tests. It's fast and easy to set up. Also, it has all of the systems that our API server uses like MySQL, Beanstalkd and Memcache pre-installed. This gets us closer to testing in a production environment than would otherwise be possible.</p>
+<p>We use <a href="http://circleci.com">CircleCI</a> to run all of these tests and are really happy with their service. It's fast and easy to set up. Also, it has all of the systems that our API server uses like MySQL, Beanstalkd and Memcache pre-installed. This gets us closer to testing in a production environment than would otherwise be possible.</p>
 
 <p>Hopefully you were able to glean some useful tips from our experience at <a href="http://rollbar.com/">Rollbar</a>. We love building tools for devs like you!</p>
 

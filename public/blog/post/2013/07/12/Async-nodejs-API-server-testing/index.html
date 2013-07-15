@@ -193,7 +193,7 @@
 
 <h2>Useful design patterns, (I swear this will be short)</h2>
 
-<p>I won&#8217;t talk much about architecture or design patterns but we&#8217;ve found a few useful idioms that we follow pretty strictly. Doing so has made writing tests super-easy; almost enjoyable—almost.</p>
+<p>We&#8217;ve found a few idioms and conventions that have been super helpful. Without going too much into design patterns and architecture, here are a few tips that have made writing tests super-easy; almost enjoyable—almost.</p>
 
 <h3>Separate your view logic from your API business logic</h3>
 
@@ -213,7 +213,7 @@
 
 <h2>Testing the API server, for reals</h2>
 
-<p>Don&#8217;t just test your API library; that&#8217;s kind of lame. Fork a process, start your API server up in it and start firing requests at it using Vows.</p>
+<p>Definitely write tests and exercise your API library directly but don&#8217;t stop there. Fork a process, start your API server up in it and start firing requests at it using Vows.</p>
 
 <p>testcommon.js:</p>
 
@@ -469,7 +469,7 @@
 
 <h2>Wrapping up…</h2>
 
-<p>I didn&#8217;t really go over our testing process much, (maybe in a subsequent blog post) but we use <a href="http://circleci.com">CircleCI</a> to run all of these tests. It&#8217;s fast and easy to set up. Also, it has all of the systems that our API server uses like MySQL, Beanstalkd and Memcache pre-installed. This gets us closer to testing in a production environment than would otherwise be possible.</p>
+<p>We use <a href="http://circleci.com">CircleCI</a> to run all of these tests and are really happy with their service. It&#8217;s fast and easy to set up. Also, it has all of the systems that our API server uses like MySQL, Beanstalkd and Memcache pre-installed. This gets us closer to testing in a production environment than would otherwise be possible.</p>
 
 <p>Hopefully you were able to glean some useful tips from our experience at <a href="http://rollbar.com/">Rollbar</a>. We love building tools for devs like you!</p>
 
