@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Rollbar launches, raises initial funding - Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash</title>
+  <title>Debug Production Errors in Minified JS with Source Maps and Rollbar - Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash</title>
   <meta name="author" content="Rollbar, Inc.">
 
   
-  <meta name="description" content="Rollbar launches, raises initial funding Feb 26th, 2013 Today we’re excited to announce the public launch of Rollbar. Rollbar tracks and analyzes &hellip;">
+  <meta name="description" content="Debug Production Errors in Minified JS with Source Maps and Rollbar Jul 25th, 2013 Rollbar just got a much-requested feature: Source Maps support &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +19,7 @@
 
   
   
-  <link rel="canonical" href="https://rollbar.com/blog/post/2013/02/26/rollbar-launch-and-initial-funding/">
+  <link rel="canonical" href="https://rollbar.com/blog/post/2013/07/25/debug-production-errors-in-minified-javascript-with-source-maps-and-rollbar/">
   
   
   <link rel="author" href="https://plus.google.com/u/1/103254942254370049907/posts"/>
@@ -97,7 +97,7 @@
   
   <header>
     
-      <h1 class="entry-title">Rollbar launches, raises initial funding</h1>
+      <h1 class="entry-title">Debug Production Errors in Minified JS with Source Maps and Rollbar</h1>
     
     
       <p class="meta">
@@ -113,40 +113,80 @@
   
 
 
-<time datetime="2013-02-26T12:15:00-08:00" pubdate data-updated="true">Feb 26<span>th</span>, 2013</time>
+<time datetime="2013-07-25T14:49:00-07:00" pubdate data-updated="true">Jul 25<span>th</span>, 2013</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>Today we’re excited to announce the public launch of Rollbar. Rollbar tracks and analyzes errors in production applications, helping dev and ops teams diagnose and fix them.</p>
+<div class="entry-content"><p><a href="https://rollbar.com">Rollbar</a> just got a much-requested feature: Source Maps support for Javascript. If you minify your Javascript code in production, this will make debugging production errors much easier. This feature is now live for all accounts.</p>
 
-<h3>Platform-agnostic API</h3>
+<h2>What Are Source Maps?</h2>
 
-<p>Anything that can speak JSON and HTTP can talk to Rollbar. Our API accepts raw &#8220;items&#8221; (errors, exceptions, and log messages) and deploys as inputs, and aggregated items, occurrences, and deploys as outputs. We provide official libraries for Ruby, Python, PHP, Node.js, Javascript, and Flash; or you can <a href="https://rollbar.com/docs/api_items/">roll your own</a>.</p>
+<p>If you minify your Javascript code (i.e. using <a href="https://github.com/mishoo/UglifyJS2">UglifyJS2</a> or the <a href="https://developers.google.com/closure/compiler/">Closure Compiler</a>), it gets harder to debug errors. Stack traces reference the line/column numbers in the minified code instead of the original source code.</p>
 
-<h3>Severity levels</h3>
+<p><a href="http://www.html5rocks.com/en/tutorials/developertools/sourcemaps/">Source Maps</a> were designed to resolve this; they provide a mapping back from the minified line/column numbers to the original code. Chrome and Firefox have tools to use them in development, but what about errors that happen in production?</p>
 
-<p>Just because something raises an exception, doesn&#8217;t mean it should be treated as an &#8220;error&#8221;. Rollbar lets you utilize five severity levels (from &#8220;debug&#8221; to &#8220;critical&#8221;) to control visibility and notifications. Severity can be set in your code, or after-the-fact in the Rollbar interface.</p>
+<h2>Source Maps and Rollbar</h2>
 
-<h3>Track users through your stack</h3>
+<p>Rollbar can now map stack traces that reference minified code back to the original source files, lines, and column numbers. Here&#8217;s what a stack trace might have looked like before:</p>
 
-<p>Person tracking helps you provide great customer support by emailing affected users when you fix an error they hit. Or see the history for a particular user and link customer error reports to code problems, client- and server-side.</p>
+<p><img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/stacktrace-minified.png"></p>
 
-<h3>So much more</h3>
+<p>Here&#8217;s the de-minified version:</p>
 
-<p>API endpoints on 3 continents. Resolving and reactivations. Real-time notifications for new issues. Graphs everywhere. Deploy tracking. Search by title, host, file, context, date, severity, status. Replay an issue by pressing a button. SSL everywhere. Github, Asana, and Pivotal Tracker integration.</p>
+<p><img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/stacktrace-unminified.png"></p>
 
-<p>We&#8217;ve built many of the pieces our beta customers have needed, and we really think you&#8217;re going to like it. <a href="https://rollbar.com/signup/">Start a free trial now</a>, or see <a href="https://rollbar.com/pricing">pricing</a>, <a href="https://rollbar.com/features/">features</a>, or <a href="https://rollbar.com/docs/">docs</a>.</p>
+<p>We&#8217;ll also use the de-minified stack trace in our <a href="https://rollbar.com/docs/guides_grouping/">grouping algorithm</a>, which should result in more useful grouping.</p>
 
-<h3>More firepower</h3>
+<h2>Getting this set up</h2>
 
-<p>We&#8217;re also excited to announce that we&#8217;ve raised an initial round of funding from some of the smartest people in the business. Mike Hirshland (Resolute.vc), Hiten Shah (KISSmetrics), and Arjun Sethi participated in the round. This funding gives us some extra firepower to grow the team and bring our vision to life.</p>
+<p>To get started, you&#8217;ll need to make a change to <code>\_rollbarParams</code> in the on-page javascript snippet. Add the following two parameters:</p>
 
-<p>We’re really excited and can’t wait to keep making Rollbar better!</p>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">_rollbarParams</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>  <span class="c1">// ... existing params ...</span>
+</span><span class='line'>  <span class="c1">// set this to &#39;true&#39; to enable source map processing</span>
+</span><span class='line'>  <span class="s2">&quot;client.javascript.source_map_enabled&quot;</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+</span><span class='line'>  <span class="c1">// provide the current code version, i.e. the git SHA of your javascript code.</span>
+</span><span class='line'>  <span class="s2">&quot;client.javascript.code_version&quot;</span><span class="o">:</span> <span class="s2">&quot;bdd2b9241f791fc9f134fb3244b40d452d2d7e35&quot;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>Brian, Cory, and Sergei</p>
+
+<p>Next, either:
+- Add a sourceMappingUrl comment at the end of your minified file to point to the source map
+- Upload the source map (along with all source files) separately, as part of your deploy process</p>
+
+<p>This second step is a bit more involved so please see our <a href="https://rollbar.com/docs/guides_sourcemaps/">docs</a> for more details.</p>
+
+<h2>Caveats</h2>
+
+<p>All of this relies on having a stack trace with line and column numbers. Unfortunately, browser support for column numbers is inconsistent. As of today, this will work in Chrome, Firefox, and IE10+, and only for caught errors reported like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="k">try</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">doSomething</span><span class="p">();</span>
+</span><span class='line'><span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">_rollbar</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Uncaught errors (reported via window.onerror) don&#8217;t have column numbers in any browser we&#8217;re aware of, so they aren&#8217;t able to be de-obfuscated. For best results, catch all your exceptions so you don&#8217;t fall back to the top-level error handler.</p>
+
+<p>Happy debugging and please don&#8217;t hesistate to contact us (<a href="team@rollbar.com">team@rollbar.com</a>) if you have any questions.</p>
 </div>
 
 
@@ -170,12 +210,12 @@
   
 
 
-<time datetime="2013-02-26T12:15:00-08:00" pubdate data-updated="true">Feb 26<span>th</span>, 2013</time>
+<time datetime="2013-07-25T14:49:00-07:00" pubdate data-updated="true">Jul 25<span>th</span>, 2013</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/blog/categories/announcements/'>announcements</a>
+    <a class='category' href='/blog/blog/categories/releases/'>releases</a>
   
 </span>
 
@@ -184,7 +224,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="https://rollbar.com/blog/post/2013/02/26/rollbar-launch-and-initial-funding/" data-via="rollbar" data-counturl="https://rollbar.com/blog/post/2013/02/26/rollbar-launch-and-initial-funding/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="https://rollbar.com/blog/post/2013/07/25/debug-production-errors-in-minified-javascript-with-source-maps-and-rollbar/" data-via="rollbar" data-counturl="https://rollbar.com/blog/post/2013/07/25/debug-production-errors-in-minified-javascript-with-source-maps-and-rollbar/" >Tweet</a>
   
   
   
@@ -193,10 +233,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/post/2013/01/11/post-mortem-from-last-nights-outage/" title="Previous Post: Post-mortem from last night's outage">&laquo; Post-mortem from last night's outage</a>
+        <a class="basic-alignment left" href="/blog/post/2013/07/12/Async-nodejs-API-server-testing/" title="Previous Post: Async node.js API server testing">&laquo; Async node.js API server testing</a>
       
-      
-        <a class="basic-alignment right" href="/blog/post/2013/02/26/rollbar-notifier-upgrades/" title="Next Post: Upgrading to the new Rollbar notifier libraries">Upgrading to the new Rollbar notifier libraries &raquo;</a>
       
     </p>
   </footer>
@@ -361,8 +399,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'https://rollbar.com/blog/post/2013/02/26/rollbar-launch-and-initial-funding/';
-        var disqus_url = 'https://rollbar.com/blog/post/2013/02/26/rollbar-launch-and-initial-funding/';
+        var disqus_identifier = 'https://rollbar.com/blog/post/2013/07/25/debug-production-errors-in-minified-javascript-with-source-maps-and-rollbar/';
+        var disqus_url = 'https://rollbar.com/blog/post/2013/07/25/debug-production-errors-in-minified-javascript-with-source-maps-and-rollbar/';
         var disqus_script = 'embed.js';
       
     (function () {

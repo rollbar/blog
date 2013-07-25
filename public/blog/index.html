@@ -9,7 +9,7 @@
   <meta name="author" content="Rollbar, Inc.">
 
   
-  <meta name="description" content="This post is about how we built our test suite for our API server at Rollbar and some of the tricks and gotchas we ran into along the way. We wanted &hellip;">
+  <meta name="description" content="Rollbar just got a much-requested feature: Source Maps support for Javascript. If you minify your Javascript code in production, this will make &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -92,6 +92,109 @@
       <div id="content">
         <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/post/2013/07/25/debug-production-errors-in-minified-javascript-with-source-maps-and-rollbar/">Debug Production Errors in Minified JS with Source Maps and Rollbar</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-07-25T14:49:00-07:00" pubdate data-updated="true">Jul 25<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="https://rollbar.com">Rollbar</a> just got a much-requested feature: Source Maps support for Javascript. If you minify your Javascript code in production, this will make debugging production errors much easier. This feature is now live for all accounts.</p>
+
+<h2>What Are Source Maps?</h2>
+
+<p>If you minify your Javascript code (i.e. using <a href="https://github.com/mishoo/UglifyJS2">UglifyJS2</a> or the <a href="https://developers.google.com/closure/compiler/">Closure Compiler</a>), it gets harder to debug errors. Stack traces reference the line/column numbers in the minified code instead of the original source code.</p>
+
+<p><a href="http://www.html5rocks.com/en/tutorials/developertools/sourcemaps/">Source Maps</a> were designed to resolve this; they provide a mapping back from the minified line/column numbers to the original code. Chrome and Firefox have tools to use them in development, but what about errors that happen in production?</p>
+
+<h2>Source Maps and Rollbar</h2>
+
+<p>Rollbar can now map stack traces that reference minified code back to the original source files, lines, and column numbers. Here&#8217;s what a stack trace might have looked like before:</p>
+
+<p><img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/stacktrace-minified.png"></p>
+
+<p>Here&#8217;s the de-minified version:</p>
+
+<p><img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/stacktrace-unminified.png"></p>
+
+<p>We&#8217;ll also use the de-minified stack trace in our <a href="https://rollbar.com/docs/guides_grouping/">grouping algorithm</a>, which should result in more useful grouping.</p>
+
+<h2>Getting this set up</h2>
+
+<p>To get started, you&#8217;ll need to make a change to <code>\_rollbarParams</code> in the on-page javascript snippet. Add the following two parameters:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">_rollbarParams</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>  <span class="c1">// ... existing params ...</span>
+</span><span class='line'>  <span class="c1">// set this to &#39;true&#39; to enable source map processing</span>
+</span><span class='line'>  <span class="s2">&quot;client.javascript.source_map_enabled&quot;</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+</span><span class='line'>  <span class="c1">// provide the current code version, i.e. the git SHA of your javascript code.</span>
+</span><span class='line'>  <span class="s2">&quot;client.javascript.code_version&quot;</span><span class="o">:</span> <span class="s2">&quot;bdd2b9241f791fc9f134fb3244b40d452d2d7e35&quot;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Next, either:
+- Add a sourceMappingUrl comment at the end of your minified file to point to the source map
+- Upload the source map (along with all source files) separately, as part of your deploy process</p>
+
+<p>This second step is a bit more involved so please see our <a href="https://rollbar.com/docs/guides_sourcemaps/">docs</a> for more details.</p>
+
+<h2>Caveats</h2>
+
+<p>All of this relies on having a stack trace with line and column numbers. Unfortunately, browser support for column numbers is inconsistent. As of today, this will work in Chrome, Firefox, and IE10+, and only for caught errors reported like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="k">try</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">doSomething</span><span class="p">();</span>
+</span><span class='line'><span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">_rollbar</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Uncaught errors (reported via window.onerror) don&#8217;t have column numbers in any browser we&#8217;re aware of, so they aren&#8217;t able to be de-obfuscated. For best results, catch all your exceptions so you don&#8217;t fall back to the top-level error handler.</p>
+
+<p>Happy debugging and please don&#8217;t hesistate to contact us (<a href="team@rollbar.com">team@rollbar.com</a>) if you have any questions.</p>
+</div>
+  
+  
+
+
+    </article>
+    <hr>
   
   
     <article>
@@ -1352,89 +1455,6 @@ Follow <a href="https://twitter.com/rollbar">@rollbar</a> for more updates.</p>
     </article>
     <hr>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/post/2012/10/24/real-time-search-for-exceptions-and-errors/">Real-time Search for Exceptions and Errors</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-10-24T11:24:00-07:00" pubdate data-updated="true">Oct 24<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>We&#8217;re happy today to announce the release of real-time search. You can now search your exceptions, errors, and log messages by title:</p>
-
-<p><img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/realtimesearch1.png"></p>
-
-<p>For exceptions, the title contains the exception class and message. For errors and log messages, it contains the entire message. It’s a full-text search that works best on whole words; we also do a few tricks with camelCase and underscore_separated terms.</p>
-
-<p>The search index is kept up-to-date in real-time as new items are added to the system (that&#8217;s the &#8220;real-time&#8221; part). Typically the delay is ~2 seconds from receiving the input at our API to being in the index and searchable.</p>
-
-<p>Current customers can try it out now; let us know if you run into any issues. What else would you like to see indexed?</p>
-
-<p>If you don&#8217;t have an account yet, <a href="https://rollbar.com/">sign up here for early access</a>.</p>
-
-<h2>Under the hood</h2>
-
-<p>We&#8217;re using the new <a href="http://sphinxsearch.com/">Sphinx</a> realtime features for indexing and querying. It&#8217;s currently running on a single dedicated machine (1 core, 2GB ram, 100GB local disk).</p>
-
-<p>New items are indexed by a long-running script that indexes new items as they are inserted. (It keeps track of its location in the table and polls every second for new rows.) The index includes two full-text <em>fields</em>, <code>title</code> and <code>environment</code>, and two scalar <em>attributes</em>, <code>status</code> and <code>level</code>.</p>
-
-<p>Title and environment don&#8217;t change, so we don&#8217;t need to update them. But status (active/resolved) and level (critical/error/warning/info/debug) do. We keep these in sync by simply writing to the search server whenever we update the primary database and whenever we modify our tokenizing algorithm.</p>
-
-<p>Queries are routed through our API server, which returns the paged list of matching item ids that we can then use to filter with on our primary database, (in case the search results are out of date) and fetch the other data necessary for the results page (last occurrence, etc.)</p>
-
-<p>Although our setup is straightforward, there were a few gotchas and lessons learned.</p>
-
-<h3>Infix queries</h3>
-
-<p>Sphinx&#8217;s realtime index does not currently support infix queries. That means that if you’re searching for &#8220;Error&#8221; then exceptions with titles like &#8220;ReferenceError&#8221; or &#8220;not_found_error&#8221; or even &#8220;(Error)&#8221; would not be found. To get around this, we index both the original title as well as another set of tokens that we’ve determined are useful for the lookup.</p>
-
-<p>e.g. &#8220;#462 UnicodeEncodeError: &#8216;latin-1&#8217; codec can&#8217;t encode character u&#8217;\u0441&#8217; in position 71: ordinal not in range(256)&#8221;</p>
-
-<p>gets tokenized and becomes</p>
-
-<p>&#8220;#462 UnicodeEncodeError: &#8216;latin-1&#8217; codec can&#8217;t encode character u&#8217;\u0441&#8217; in position 71: ordinal not in range(256) can’t u0441 71 256 Unicode Encode Error latin-1&#8217;&#8221;</p>
-
-<p>By tacking on these extra tokens, we are able to support most of the relevant infix searches our users are likely to make.</p>
-
-<h3>Sphinx + MySQL</h3>
-
-<p>Sphinx search comes with a super-handy feature that lets you connect, add and query the search index using a vanilla MySQL protocol. This is great for debugging and testing but comes with some caveats.</p>
-
-<p>There are a lot of operations that SphinxQL does not yet support. One of the major ones is the lack of support for &#8220;OR&#8221; where_conditions and another is lack of a &#8220;COUNT(*)&#8221; method.</p>
-
-<p>Since our API server is written in node, we were able to use the <a href="https://github.com/felixge/node-mysql">node-mysql</a> library from Felix Geisendörfer. After plugging in the library, we noticed that the Sphinx server drops client connections fairly rigorously so we implemented a layer on top of the node-mysql library to handle reconnects, disconnects, etc&#8230; This has been great since it lets us perform maintenance on the Sphinx server without taking down our API server.</p>
-
-<h3>REPLACE</h3>
-
-<p>Lastly, we made sure that we were able to re-index our entire database into our Sphinx server by only using the REPLACE command when inserting new items. The docs mention that this can cause memory issues but since it&#8217;s so infrequent for our use-case, we haven&#8217;t run into any trouble and the benefit of re-indexing whenever we want more than makes up for it.</p>
-</div>
-  
-  
-
-
-    </article>
-    <hr>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/blog/page/2/">&larr; Older</a>
@@ -1450,6 +1470,10 @@ Follow <a href="https://twitter.com/rollbar">@rollbar</a> for more updates.</p>
     <li class="nav-header">Recent Posts</li>
     
       <li class="post">
+        <a href="/blog/post/2013/07/25/debug-production-errors-in-minified-javascript-with-source-maps-and-rollbar/">Debug Production Errors in Minified JS with Source Maps and Rollbar</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/post/2013/07/12/Async-nodejs-API-server-testing/">Async node.js API server testing</a>
       </li>
     
@@ -1463,10 +1487,6 @@ Follow <a href="https://twitter.com/rollbar">@rollbar</a> for more updates.</p>
     
       <li class="post">
         <a href="/blog/post/2013/03/29/using-unique-indexes-for-fun-and-profit/">Taking UNIQUE indexes to the next level</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/post/2013/03/21/improved-grouping-for-javascript-errors/">Improved grouping for Javascript errors</a>
       </li>
     
     <li class="divider"></li>
