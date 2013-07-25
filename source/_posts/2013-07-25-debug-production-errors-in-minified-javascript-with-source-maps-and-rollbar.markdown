@@ -30,7 +30,7 @@ We'll also use the de-minified stack trace in our [grouping algorithm](https://r
 
 ## Getting this set up
 
-To get started, you'll need to make a change to `\_rollbarParams` in the on-page javascript snippet. Add the following two parameters:
+To get started, you'll need to make a change to `_rollbarParams` in the on-page javascript snippet. Add the following two parameters:
 
 ``` javascript
 _rollbarParams = {

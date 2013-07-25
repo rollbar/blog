@@ -4,7 +4,7 @@
   <title><![CDATA[Category: releases | Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
   <link href="https://rollbar.com/blog/blog/categories/releases/atom.xml" rel="self"/>
   <link href="https://rollbar.com/blog/"/>
-  <updated>2013-07-25T15:25:28-07:00</updated>
+  <updated>2013-07-25T15:55:50-07:00</updated>
   <id>https://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
@@ -40,7 +40,7 @@
 
 <h2>Getting this set up</h2>
 
-<p>To get started, you'll need to make a change to <code>\_rollbarParams</code> in the on-page javascript snippet. Add the following two parameters:</p>
+<p>To get started, you'll need to make a change to <code>_rollbarParams</code> in the on-page javascript snippet. Add the following two parameters:</p>
 
 <p><code>javascript
 _rollbarParams = {
