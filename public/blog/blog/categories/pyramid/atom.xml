@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: pyramid | Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
-  <link href="http://rollbar.com/blog/blog/categories/pyramid/atom.xml" rel="self"/>
-  <link href="http://rollbar.com/blog/"/>
-  <updated>2013-07-15T12:06:44-07:00</updated>
-  <id>http://rollbar.com/blog/</id>
+  <link href="https://rollbar.com/blog/blog/categories/pyramid/atom.xml" rel="self"/>
+  <link href="https://rollbar.com/blog/"/>
+  <updated>2013-07-24T17:56:24-07:00</updated>
+  <id>https://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Using a Request Factory in Pyramid to write a little less code]]></title>
-    <link href="http://rollbar.com/blog/post/2012/09/07/using-pyramid-request-factory-to-write-less-code/"/>
+    <link href="https://rollbar.com/blog/post/2012/09/07/using-pyramid-request-factory-to-write-less-code/"/>
     <updated>2012-09-07T11:00:00-07:00</updated>
-    <id>http://rollbar.com/blog/post/2012/09/07/using-pyramid-request-factory-to-write-less-code</id>
+    <id>https://rollbar.com/blog/post/2012/09/07/using-pyramid-request-factory-to-write-less-code</id>
     <content type="html"><![CDATA[<p>At <a href="http://rollbar.com/">Rollbar.com</a>, we've been using <a href="http://www.pylonsproject.org/">Pyramid</a> as our web framework and have been pretty happy with it. It's lightweight and mostly stays out of our way.</p>
 
 <p>Pyramid doesn't have a global request object that you can just import [1], so it makes you pass around <code>request</code> wherever you need it. That results in a lot of library code that looks like this:</p>

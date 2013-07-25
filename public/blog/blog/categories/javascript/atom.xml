@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: javascript | Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
-  <link href="http://rollbar.com/blog/blog/categories/javascript/atom.xml" rel="self"/>
-  <link href="http://rollbar.com/blog/"/>
-  <updated>2013-07-15T12:06:44-07:00</updated>
-  <id>http://rollbar.com/blog/</id>
+  <link href="https://rollbar.com/blog/blog/categories/javascript/atom.xml" rel="self"/>
+  <link href="https://rollbar.com/blog/"/>
+  <updated>2013-07-24T17:56:24-07:00</updated>
+  <id>https://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Async node.js API server testing]]></title>
-    <link href="http://rollbar.com/blog/post/2013/07/12/Async-nodejs-API-server-testing/"/>
+    <link href="https://rollbar.com/blog/post/2013/07/12/Async-nodejs-API-server-testing/"/>
     <updated>2013-07-12T01:20:00-07:00</updated>
-    <id>http://rollbar.com/blog/post/2013/07/12/Async-nodejs-API-server-testing</id>
+    <id>https://rollbar.com/blog/post/2013/07/12/Async-nodejs-API-server-testing</id>
     <content type="html"><![CDATA[<p>This post is about how we built our test suite for our API server at <a href="http://rollbar.com/">Rollbar</a> and some of the tricks and gotchas we ran into along the way. We wanted to build a test suite that not only tested the API logic, but also the underlying code, namely the <a href="http://expressjs.com/">Express</a> and the <a href="http://www.senchalabs.org/connect/">Connect</a> middlewares we use. If our API server was going to break, we wanted to know before we deployed it to thousands of customers and millions of requests per day.</p>
 
 <p>Testing is super important. If you don't want to test, this probably won't be very helpful or interesting.</p>

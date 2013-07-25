@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: articles | Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
-  <link href="http://rollbar.com/blog/blog/categories/articles/atom.xml" rel="self"/>
-  <link href="http://rollbar.com/blog/"/>
-  <updated>2013-07-15T12:06:44-07:00</updated>
-  <id>http://rollbar.com/blog/</id>
+  <link href="https://rollbar.com/blog/blog/categories/articles/atom.xml" rel="self"/>
+  <link href="https://rollbar.com/blog/"/>
+  <updated>2013-07-24T17:56:24-07:00</updated>
+  <id>https://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Async node.js API server testing]]></title>
-    <link href="http://rollbar.com/blog/post/2013/07/12/Async-nodejs-API-server-testing/"/>
+    <link href="https://rollbar.com/blog/post/2013/07/12/Async-nodejs-API-server-testing/"/>
     <updated>2013-07-12T01:20:00-07:00</updated>
-    <id>http://rollbar.com/blog/post/2013/07/12/Async-nodejs-API-server-testing</id>
+    <id>https://rollbar.com/blog/post/2013/07/12/Async-nodejs-API-server-testing</id>
     <content type="html"><![CDATA[<p>This post is about how we built our test suite for our API server at <a href="http://rollbar.com/">Rollbar</a> and some of the tricks and gotchas we ran into along the way. We wanted to build a test suite that not only tested the API logic, but also the underlying code, namely the <a href="http://expressjs.com/">Express</a> and the <a href="http://www.senchalabs.org/connect/">Connect</a> middlewares we use. If our API server was going to break, we wanted to know before we deployed it to thousands of customers and millions of requests per day.</p>
 
 <p>Testing is super important. If you don't want to test, this probably won't be very helpful or interesting.</p>
@@ -285,9 +285,9 @@ Follow <a href="https://twitter.com/rollbar">@rollbar</a> for more updates.</p>
   
   <entry>
     <title type="html"><![CDATA[Taking UNIQUE indexes to the next level]]></title>
-    <link href="http://rollbar.com/blog/post/2013/03/29/using-unique-indexes-for-fun-and-profit/"/>
+    <link href="https://rollbar.com/blog/post/2013/03/29/using-unique-indexes-for-fun-and-profit/"/>
     <updated>2013-03-29T09:15:00-07:00</updated>
-    <id>http://rollbar.com/blog/post/2013/03/29/using-unique-indexes-for-fun-and-profit</id>
+    <id>https://rollbar.com/blog/post/2013/03/29/using-unique-indexes-for-fun-and-profit</id>
     <content type="html"><![CDATA[<p>You've probably seen unique constraints somewhere -- either in Rails' <a href="http://guides.rubyonrails.org/active_record_validations_callbacks.html#uniqueness"><code>validates :uniqueness</code></a>, Django's <a href="https://docs.djangoproject.com/en/dev/ref/models/fields/#unique"><code>Field.unique</code></a>, or a raw SQL <a href="http://dev.mysql.com/doc/refman/5.5/en/create-index.html">table definition</a>. The basic function of unique constraints (preventing duplicate data from being inserted) is nice, but they're so much more powerful than that. When you write INSERT or REPLACE statements that rely on them, you can do some pretty cool (and efficient) things that you would've had to do multiple queries for otherwise.</p>
 
 <p>This post covers unique indexes in MySQL 5.5. Other versions of MySQL are similar. I'm not sure about Postgres or other relational databases but presume they're similar-ish as well.</p>
@@ -481,9 +481,9 @@ impressions = impressions + VALUES(impressions)
   
   <entry>
     <title type="html"><![CDATA[Using a Request Factory in Pyramid to write a little less code]]></title>
-    <link href="http://rollbar.com/blog/post/2012/09/07/using-pyramid-request-factory-to-write-less-code/"/>
+    <link href="https://rollbar.com/blog/post/2012/09/07/using-pyramid-request-factory-to-write-less-code/"/>
     <updated>2012-09-07T11:00:00-07:00</updated>
-    <id>http://rollbar.com/blog/post/2012/09/07/using-pyramid-request-factory-to-write-less-code</id>
+    <id>https://rollbar.com/blog/post/2012/09/07/using-pyramid-request-factory-to-write-less-code</id>
     <content type="html"><![CDATA[<p>At <a href="http://rollbar.com/">Rollbar.com</a>, we've been using <a href="http://www.pylonsproject.org/">Pyramid</a> as our web framework and have been pretty happy with it. It's lightweight and mostly stays out of our way.</p>
 
 <p>Pyramid doesn't have a global request object that you can just import [1], so it makes you pass around <code>request</code> wherever you need it. That results in a lot of library code that looks like this:</p>
@@ -597,9 +597,9 @@ def _flash_message(self, body, title='', queue=''):
   
   <entry>
     <title type="html"><![CDATA[Writing a simple deploy script with Fabric and @roles]]></title>
-    <link href="http://rollbar.com/blog/post/2012/08/16/writing-a-simple-deploy-script-with-fabric-and-roles/"/>
+    <link href="https://rollbar.com/blog/post/2012/08/16/writing-a-simple-deploy-script-with-fabric-and-roles/"/>
     <updated>2012-08-16T11:52:00-07:00</updated>
-    <id>http://rollbar.com/blog/post/2012/08/16/writing-a-simple-deploy-script-with-fabric-and-roles</id>
+    <id>https://rollbar.com/blog/post/2012/08/16/writing-a-simple-deploy-script-with-fabric-and-roles</id>
     <content type="html"><![CDATA[<p>I first heard about <a href="http://www.fabfile.org">Fabric</a> a couple years ago while at Lolapps and liked the idea of:</p>
 
 <ul style="margin-left:40px;">

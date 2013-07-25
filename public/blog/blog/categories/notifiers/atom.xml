@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: notifiers | Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
-  <link href="http://rollbar.com/blog/blog/categories/notifiers/atom.xml" rel="self"/>
-  <link href="http://rollbar.com/blog/"/>
-  <updated>2013-07-15T12:06:44-07:00</updated>
-  <id>http://rollbar.com/blog/</id>
+  <link href="https://rollbar.com/blog/blog/categories/notifiers/atom.xml" rel="self"/>
+  <link href="https://rollbar.com/blog/"/>
+  <updated>2013-07-24T17:56:24-07:00</updated>
+  <id>https://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Upgrading to the new Rollbar notifier libraries]]></title>
-    <link href="http://rollbar.com/blog/post/2013/02/26/rollbar-notifier-upgrades/"/>
+    <link href="https://rollbar.com/blog/post/2013/02/26/rollbar-notifier-upgrades/"/>
     <updated>2013-02-26T17:25:00-08:00</updated>
-    <id>http://rollbar.com/blog/post/2013/02/26/rollbar-notifier-upgrades</id>
+    <id>https://rollbar.com/blog/post/2013/02/26/rollbar-notifier-upgrades</id>
     <content type="html"><![CDATA[<p>We've updated all of our notifier library repositories to match the name change to Rollbar today. The old Ratchet.io repos have been deprecated and all further development will continue on the respective Rollbar versions.</p>
 
 <p>Please note that the <code>submit.ratchet.io</code> endpoint and the existing libraries will continue to work for the indefinite future, so you don't have to do anything right now. But we do recommend upgrading to take advantage of future updates.</p>

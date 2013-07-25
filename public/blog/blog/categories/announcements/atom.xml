@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: announcements | Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
-  <link href="http://rollbar.com/blog/blog/categories/announcements/atom.xml" rel="self"/>
-  <link href="http://rollbar.com/blog/"/>
-  <updated>2013-07-15T12:06:44-07:00</updated>
-  <id>http://rollbar.com/blog/</id>
+  <link href="https://rollbar.com/blog/blog/categories/announcements/atom.xml" rel="self"/>
+  <link href="https://rollbar.com/blog/"/>
+  <updated>2013-07-24T17:56:24-07:00</updated>
+  <id>https://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Rollbar launches, raises initial funding]]></title>
-    <link href="http://rollbar.com/blog/post/2013/02/26/rollbar-launch-and-initial-funding/"/>
+    <link href="https://rollbar.com/blog/post/2013/02/26/rollbar-launch-and-initial-funding/"/>
     <updated>2013-02-26T12:15:00-08:00</updated>
-    <id>http://rollbar.com/blog/post/2013/02/26/rollbar-launch-and-initial-funding</id>
+    <id>https://rollbar.com/blog/post/2013/02/26/rollbar-launch-and-initial-funding</id>
     <content type="html"><![CDATA[<p>Today we’re excited to announce the public launch of Rollbar. Rollbar tracks and analyzes errors in production applications, helping dev and ops teams diagnose and fix them.</p>
 
 <h3>Platform-agnostic API</h3>

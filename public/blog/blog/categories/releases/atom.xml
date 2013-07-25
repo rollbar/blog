@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: releases | Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
-  <link href="http://rollbar.com/blog/blog/categories/releases/atom.xml" rel="self"/>
-  <link href="http://rollbar.com/blog/"/>
-  <updated>2013-07-15T12:06:44-07:00</updated>
-  <id>http://rollbar.com/blog/</id>
+  <link href="https://rollbar.com/blog/blog/categories/releases/atom.xml" rel="self"/>
+  <link href="https://rollbar.com/blog/"/>
+  <updated>2013-07-24T17:56:24-07:00</updated>
+  <id>https://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[May Release Roundup]]></title>
-    <link href="http://rollbar.com/blog/post/2013/05/29/may-release-roundup/"/>
+    <link href="https://rollbar.com/blog/post/2013/05/29/may-release-roundup/"/>
     <updated>2013-05-29T15:30:00-07:00</updated>
-    <id>http://rollbar.com/blog/post/2013/05/29/may-release-roundup</id>
+    <id>https://rollbar.com/blog/post/2013/05/29/may-release-roundup</id>
     <content type="html"><![CDATA[<p>Here's a roundup of what's new at Rollbar in the month of May.</p>
 
 <h3>Big Features</h3>
@@ -83,9 +83,9 @@ gem 'rollbar', '~&gt; 0.9.14'
   
   <entry>
     <title type="html"><![CDATA[Rules Engine for Notifications, Plus Integrations with Campfire, Hipchat, JIRA, and Trello]]></title>
-    <link href="http://rollbar.com/blog/post/2013/05/06/rules-engine-for-notifications-campfire-hipchat-jira-trello/"/>
+    <link href="https://rollbar.com/blog/post/2013/05/06/rules-engine-for-notifications-campfire-hipchat-jira-trello/"/>
     <updated>2013-05-06T21:30:00-07:00</updated>
-    <id>http://rollbar.com/blog/post/2013/05/06/rules-engine-for-notifications-campfire-hipchat-jira-trello</id>
+    <id>https://rollbar.com/blog/post/2013/05/06/rules-engine-for-notifications-campfire-hipchat-jira-trello</id>
     <content type="html"><![CDATA[<p>Today we're revamping the model for defining what you want to be notified about from <a href="https://rollbar.com">Rollbar</a>. Rollbar now integrates with <a href="http://asana.com">Asana</a>, <a href="http://campfirenow.com/">Campfire</a>, <a href="https://github.com/features/projects/issues">Github Issues</a>, <a href="http://hipchat.com">Hipchat</a>, <a href="http://jira.com">JIRA</a>, <a href="http://pivotaltracker.com">Pivotal Tracker</a>, and <a href="http://trello.com">Trello</a>, as well as any arbitrary system via a <a href="http://www.webhooks.org/">Webhook</a>.</p>
 
 <h2>New Integration Channels</h2>
@@ -128,9 +128,9 @@ gem 'rollbar', '~&gt; 0.9.14'
   
   <entry>
     <title type="html"><![CDATA[Real-time Search for Exceptions and Errors]]></title>
-    <link href="http://rollbar.com/blog/post/2012/10/24/real-time-search-for-exceptions-and-errors/"/>
+    <link href="https://rollbar.com/blog/post/2012/10/24/real-time-search-for-exceptions-and-errors/"/>
     <updated>2012-10-24T11:24:00-07:00</updated>
-    <id>http://rollbar.com/blog/post/2012/10/24/real-time-search-for-exceptions-and-errors</id>
+    <id>https://rollbar.com/blog/post/2012/10/24/real-time-search-for-exceptions-and-errors</id>
     <content type="html"><![CDATA[<p>We're happy today to announce the release of real-time search. You can now search your exceptions, errors, and log messages by title:</p>
 
 <p><img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/realtimesearch1.png"></p>

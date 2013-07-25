@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
-  <link href="http://rollbar.com/blog/atom.xml" rel="self"/>
-  <link href="http://rollbar.com/blog/"/>
-  <updated>2013-07-15T12:06:44-07:00</updated>
-  <id>http://rollbar.com/blog/</id>
+  <link href="https://rollbar.com/blog/atom.xml" rel="self"/>
+  <link href="https://rollbar.com/blog/"/>
+  <updated>2013-07-24T17:56:24-07:00</updated>
+  <id>https://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Async node.js API server testing]]></title>
-    <link href="http://rollbar.com/blog/post/2013/07/12/Async-nodejs-API-server-testing/"/>
+    <link href="https://rollbar.com/blog/post/2013/07/12/Async-nodejs-API-server-testing/"/>
     <updated>2013-07-12T01:20:00-07:00</updated>
-    <id>http://rollbar.com/blog/post/2013/07/12/Async-nodejs-API-server-testing</id>
+    <id>https://rollbar.com/blog/post/2013/07/12/Async-nodejs-API-server-testing</id>
     <content type="html"><![CDATA[<p>This post is about how we built our test suite for our API server at <a href="http://rollbar.com/">Rollbar</a> and some of the tricks and gotchas we ran into along the way. We wanted to build a test suite that not only tested the API logic, but also the underlying code, namely the <a href="http://expressjs.com/">Express</a> and the <a href="http://www.senchalabs.org/connect/">Connect</a> middlewares we use. If our API server was going to break, we wanted to know before we deployed it to thousands of customers and millions of requests per day.</p>
 
 <p>Testing is super important. If you don&#8217;t want to test, this probably won&#8217;t be very helpful or interesting.</p>
@@ -385,9 +385,9 @@ Follow <a href="https://twitter.com/rollbar">@rollbar</a> for more updates.</p>
   
   <entry>
     <title type="html"><![CDATA[May Release Roundup]]></title>
-    <link href="http://rollbar.com/blog/post/2013/05/29/may-release-roundup/"/>
+    <link href="https://rollbar.com/blog/post/2013/05/29/may-release-roundup/"/>
     <updated>2013-05-29T15:30:00-07:00</updated>
-    <id>http://rollbar.com/blog/post/2013/05/29/may-release-roundup</id>
+    <id>https://rollbar.com/blog/post/2013/05/29/may-release-roundup</id>
     <content type="html"><![CDATA[<p>Here&#8217;s a roundup of what&#8217;s new at Rollbar in the month of May.</p>
 
 <h3>Big Features</h3>
@@ -454,9 +454,9 @@ Follow <a href="https://twitter.com/rollbar">@rollbar</a> for more updates.</p>
   
   <entry>
     <title type="html"><![CDATA[Rules Engine for Notifications, Plus Integrations with Campfire, Hipchat, JIRA, and Trello]]></title>
-    <link href="http://rollbar.com/blog/post/2013/05/06/rules-engine-for-notifications-campfire-hipchat-jira-trello/"/>
+    <link href="https://rollbar.com/blog/post/2013/05/06/rules-engine-for-notifications-campfire-hipchat-jira-trello/"/>
     <updated>2013-05-06T21:30:00-07:00</updated>
-    <id>http://rollbar.com/blog/post/2013/05/06/rules-engine-for-notifications-campfire-hipchat-jira-trello</id>
+    <id>https://rollbar.com/blog/post/2013/05/06/rules-engine-for-notifications-campfire-hipchat-jira-trello</id>
     <content type="html"><![CDATA[<p>Today we&#8217;re revamping the model for defining what you want to be notified about from <a href="https://rollbar.com">Rollbar</a>. Rollbar now integrates with <a href="http://asana.com">Asana</a>, <a href="http://campfirenow.com/">Campfire</a>, <a href="https://github.com/features/projects/issues">Github Issues</a>, <a href="http://hipchat.com">Hipchat</a>, <a href="http://jira.com">JIRA</a>, <a href="http://pivotaltracker.com">Pivotal Tracker</a>, and <a href="http://trello.com">Trello</a>, as well as any arbitrary system via a <a href="http://www.webhooks.org/">Webhook</a>.</p>
 
 <h2>New Integration Channels</h2>
@@ -499,9 +499,9 @@ Follow <a href="https://twitter.com/rollbar">@rollbar</a> for more updates.</p>
   
   <entry>
     <title type="html"><![CDATA[Taking UNIQUE indexes to the next level]]></title>
-    <link href="http://rollbar.com/blog/post/2013/03/29/using-unique-indexes-for-fun-and-profit/"/>
+    <link href="https://rollbar.com/blog/post/2013/03/29/using-unique-indexes-for-fun-and-profit/"/>
     <updated>2013-03-29T09:15:00-07:00</updated>
-    <id>http://rollbar.com/blog/post/2013/03/29/using-unique-indexes-for-fun-and-profit</id>
+    <id>https://rollbar.com/blog/post/2013/03/29/using-unique-indexes-for-fun-and-profit</id>
     <content type="html"><![CDATA[<p>You&#8217;ve probably seen unique constraints somewhere &#8211; either in Rails&#8217; <a href="http://guides.rubyonrails.org/active_record_validations_callbacks.html#uniqueness"><code>validates :uniqueness</code></a>, Django&#8217;s <a href="https://docs.djangoproject.com/en/dev/ref/models/fields/#unique"><code>Field.unique</code></a>, or a raw SQL <a href="http://dev.mysql.com/doc/refman/5.5/en/create-index.html">table definition</a>. The basic function of unique constraints (preventing duplicate data from being inserted) is nice, but they&#8217;re so much more powerful than that. When you write INSERT or REPLACE statements that rely on them, you can do some pretty cool (and efficient) things that you would&#8217;ve had to do multiple queries for otherwise.</p>
 
 <p>This post covers unique indexes in MySQL 5.5. Other versions of MySQL are similar. I&#8217;m not sure about Postgres or other relational databases but presume they&#8217;re similar-ish as well.</p>
@@ -743,9 +743,9 @@ Follow <a href="https://twitter.com/rollbar">@rollbar</a> for more updates.</p>
   
   <entry>
     <title type="html"><![CDATA[Improved grouping for Javascript errors]]></title>
-    <link href="http://rollbar.com/blog/post/2013/03/21/improved-grouping-for-javascript-errors/"/>
+    <link href="https://rollbar.com/blog/post/2013/03/21/improved-grouping-for-javascript-errors/"/>
     <updated>2013-03-21T16:14:00-07:00</updated>
-    <id>http://rollbar.com/blog/post/2013/03/21/improved-grouping-for-javascript-errors</id>
+    <id>https://rollbar.com/blog/post/2013/03/21/improved-grouping-for-javascript-errors</id>
     <content type="html"><![CDATA[<p>We&#8217;ve released an updated to how Javascript errors are grouped in Rollbar. The new update does a better job of separating different errors into different groups (&#8220;Items&#8221; in Rollbar parlance) while still recognizing the same issue in different browsers as the same. It&#8217;s now enabled for all new projects. Existing projects can enable it on the Migrations tab in Settings.</p>
 
 <p>Now the longer version&#8230;</p>
@@ -784,9 +784,9 @@ Follow <a href="https://twitter.com/rollbar">@rollbar</a> for more updates.</p>
   
   <entry>
     <title type="html"><![CDATA[Upgrading to the new Rollbar notifier libraries]]></title>
-    <link href="http://rollbar.com/blog/post/2013/02/26/rollbar-notifier-upgrades/"/>
+    <link href="https://rollbar.com/blog/post/2013/02/26/rollbar-notifier-upgrades/"/>
     <updated>2013-02-26T17:25:00-08:00</updated>
-    <id>http://rollbar.com/blog/post/2013/02/26/rollbar-notifier-upgrades</id>
+    <id>https://rollbar.com/blog/post/2013/02/26/rollbar-notifier-upgrades</id>
     <content type="html"><![CDATA[<p>We&#8217;ve updated all of our notifier library repositories to match the name change to Rollbar today. The old Ratchet.io repos have been deprecated and all further development will continue on the respective Rollbar versions.</p>
 
 <p>Please note that the <code>submit.ratchet.io</code> endpoint and the existing libraries will continue to work for the indefinite future, so you don&#8217;t have to do anything right now. But we do recommend upgrading to take advantage of future updates.</p>
@@ -810,9 +810,9 @@ Follow <a href="https://twitter.com/rollbar">@rollbar</a> for more updates.</p>
   
   <entry>
     <title type="html"><![CDATA[Rollbar launches, raises initial funding]]></title>
-    <link href="http://rollbar.com/blog/post/2013/02/26/rollbar-launch-and-initial-funding/"/>
+    <link href="https://rollbar.com/blog/post/2013/02/26/rollbar-launch-and-initial-funding/"/>
     <updated>2013-02-26T12:15:00-08:00</updated>
-    <id>http://rollbar.com/blog/post/2013/02/26/rollbar-launch-and-initial-funding</id>
+    <id>https://rollbar.com/blog/post/2013/02/26/rollbar-launch-and-initial-funding</id>
     <content type="html"><![CDATA[<p>Today we’re excited to announce the public launch of Rollbar. Rollbar tracks and analyzes errors in production applications, helping dev and ops teams diagnose and fix them.</p>
 
 <h3>Platform-agnostic API</h3>
@@ -845,9 +845,9 @@ Follow <a href="https://twitter.com/rollbar">@rollbar</a> for more updates.</p>
   
   <entry>
     <title type="html"><![CDATA[Post-mortem from last night's outage]]></title>
-    <link href="http://rollbar.com/blog/post/2013/01/11/post-mortem-from-last-nights-outage/"/>
+    <link href="https://rollbar.com/blog/post/2013/01/11/post-mortem-from-last-nights-outage/"/>
     <updated>2013-01-11T15:57:00-08:00</updated>
-    <id>http://rollbar.com/blog/post/2013/01/11/post-mortem-from-last-nights-outage</id>
+    <id>https://rollbar.com/blog/post/2013/01/11/post-mortem-from-last-nights-outage</id>
     <content type="html"><![CDATA[<blockquote><p><em>Tl;dr: from about 9:30pm to 12:30am last night, our website was unreachable and we weren&#8217;t sending out any notifications. Our API stayed up nearly the whole time thanks to an automatic failover.</em></p></blockquote>
 
 <p>We had our first major outage last night. We want to apologize to all of our customers for this outage, and we&#8217;re going to continue to work to make the <a href="http://rollbar.com">Rollbar.com</a> service stable, reliable, and performant.</p>
@@ -1007,9 +1007,9 @@ Follow <a href="https://twitter.com/rollbar">@rollbar</a> for more updates.</p>
   
   <entry>
     <title type="html"><![CDATA[Happy Halloween]]></title>
-    <link href="http://rollbar.com/blog/post/2012/10/31/happy-halloween/"/>
+    <link href="https://rollbar.com/blog/post/2012/10/31/happy-halloween/"/>
     <updated>2012-10-31T12:40:00-07:00</updated>
-    <id>http://rollbar.com/blog/post/2012/10/31/happy-halloween</id>
+    <id>https://rollbar.com/blog/post/2012/10/31/happy-halloween</id>
     <content type="html"><![CDATA[<h1>Y U No Use Rollbar?</h1>
 
 <p><img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/halloween-2012.jpg"></p>
@@ -1022,9 +1022,9 @@ Follow <a href="https://twitter.com/rollbar">@rollbar</a> for more updates.</p>
   
   <entry>
     <title type="html"><![CDATA[Real-time Search for Exceptions and Errors]]></title>
-    <link href="http://rollbar.com/blog/post/2012/10/24/real-time-search-for-exceptions-and-errors/"/>
+    <link href="https://rollbar.com/blog/post/2012/10/24/real-time-search-for-exceptions-and-errors/"/>
     <updated>2012-10-24T11:24:00-07:00</updated>
-    <id>http://rollbar.com/blog/post/2012/10/24/real-time-search-for-exceptions-and-errors</id>
+    <id>https://rollbar.com/blog/post/2012/10/24/real-time-search-for-exceptions-and-errors</id>
     <content type="html"><![CDATA[<p>We&#8217;re happy today to announce the release of real-time search. You can now search your exceptions, errors, and log messages by title:</p>
 
 <p><img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/realtimesearch1.png"></p>
@@ -1077,9 +1077,9 @@ Follow <a href="https://twitter.com/rollbar">@rollbar</a> for more updates.</p>
   
   <entry>
     <title type="html"><![CDATA[Using a Request Factory in Pyramid to write a little less code]]></title>
-    <link href="http://rollbar.com/blog/post/2012/09/07/using-pyramid-request-factory-to-write-less-code/"/>
+    <link href="https://rollbar.com/blog/post/2012/09/07/using-pyramid-request-factory-to-write-less-code/"/>
     <updated>2012-09-07T11:00:00-07:00</updated>
-    <id>http://rollbar.com/blog/post/2012/09/07/using-pyramid-request-factory-to-write-less-code</id>
+    <id>https://rollbar.com/blog/post/2012/09/07/using-pyramid-request-factory-to-write-less-code</id>
     <content type="html"><![CDATA[<p>At <a href="http://rollbar.com/">Rollbar.com</a>, we&#8217;ve been using <a href="http://www.pylonsproject.org/">Pyramid</a> as our web framework and have been pretty happy with it. It&#8217;s lightweight and mostly stays out of our way.</p>
 
 <p>Pyramid doesn&#8217;t have a global request object that you can just import [1], so it makes you pass around <code>request</code> wherever you need it. That results in a lot of library code that looks like this:</p>
@@ -1234,9 +1234,9 @@ Follow <a href="https://twitter.com/rollbar">@rollbar</a> for more updates.</p>
   
   <entry>
     <title type="html"><![CDATA[Writing a simple deploy script with Fabric and @roles]]></title>
-    <link href="http://rollbar.com/blog/post/2012/08/16/writing-a-simple-deploy-script-with-fabric-and-roles/"/>
+    <link href="https://rollbar.com/blog/post/2012/08/16/writing-a-simple-deploy-script-with-fabric-and-roles/"/>
     <updated>2012-08-16T11:52:00-07:00</updated>
-    <id>http://rollbar.com/blog/post/2012/08/16/writing-a-simple-deploy-script-with-fabric-and-roles</id>
+    <id>https://rollbar.com/blog/post/2012/08/16/writing-a-simple-deploy-script-with-fabric-and-roles</id>
     <content type="html"><![CDATA[<p>I first heard about <a href="http://www.fabfile.org">Fabric</a> a couple years ago while at Lolapps and liked the idea of:</p>
 
 <ul style="margin-left:40px;">
@@ -1264,7 +1264,7 @@ Follow <a href="https://twitter.com/rollbar">@rollbar</a> for more updates.</p>
 
 <p>Here’s my first attempt:</p>
 
-<figure class='code'><figcaption><span> (fabfile1.py)</span> <a href='http://rollbar.com/blog/downloads/code/fabfile1.py'>download</a></figcaption>
+<figure class='code'><figcaption><span> (fabfile1.py)</span> <a href='https://rollbar.com/blog/downloads/code/fabfile1.py'>download</a></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
@@ -1522,7 +1522,7 @@ Follow <a href="https://twitter.com/rollbar">@rollbar</a> for more updates.</p>
 
 <p>Fabric&#8217;s solution to this, described in their <a href="http://docs.fabfile.org/en/1.4.3/usage/execution.html">docs</a>, is &#8220;roles&#8221;. We can map hosts to roles, then decorate tasks with which roles they apply to. Here we replace the <code>env.hosts</code> declaration with <code>env.roledefs</code>, decorate <code>update_and_restart</code> with <code>@roles</code>, and call <code>update_and_restart</code> with <code>execute</code> so that the <code>@roles</code> decorator is honored:</p>
 
-<figure class='code'><figcaption><span> (fabfile2.py)</span> <a href='http://rollbar.com/blog/downloads/code/fabfile2.py'>download</a></figcaption>
+<figure class='code'><figcaption><span> (fabfile2.py)</span> <a href='https://rollbar.com/blog/downloads/code/fabfile2.py'>download</a></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>

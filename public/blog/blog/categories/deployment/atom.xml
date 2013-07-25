@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: deployment | Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
-  <link href="http://rollbar.com/blog/blog/categories/deployment/atom.xml" rel="self"/>
-  <link href="http://rollbar.com/blog/"/>
-  <updated>2013-07-15T12:06:44-07:00</updated>
-  <id>http://rollbar.com/blog/</id>
+  <link href="https://rollbar.com/blog/blog/categories/deployment/atom.xml" rel="self"/>
+  <link href="https://rollbar.com/blog/"/>
+  <updated>2013-07-24T17:56:24-07:00</updated>
+  <id>https://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Writing a simple deploy script with Fabric and @roles]]></title>
-    <link href="http://rollbar.com/blog/post/2012/08/16/writing-a-simple-deploy-script-with-fabric-and-roles/"/>
+    <link href="https://rollbar.com/blog/post/2012/08/16/writing-a-simple-deploy-script-with-fabric-and-roles/"/>
     <updated>2012-08-16T11:52:00-07:00</updated>
-    <id>http://rollbar.com/blog/post/2012/08/16/writing-a-simple-deploy-script-with-fabric-and-roles</id>
+    <id>https://rollbar.com/blog/post/2012/08/16/writing-a-simple-deploy-script-with-fabric-and-roles</id>
     <content type="html"><![CDATA[<p>I first heard about <a href="http://www.fabfile.org">Fabric</a> a couple years ago while at Lolapps and liked the idea of:</p>
 
 <ul style="margin-left:40px;">

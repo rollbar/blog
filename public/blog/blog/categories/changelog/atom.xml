@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: changelog | Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
-  <link href="http://rollbar.com/blog/blog/categories/changelog/atom.xml" rel="self"/>
-  <link href="http://rollbar.com/blog/"/>
-  <updated>2013-07-15T12:06:44-07:00</updated>
-  <id>http://rollbar.com/blog/</id>
+  <link href="https://rollbar.com/blog/blog/categories/changelog/atom.xml" rel="self"/>
+  <link href="https://rollbar.com/blog/"/>
+  <updated>2013-07-24T17:56:24-07:00</updated>
+  <id>https://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Improved grouping for Javascript errors]]></title>
-    <link href="http://rollbar.com/blog/post/2013/03/21/improved-grouping-for-javascript-errors/"/>
+    <link href="https://rollbar.com/blog/post/2013/03/21/improved-grouping-for-javascript-errors/"/>
     <updated>2013-03-21T16:14:00-07:00</updated>
-    <id>http://rollbar.com/blog/post/2013/03/21/improved-grouping-for-javascript-errors</id>
+    <id>https://rollbar.com/blog/post/2013/03/21/improved-grouping-for-javascript-errors</id>
     <content type="html"><![CDATA[<p>We've released an updated to how Javascript errors are grouped in Rollbar. The new update does a better job of separating different errors into different groups ("Items" in Rollbar parlance) while still recognizing the same issue in different browsers as the same. It's now enabled for all new projects. Existing projects can enable it on the Migrations tab in Settings.</p>
 
 <p>Now the longer version...</p>

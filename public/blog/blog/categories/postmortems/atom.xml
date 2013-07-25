@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: postmortems | Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
-  <link href="http://rollbar.com/blog/blog/categories/postmortems/atom.xml" rel="self"/>
-  <link href="http://rollbar.com/blog/"/>
-  <updated>2013-07-15T12:06:44-07:00</updated>
-  <id>http://rollbar.com/blog/</id>
+  <link href="https://rollbar.com/blog/blog/categories/postmortems/atom.xml" rel="self"/>
+  <link href="https://rollbar.com/blog/"/>
+  <updated>2013-07-24T17:56:24-07:00</updated>
+  <id>https://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Post-mortem from last night's outage]]></title>
-    <link href="http://rollbar.com/blog/post/2013/01/11/post-mortem-from-last-nights-outage/"/>
+    <link href="https://rollbar.com/blog/post/2013/01/11/post-mortem-from-last-nights-outage/"/>
     <updated>2013-01-11T15:57:00-08:00</updated>
-    <id>http://rollbar.com/blog/post/2013/01/11/post-mortem-from-last-nights-outage</id>
+    <id>https://rollbar.com/blog/post/2013/01/11/post-mortem-from-last-nights-outage</id>
     <content type="html"><![CDATA[<blockquote><p><em>Tl;dr: from about 9:30pm to 12:30am last night, our website was unreachable and we weren't sending out any notifications. Our API stayed up nearly the whole time thanks to an automatic failover.</em></p></blockquote>
 
 <p>We had our first major outage last night. We want to apologize to all of our customers for this outage, and we're going to continue to work to make the <a href="http://rollbar.com">Rollbar.com</a> service stable, reliable, and performant.</p>
