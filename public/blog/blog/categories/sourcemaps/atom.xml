@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: sourcemaps | Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
+  <link href="https://rollbar.com/blog/blog/categories/sourcemaps/atom.xml" rel="self"/>
+  <link href="https://rollbar.com/blog/"/>
+  <updated>2013-08-01T16:15:22-07:00</updated>
+  <id>https://rollbar.com/blog/</id>
+  <author>
+    <name><![CDATA[Rollbar, Inc.]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[JavaScript and Source Maps in a Django App]]></title>
+    <link href="https://rollbar.com/blog/post/2013/08/01/javascript-and-source-maps-in-a-django-app/"/>
+    <updated>2013-08-01T15:00:00-07:00</updated>
+    <id>https://rollbar.com/blog/post/2013/08/01/javascript-and-source-maps-in-a-django-app</id>
+    <content type="html"><![CDATA[<p>It's pretty well known that every web app needs frontend JavaScript these days to provide the best possible user experience. You are probably going to have a bunch of JavaScript files that need to be loaded by your users for that to happen, and since we all care about performance, minifiying and compressing these files is an absolute must. But what happens when it comes time to debug issues in these minified files? Stack traces will more or less be completely useless. How do we solve this problem?</p>
+
+<p>JavaScript source maps solve this problem. They allow you to map a point in a minified file back to the unminfied source, making it possible to actually identify and fix issues encountered in a production app environment.</p>
+
+<p>Below I have outlined a simple guide for setting up source map generation and usage in a sample Django app. You'll learn how generate source maps for minified files, debug errors that happen in these files, and also a quick overview of what's required to get this working for your production environments.</p>
+
+<h2>Local Debugging with Source Maps</h2>
+
+<p>Say you have a simple Django app with the following directory structure:</p>
+
+<pre><code>...
+app/
+    ...
+    views.py
+    static/
+        js/
+            site.js (containing various models and functionality used in your app)
+            jquery.js (unminified)
+            util.js
+    templates/
+        index.html
+</code></pre>
+
+<p><code>site.js</code> would have the following code:
+```javascript
+var aFunction = function() {</p>
+
+<pre><code>var a = b;
+</code></pre>
+
+<p>}</p>
+
+<p>App = {};
+App.errorCausingFunction = function() {</p>
+
+<pre><code>aFunction();
+</code></pre>
+
+<p>}
+```</p>
+
+<p><code>views.py</code> would just contain one view that rendered <code>index.html</code>, and here is how <code>index.html</code> would look like:
+```html
+...</p>
+
+<script src="static/js/site.js"></script>
+
+
+<script src="static/js/jquery.js"></script>
+
+
+<script src="static/js/util.js"></script>
+
+
+<p>....</p>
+
+<script>
+    App.errorCausingFunction();
+</script>
+
+
+<p>...
+```</p>
+
+<p>Let's minify. Start by installing UglifyJS2:</p>
+
+<pre><code>npm install -g uglify-js
+</code></pre>
+
+<p>Here is an example command run from <code>app/</code> that will generate minified Javascript:</p>
+
+<pre><code>uglifyjs static/js/site.js static/js/jquery.js static/js/util.js --output static/js/all.min.js
+</code></pre>
+
+<p>Here we are using uglifyjs to minify three JS files, <code>site.js</code>, <code>util.js</code> and <code>jquery.js</code>, into <code>all.min.js</code>.</p>
+
+<p>Update your <code>index.html</code> to include only <code>all.min.js</code>:
+```html</p>
+
+<script src="static/js/all.min.js"></script>
+
+
+<p>```</p>
+
+<p>Now let's try navigating to <code>index.html</code> and seeing what happens:</p>
+
+<p><img src="http://sbmac:7943/static/img/blog/stacktrace-minified-chrome.png"></p>
+
+<p>Not the most helpful stack trace. All the line numbers are 1, and if this were a much larger file with more generic function/variable names, it would be completely useless in helping you debug where things went wrong.</p>
+
+<p>Let's introduce source map functionality to our app.</p>
+
+<p>Modify your minification command to look like this:</p>
+
+<pre><code>uglifyjs static/js/site.js static/js/jquery.js static/js/util.js --output static/js/all.min.js --source-map static/js/all.min.map --source-map-url /static/js/all.min.map
+</code></pre>
+
+<p>Here we are adding two new options, <code>--source-map</code> and <code>--source-map-url</code>. UglifyJS2 will now generate the resulting source map as <code>static/js/all.min.map</code>, and will append a comment to the end of the minified file containing the url to the source map on your website, in this case <code>/static/js/all.min.map</code>. Note, you may need to modify the comment in <code>all.min.map</code> to read <code>//#</code> instead of <code>//@</code>, as this is a <a href="https://groups.google.com/forum/#!topic/mozilla.dev.js-sourcemap/4uo7Z5nTfUY">recently new convention</a>.</p>
+
+<p>Now navigate to your app in Chrome with Developer Tools open. If everything is set up right, Chrome will automatically translate the frames in the stack trace to the unminified equivalents, like so:</p>
+
+<p><img src="http://sbmac:7943/static/img/blog/stacktrace-unminified-chrome.png"></p>
+
+<p>Note that the filenames and line numbers now refer to the original source code, instead of the minified source.</p>
+
+<h2>Production Debugging with Source Maps</h2>
+
+<p>The above process is all fine and dandy for errors encountered on your local machine, but what if you want to keep track of errors encountered by your users in real-time?</p>
+
+<p>Here at <a href="https://rollbar.com">Rollbar</a>, we have recently reworked our error processing pipeline to support the application of source maps on JavaScript errors. Here's how you would get Rollbar hooked up and reporting from your production environment:</p>
+
+<ol>
+<li><p>Create a Rollbar account</p></li>
+<li><p>Follow the instructions to insert the Rollbar Javascript notifier snippet into your base template</p></li>
+<li><p>Modify the snippet configuration to signal that source maps should be used:
+<code>javascript
+_rollbarParams = {
+// ... other params ...
+// set this to 'true' to enable source map processing
+"client.javascript.source_map_enabled": true,
+// provide the current code version, i.e. the git SHA of your javascript code.
+"client.javascript.code_version": "bdd2b9241f791fc9f134fb3244b40d452d2d7e35"
+}
+</code></p></li>
+<li><p>Make sure your minified files link properly to publicly accessible source maps using the <code>sourceMappingURL</code> comment:
+<code>javascript
+// ... minified js file contents ...
+//# sourceMappingURL=&lt;url for source map&gt;
+</code></p></li>
+</ol>
+
+
+<p>Now, when your app sends Rollbar an error report, Rollbar will automatically attempt to download source maps defined in your minified files and apply them to stack frames located in these files.</p>
+
+<p>Here is an example of the source map application process in action with an unminified stack trace that you would see in Rollbar:</p>
+
+<p><img src="http://sbmac:7943/static/img/blog/stacktrace-unminified-rollbar.png"></p>
+
+<p>Notice the unminified source filenames with relevant line and column numbers.</p>
+
+<h2>Automating things</h2>
+
+<p>It's a bit annoying to have to minify everything every time you change one of your Javascript files. We have a small script set up here in our dev environments that uses <a href="https://pypi.python.org/pypi/MacFSEvents">macfsevents</a> to listen for Javascript file changes. Once such events occur, we check to see if only the Javascript files we care about are affected. If so, we run an <code>uglifyjs</code> command on all the Javascript files to generate minified sources and source maps.</p>
+
+<p>You can even go one step further by making an API call to Rollbar to upload your source map as part of your deploy process. This API endpoint also accepts source file uploads for files referenced by the source map, giving us the ability to print out the unminified source code for each frame in the stack trace. For example:</p>
+
+<p><img src="http://sbmac:7943/static/img/blog/stacktrace-unminified-rollbar-with-source.png"></p>
+
+<p>Here's a sample command you could use to upload a source map and source file to our API:</p>
+
+<p><code>bash
+curl https://api.rollbar.com/api/1/sourcemap \
+-F access_token=aaaabbbbccccddddeeeeffff00001111 \
+-F version=bdd2b9241f791fc9f134fb3244b40d452d2d7e35 \
+-F minified_url=http://127.0.0.1:8005/static/js/all.min.js \
+-F source_map=@app/static/js/all.min.map \
+-F app/static/js/site.js=@app/static/js/site.js
+</code></p>
+
+<p>The last param is a mapping of source file path to actual source file contents. The path would need to match the one defined in your source map, generated by your minification tool.</p>
+
+<h2>More info</h2>
+
+<p>Check out more documentation about integrating your JavaScript and source maps with Rollbar <a href="https://rollbar.com/docs/project/143/notifier/rollbar.js/">here</a> and <a href="https://rollbar.com/docs/guides_sourcemaps/">here</a>. Rollbar also integrates with your Python, Rails, PHP and Node.js based backends.</p>
+
+<p>Contact us at <a href="team@rollbar.com">team@rollbar.com</a> if you have any questions, and be sure to follow <a href="https://twitter.com/rollbar">@rollbar</a> for more updates regarding new releases!</p>
+]]></content>
+  </entry>
+  
+</feed>
