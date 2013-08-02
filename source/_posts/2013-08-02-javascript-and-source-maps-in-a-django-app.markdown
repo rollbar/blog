@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "JavaScript and Source Maps in a Django App"
-date: 2013-08-01 15:00
+date: 2013-08-02 11:40
 comments: true
 author: Sergei Bezborodko
 categories: guides javascript sourcemaps

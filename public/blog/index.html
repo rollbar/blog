@@ -98,7 +98,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/post/2013/08/01/javascript-and-source-maps-in-a-django-app/">JavaScript and Source Maps in a Django App</a></h1>
+      <h1 class="entry-title"><a href="/blog/post/2013/08/02/javascript-and-source-maps-in-a-django-app/">JavaScript and Source Maps in a Django App</a></h1>
     
     
       <p class="meta">
@@ -114,7 +114,7 @@
   
 
 
-<time datetime="2013-08-01T15:00:00-07:00" pubdate data-updated="true">Aug 1<span>st</span>, 2013</time>
+<time datetime="2013-08-02T11:40:00-07:00" pubdate data-updated="true">Aug 2<span>nd</span>, 2013</time>
         
       </p>
     
@@ -209,7 +209,7 @@ app/
 
 <p>Now let&#8217;s try navigating to <code>index.html</code> and seeing what happens:</p>
 
-<p><img src="http://sbmac:7943/static/img/blog/stacktrace-minified-chrome.png"></p>
+<p><img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/stacktrace-minified-chrome.png"></p>
 
 <p>Not the most helpful stack trace. All the line numbers are 1, and if this were a much larger file with more generic function/variable names, it would be completely useless in helping you debug where things went wrong.</p>
 
@@ -224,7 +224,7 @@ app/
 
 <p>Now navigate to your app in Chrome with Developer Tools open. If everything is set up right, Chrome will automatically translate the frames in the stack trace to the unminified equivalents, like so:</p>
 
-<p><img src="http://sbmac:7943/static/img/blog/stacktrace-unminified-chrome.png"></p>
+<p><img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/stacktrace-unminified-chrome.png"></p>
 
 <p>Note that the filenames and line numbers now refer to the original source code, instead of the minified source.</p>
 
@@ -274,7 +274,7 @@ app/
 
 <p>Here is an example of the source map application process in action with an unminified stack trace that you would see in Rollbar:</p>
 
-<p><img src="http://sbmac:7943/static/img/blog/stacktrace-unminified-rollbar.png"></p>
+<p><img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/stacktrace-unminified-rollbar.png"></p>
 
 <p>Notice the unminified source filenames with relevant line and column numbers.</p>
 
@@ -284,7 +284,7 @@ app/
 
 <p>You can even go one step further by making an API call to Rollbar to upload your source map as part of your deploy process. This API endpoint also accepts source file uploads for files referenced by the source map, giving us the ability to print out the unminified source code for each frame in the stack trace. For example:</p>
 
-<p><img src="http://sbmac:7943/static/img/blog/stacktrace-unminified-rollbar-with-source.png"></p>
+<p><img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/stacktrace-unminified-rollbar-with-source.png"></p>
 
 <p>Here&#8217;s a sample command you could use to upload a source map and source file to our API:</p>
 
@@ -1652,7 +1652,7 @@ Follow <a href="https://twitter.com/rollbar">@rollbar</a> for more updates.</p>
     <li class="nav-header">Recent Posts</li>
     
       <li class="post">
-        <a href="/blog/post/2013/08/01/javascript-and-source-maps-in-a-django-app/">JavaScript and Source Maps in a Django App</a>
+        <a href="/blog/post/2013/08/02/javascript-and-source-maps-in-a-django-app/">JavaScript and Source Maps in a Django App</a>
       </li>
     
       <li class="post">
