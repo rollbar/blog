@@ -147,6 +147,6 @@ The last param is a mapping of source file path to actual source file contents. 
 
 ## More info
 
-Check out more documentation about integrating your JavaScript and source maps with Rollbar [here](https://rollbar.com/docs/project/143/notifier/rollbar.js/) and [here](https://rollbar.com/docs/guides_sourcemaps/). Rollbar also integrates with your Python, Rails, PHP and Node.js based backends.
+Check out the documentation for more info about integrating your [JavaScript](https://rollbar.com/docs/notifier/rollbar.js/) and [source maps](https://rollbar.com/docs/guides_sourcemaps/) with Rollbar. Rollbar also integrates with your Python, Rails, PHP and Node.js based backends.
 
 Contact us at [team@rollbar.com](team@rollbar.com) if you have any questions, and be sure to follow [@rollbar](https://twitter.com/rollbar) for more updates regarding new releases!
