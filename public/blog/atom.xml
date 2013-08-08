@@ -4,7 +4,7 @@
   <title><![CDATA[Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
   <link href="https://rollbar.com/blog/atom.xml" rel="self"/>
   <link href="https://rollbar.com/blog/"/>
-  <updated>2013-08-07T14:11:09-07:00</updated>
+  <updated>2013-08-08T11:15:41-07:00</updated>
   <id>https://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
@@ -12,6 +12,54 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[jQuery Error Instrumentation]]></title>
+    <link href="https://rollbar.com/blog/post/2013/08/08/jquery-error-instrumentation/"/>
+    <updated>2013-08-08T11:18:00-07:00</updated>
+    <id>https://rollbar.com/blog/post/2013/08/08/jquery-error-instrumentation</id>
+    <content type="html"><![CDATA[<p>Today we are releasing a new feature for our JavaScript notifier that should make tracking down errors much easier if you use jQuery 1.7 and above. The new functionality comes in a separate JS plugin snippet that should be placed right below where jQuery is loaded. Here is the first version of the plugin:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;script&gt;</span>
+</span><span class='line'><span class="o">!</span><span class="kd">function</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span><span class="nx">n</span><span class="p">,</span><span class="nx">t</span><span class="p">){</span><span class="kd">var</span> <span class="nx">e</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;notifier.plugins.jquery.version&quot;</span><span class="o">:</span><span class="s2">&quot;0.0.1&quot;</span><span class="p">};</span><span class="nx">n</span><span class="p">.</span><span class="nx">_rollbar</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span>
+</span><span class='line'><span class="p">{</span><span class="nx">_rollbarParams</span><span class="o">:</span><span class="nx">e</span><span class="p">});</span><span class="nx">r</span><span class="p">(</span><span class="nx">t</span><span class="p">).</span><span class="nx">ajaxError</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span><span class="nx">t</span><span class="p">,</span><span class="nx">e</span><span class="p">,</span><span class="nx">u</span><span class="p">){</span><span class="kd">var</span> <span class="nx">o</span><span class="o">=</span><span class="nx">t</span><span class="p">.</span><span class="nx">status</span><span class="p">;</span><span class="kd">var</span> <span class="nx">a</span><span class="o">=</span><span class="nx">e</span><span class="p">.</span><span class="nx">url</span><span class="p">;</span>
+</span><span class='line'><span class="nx">n</span><span class="p">.</span><span class="nx">_rollbar</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span><span class="nx">level</span><span class="o">:</span><span class="s2">&quot;warning&quot;</span><span class="p">,</span><span class="nx">msg</span><span class="o">:</span><span class="s2">&quot;jQuery ajax error for url &quot;</span><span class="o">+</span><span class="nx">a</span><span class="p">,</span><span class="nx">jquery_status</span><span class="o">:</span><span class="nx">o</span><span class="p">,</span>
+</span><span class='line'><span class="nx">jquery_url</span><span class="o">:</span><span class="nx">a</span><span class="p">,</span><span class="nx">jquery_thrown_error</span><span class="o">:</span><span class="nx">u</span><span class="p">})});</span><span class="kd">var</span> <span class="nx">u</span><span class="o">=</span><span class="nx">r</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">ready</span><span class="p">;</span><span class="nx">r</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">ready</span><span class="o">=</span><span class="kd">function</span><span class="p">(</span><span class="nx">r</span><span class="p">){</span>
+</span><span class='line'><span class="k">return</span> <span class="nx">u</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="kd">function</span><span class="p">(){</span><span class="k">try</span><span class="p">{</span><span class="nx">r</span><span class="p">()}</span><span class="k">catch</span><span class="p">(</span><span class="nx">t</span><span class="p">){</span><span class="nx">n</span><span class="p">.</span><span class="nx">_rollbar</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">t</span><span class="p">)}})};</span><span class="kd">var</span> <span class="nx">o</span><span class="o">=</span><span class="p">{};</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">a</span><span class="o">=</span><span class="nx">r</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">on</span><span class="p">;</span><span class="nx">r</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">on</span><span class="o">=</span><span class="kd">function</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span><span class="nx">t</span><span class="p">,</span><span class="nx">e</span><span class="p">,</span><span class="nx">u</span><span class="p">){</span><span class="kd">var</span> <span class="nx">f</span><span class="o">=</span><span class="kd">function</span><span class="p">(</span><span class="nx">r</span><span class="p">){</span><span class="kd">var</span> <span class="nx">t</span><span class="o">=</span><span class="kd">function</span><span class="p">(){</span><span class="k">try</span><span class="p">{</span>
+</span><span class='line'><span class="k">return</span> <span class="nx">r</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="nx">arguments</span><span class="p">)}</span><span class="k">catch</span><span class="p">(</span><span class="nx">t</span><span class="p">){</span><span class="nx">n</span><span class="p">.</span><span class="nx">_rollbar</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">t</span><span class="p">);</span><span class="k">return</span> <span class="kc">null</span><span class="p">}};</span><span class="nx">o</span><span class="p">[</span><span class="nx">r</span><span class="p">]</span><span class="o">=</span><span class="nx">t</span><span class="p">;</span><span class="k">return</span> <span class="nx">t</span><span class="p">};</span>
+</span><span class='line'><span class="k">if</span><span class="p">(</span><span class="nx">t</span><span class="o">&amp;&amp;</span><span class="k">typeof</span> <span class="nx">t</span><span class="o">===</span><span class="s2">&quot;function&quot;</span><span class="p">){</span><span class="nx">t</span><span class="o">=</span><span class="nx">f</span><span class="p">(</span><span class="nx">t</span><span class="p">)}</span><span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="nx">e</span><span class="o">&amp;&amp;</span><span class="k">typeof</span> <span class="nx">e</span><span class="o">===</span><span class="s2">&quot;function&quot;</span><span class="p">){</span><span class="nx">e</span><span class="o">=</span><span class="nx">f</span><span class="p">(</span><span class="nx">e</span><span class="p">)}</span><span class="k">else</span> <span class="k">if</span><span class="p">(</span>
+</span><span class='line'><span class="nx">u</span><span class="o">&amp;&amp;</span><span class="k">typeof</span> <span class="nx">u</span><span class="o">===</span><span class="s2">&quot;function&quot;</span><span class="p">){</span><span class="nx">u</span><span class="o">=</span><span class="nx">f</span><span class="p">(</span><span class="nx">u</span><span class="p">)}</span><span class="k">return</span> <span class="nx">a</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="nx">r</span><span class="p">,</span><span class="nx">t</span><span class="p">,</span><span class="nx">e</span><span class="p">,</span><span class="nx">u</span><span class="p">)};</span><span class="kd">var</span> <span class="nx">f</span><span class="o">=</span><span class="nx">r</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">off</span><span class="p">;</span>
+</span><span class='line'><span class="nx">r</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">off</span><span class="o">=</span><span class="kd">function</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span><span class="nx">n</span><span class="p">,</span><span class="nx">t</span><span class="p">){</span><span class="k">if</span><span class="p">(</span><span class="nx">n</span><span class="o">&amp;&amp;</span><span class="k">typeof</span> <span class="nx">n</span><span class="o">===</span><span class="s2">&quot;function&quot;</span><span class="p">){</span><span class="nx">n</span><span class="o">=</span><span class="nx">o</span><span class="p">[</span><span class="nx">n</span><span class="p">];</span><span class="k">delete</span> <span class="nx">o</span><span class="p">[</span><span class="nx">n</span><span class="p">]}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'><span class="nx">t</span><span class="o">=</span><span class="nx">o</span><span class="p">[</span><span class="nx">t</span><span class="p">];</span><span class="k">delete</span> <span class="nx">o</span><span class="p">[</span><span class="nx">t</span><span class="p">]}</span><span class="k">return</span> <span class="nx">f</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="nx">r</span><span class="p">,</span><span class="nx">n</span><span class="p">,</span><span class="nx">t</span><span class="p">)}}(</span><span class="nx">jQuery</span><span class="p">,</span><span class="nb">window</span><span class="p">,</span><span class="nb">document</span><span class="p">);</span>
+</span><span class='line'><span class="nt">&lt;/script&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The source can be found on GitHub <a href="https://github.com/rollbar/rollbar.js/blob/master/src/plugins/jquery.js">here</a>.</p>
+
+<p>The snippet wraps the <code>ready()</code>, <code>on()</code> and <code>off()</code> functions in jQuery to wrap any passed-in handlers in try/except blocks to automatically report errors to Rollbar. This lets us collect the full stack trace with line and column numbers for each frame, instead of just the last frame with only a line number. When combined with <a href="https://rollbar.com/docs/guides_sourcemaps/">source maps</a>, this makes debugging JavaScript errors much more doable.</p>
+
+<p>The new snippet also adds a handler to ajaxError() to automatically report any jQuery AJAX errors such as 404s and 500s to Rollbar. If you don&#8217;t want this, add the following option to your base snippet&#8217;s <code>_rollbarParams</code>:
+&#8220;`
+&#8220;notifier.plugins.jquery.ignoreAjaxErrors&#8221;: true</p>
+
+<p>You can start tracking errors in Rollbar by <a href="https://rollbar.com/signup">signing up for free</a>. Or read more in the <a href="https://rollbar.com/docs/notifier/rollbar.js">docs</a>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[JavaScript and Source Maps in a Django App]]></title>

@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Debug Production Errors in Minified JS with Source Maps and Rollbar - Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash</title>
+  <title>jQuery Error Instrumentation - Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash</title>
   <meta name="author" content="Rollbar, Inc.">
 
   
-  <meta name="description" content="Debug Production Errors in Minified JS with Source Maps and Rollbar Jul 25th, 2013 Rollbar just got a much-requested feature: Source Maps support &hellip;">
+  <meta name="description" content="jQuery Error Instrumentation Aug 8th, 2013 Today we are releasing a new feature for our JavaScript notifier that should make tracking down errors &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,10 +19,8 @@
 
   
   
-  <link rel="canonical" href="https://rollbar.com/blog/post/2013/07/25/debug-production-errors-in-minified-javascript-with-source-maps-and-rollbar/">
+  <link rel="canonical" href="https://rollbar.com/blog/post/2013/08/08/jquery-error-instrumentation/">
   
-  
-  <link rel="author" href="https://plus.google.com/u/1/103254942254370049907/posts"/>
   
   <link rel="publisher" href="https://plus.google.com/u/1/b/117853246165185436076/117853246165185436076/posts"/>
   
@@ -97,7 +95,7 @@
   
   <header>
     
-      <h1 class="entry-title">Debug Production Errors in Minified JS with Source Maps and Rollbar</h1>
+      <h1 class="entry-title">jQuery Error Instrumentation</h1>
     
     
       <p class="meta">
@@ -113,36 +111,14 @@
   
 
 
-<time datetime="2013-07-25T14:49:00-07:00" pubdate data-updated="true">Jul 25<span>th</span>, 2013</time>
+<time datetime="2013-08-08T11:18:00-07:00" pubdate data-updated="true">Aug 8<span>th</span>, 2013</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p><a href="https://rollbar.com">Rollbar</a> just got a much-requested feature: Source Maps support for Javascript. If you minify your Javascript code in production, this will make debugging production errors much easier. This feature is now live for all accounts.</p>
-
-<h2>What Are Source Maps?</h2>
-
-<p>If you minify your Javascript code (i.e. using <a href="https://github.com/mishoo/UglifyJS2">UglifyJS2</a> or the <a href="https://developers.google.com/closure/compiler/">Closure Compiler</a>), it gets harder to debug errors. Stack traces reference the line/column numbers in the minified code instead of the original source code.</p>
-
-<p><a href="http://www.html5rocks.com/en/tutorials/developertools/sourcemaps/">Source Maps</a> were designed to resolve this; they provide a mapping back from the minified line/column numbers to the original code. Chrome and Firefox have tools to use them in development, but what about errors that happen in production?</p>
-
-<h2>Source Maps and Rollbar</h2>
-
-<p>Rollbar can now map stack traces that reference minified code back to the original source files, lines, and column numbers. Here&#8217;s what a stack trace might have looked like before:</p>
-
-<p><img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/stacktrace-minified.png"></p>
-
-<p>Here&#8217;s the de-minified version:</p>
-
-<p><img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/stacktrace-unminified.png"></p>
-
-<p>We&#8217;ll also use the de-minified stack trace in our <a href="https://rollbar.com/docs/guides_grouping/">grouping algorithm</a>, which should result in more useful grouping.</p>
-
-<h2>Getting this set up</h2>
-
-<p>To get started, you&#8217;ll need to make a change to <code>_rollbarParams</code> in the on-page javascript snippet. Add the following two parameters:</p>
+<div class="entry-content"><p>Today we are releasing a new feature for our JavaScript notifier that should make tracking down errors much easier if you use jQuery 1.7 and above. The new functionality comes in a separate JS plugin snippet that should be placed right below where jQuery is loaded. Here is the first version of the plugin:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -151,42 +127,37 @@
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">_rollbarParams</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>  <span class="c1">// ... existing params ...</span>
-</span><span class='line'>  <span class="c1">// set this to &#39;true&#39; to enable source map processing</span>
-</span><span class='line'>  <span class="s2">&quot;client.javascript.source_map_enabled&quot;</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
-</span><span class='line'>  <span class="c1">// provide the current code version, i.e. the git SHA of your javascript code.</span>
-</span><span class='line'>  <span class="s2">&quot;client.javascript.code_version&quot;</span><span class="o">:</span> <span class="s2">&quot;bdd2b9241f791fc9f134fb3244b40d452d2d7e35&quot;</span>
-</span><span class='line'><span class="p">}</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;script&gt;</span>
+</span><span class='line'><span class="o">!</span><span class="kd">function</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span><span class="nx">n</span><span class="p">,</span><span class="nx">t</span><span class="p">){</span><span class="kd">var</span> <span class="nx">e</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;notifier.plugins.jquery.version&quot;</span><span class="o">:</span><span class="s2">&quot;0.0.1&quot;</span><span class="p">};</span><span class="nx">n</span><span class="p">.</span><span class="nx">_rollbar</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span>
+</span><span class='line'><span class="p">{</span><span class="nx">_rollbarParams</span><span class="o">:</span><span class="nx">e</span><span class="p">});</span><span class="nx">r</span><span class="p">(</span><span class="nx">t</span><span class="p">).</span><span class="nx">ajaxError</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span><span class="nx">t</span><span class="p">,</span><span class="nx">e</span><span class="p">,</span><span class="nx">u</span><span class="p">){</span><span class="kd">var</span> <span class="nx">o</span><span class="o">=</span><span class="nx">t</span><span class="p">.</span><span class="nx">status</span><span class="p">;</span><span class="kd">var</span> <span class="nx">a</span><span class="o">=</span><span class="nx">e</span><span class="p">.</span><span class="nx">url</span><span class="p">;</span>
+</span><span class='line'><span class="nx">n</span><span class="p">.</span><span class="nx">_rollbar</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span><span class="nx">level</span><span class="o">:</span><span class="s2">&quot;warning&quot;</span><span class="p">,</span><span class="nx">msg</span><span class="o">:</span><span class="s2">&quot;jQuery ajax error for url &quot;</span><span class="o">+</span><span class="nx">a</span><span class="p">,</span><span class="nx">jquery_status</span><span class="o">:</span><span class="nx">o</span><span class="p">,</span>
+</span><span class='line'><span class="nx">jquery_url</span><span class="o">:</span><span class="nx">a</span><span class="p">,</span><span class="nx">jquery_thrown_error</span><span class="o">:</span><span class="nx">u</span><span class="p">})});</span><span class="kd">var</span> <span class="nx">u</span><span class="o">=</span><span class="nx">r</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">ready</span><span class="p">;</span><span class="nx">r</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">ready</span><span class="o">=</span><span class="kd">function</span><span class="p">(</span><span class="nx">r</span><span class="p">){</span>
+</span><span class='line'><span class="k">return</span> <span class="nx">u</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="kd">function</span><span class="p">(){</span><span class="k">try</span><span class="p">{</span><span class="nx">r</span><span class="p">()}</span><span class="k">catch</span><span class="p">(</span><span class="nx">t</span><span class="p">){</span><span class="nx">n</span><span class="p">.</span><span class="nx">_rollbar</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">t</span><span class="p">)}})};</span><span class="kd">var</span> <span class="nx">o</span><span class="o">=</span><span class="p">{};</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">a</span><span class="o">=</span><span class="nx">r</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">on</span><span class="p">;</span><span class="nx">r</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">on</span><span class="o">=</span><span class="kd">function</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span><span class="nx">t</span><span class="p">,</span><span class="nx">e</span><span class="p">,</span><span class="nx">u</span><span class="p">){</span><span class="kd">var</span> <span class="nx">f</span><span class="o">=</span><span class="kd">function</span><span class="p">(</span><span class="nx">r</span><span class="p">){</span><span class="kd">var</span> <span class="nx">t</span><span class="o">=</span><span class="kd">function</span><span class="p">(){</span><span class="k">try</span><span class="p">{</span>
+</span><span class='line'><span class="k">return</span> <span class="nx">r</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="nx">arguments</span><span class="p">)}</span><span class="k">catch</span><span class="p">(</span><span class="nx">t</span><span class="p">){</span><span class="nx">n</span><span class="p">.</span><span class="nx">_rollbar</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">t</span><span class="p">);</span><span class="k">return</span> <span class="kc">null</span><span class="p">}};</span><span class="nx">o</span><span class="p">[</span><span class="nx">r</span><span class="p">]</span><span class="o">=</span><span class="nx">t</span><span class="p">;</span><span class="k">return</span> <span class="nx">t</span><span class="p">};</span>
+</span><span class='line'><span class="k">if</span><span class="p">(</span><span class="nx">t</span><span class="o">&amp;&amp;</span><span class="k">typeof</span> <span class="nx">t</span><span class="o">===</span><span class="s2">&quot;function&quot;</span><span class="p">){</span><span class="nx">t</span><span class="o">=</span><span class="nx">f</span><span class="p">(</span><span class="nx">t</span><span class="p">)}</span><span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="nx">e</span><span class="o">&amp;&amp;</span><span class="k">typeof</span> <span class="nx">e</span><span class="o">===</span><span class="s2">&quot;function&quot;</span><span class="p">){</span><span class="nx">e</span><span class="o">=</span><span class="nx">f</span><span class="p">(</span><span class="nx">e</span><span class="p">)}</span><span class="k">else</span> <span class="k">if</span><span class="p">(</span>
+</span><span class='line'><span class="nx">u</span><span class="o">&amp;&amp;</span><span class="k">typeof</span> <span class="nx">u</span><span class="o">===</span><span class="s2">&quot;function&quot;</span><span class="p">){</span><span class="nx">u</span><span class="o">=</span><span class="nx">f</span><span class="p">(</span><span class="nx">u</span><span class="p">)}</span><span class="k">return</span> <span class="nx">a</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="nx">r</span><span class="p">,</span><span class="nx">t</span><span class="p">,</span><span class="nx">e</span><span class="p">,</span><span class="nx">u</span><span class="p">)};</span><span class="kd">var</span> <span class="nx">f</span><span class="o">=</span><span class="nx">r</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">off</span><span class="p">;</span>
+</span><span class='line'><span class="nx">r</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">off</span><span class="o">=</span><span class="kd">function</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span><span class="nx">n</span><span class="p">,</span><span class="nx">t</span><span class="p">){</span><span class="k">if</span><span class="p">(</span><span class="nx">n</span><span class="o">&amp;&amp;</span><span class="k">typeof</span> <span class="nx">n</span><span class="o">===</span><span class="s2">&quot;function&quot;</span><span class="p">){</span><span class="nx">n</span><span class="o">=</span><span class="nx">o</span><span class="p">[</span><span class="nx">n</span><span class="p">];</span><span class="k">delete</span> <span class="nx">o</span><span class="p">[</span><span class="nx">n</span><span class="p">]}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'><span class="nx">t</span><span class="o">=</span><span class="nx">o</span><span class="p">[</span><span class="nx">t</span><span class="p">];</span><span class="k">delete</span> <span class="nx">o</span><span class="p">[</span><span class="nx">t</span><span class="p">]}</span><span class="k">return</span> <span class="nx">f</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="nx">r</span><span class="p">,</span><span class="nx">n</span><span class="p">,</span><span class="nx">t</span><span class="p">)}}(</span><span class="nx">jQuery</span><span class="p">,</span><span class="nb">window</span><span class="p">,</span><span class="nb">document</span><span class="p">);</span>
+</span><span class='line'><span class="nt">&lt;/script&gt;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Next, either:
-- Add a sourceMappingUrl comment at the end of your minified file to point to the source map
-- Upload the source map (along with all source files) separately, as part of your deploy process</p>
+<p>The source can be found on GitHub <a href="https://github.com/rollbar/rollbar.js/blob/master/src/plugins/jquery.js">here</a>.</p>
 
-<p>This second step is a bit more involved so please see our <a href="https://rollbar.com/docs/guides_sourcemaps/">docs</a> for more details.</p>
+<p>The snippet wraps the <code>ready()</code>, <code>on()</code> and <code>off()</code> functions in jQuery to wrap any passed-in handlers in try/except blocks to automatically report errors to Rollbar. This lets us collect the full stack trace with line and column numbers for each frame, instead of just the last frame with only a line number. When combined with <a href="https://rollbar.com/docs/guides_sourcemaps/">source maps</a>, this makes debugging JavaScript errors much more doable.</p>
 
-<h2>Caveats</h2>
+<p>The new snippet also adds a handler to ajaxError() to automatically report any jQuery AJAX errors such as 404s and 500s to Rollbar. If you don&#8217;t want this, add the following option to your base snippet&#8217;s <code>_rollbarParams</code>:
+&#8220;`
+&#8220;notifier.plugins.jquery.ignoreAjaxErrors&#8221;: true</p>
 
-<p>All of this relies on having a stack trace with line and column numbers. Unfortunately, browser support for column numbers is inconsistent. As of today, this will work in Chrome, Firefox, and IE10+, and only for caught errors reported like this:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="k">try</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">doSomething</span><span class="p">();</span>
-</span><span class='line'><span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">_rollbar</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Uncaught errors (reported via window.onerror) don&#8217;t have column numbers in any browser we&#8217;re aware of, so they aren&#8217;t able to be de-obfuscated. For best results, catch all your exceptions so you don&#8217;t fall back to the top-level error handler.</p>
-
-<p>Happy debugging and please don&#8217;t hesistate to contact us (<a href="team@rollbar.com">team@rollbar.com</a>) if you have any questions.</p>
+<p>You can start tracking errors in Rollbar by <a href="https://rollbar.com/signup">signing up for free</a>. Or read more in the <a href="https://rollbar.com/docs/notifier/rollbar.js">docs</a>.</p>
 </div>
 
 
@@ -196,7 +167,7 @@
       
   
 
-<span class="byline author vcard">Posted by <span class="fn">Brian Rue</span></span>
+<span class="byline author vcard">Posted by <span class="fn">Sergei Bezborodko</span></span>
 
       
 
@@ -210,12 +181,12 @@
   
 
 
-<time datetime="2013-07-25T14:49:00-07:00" pubdate data-updated="true">Jul 25<span>th</span>, 2013</time>
+<time datetime="2013-08-08T11:18:00-07:00" pubdate data-updated="true">Aug 8<span>th</span>, 2013</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/blog/categories/releases/'>releases</a>
+    <a class='category' href='/blog/blog/categories/javascript/'>javascript</a>, <a class='category' href='/blog/blog/categories/releases/'>releases</a>
   
 </span>
 
@@ -224,7 +195,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="https://rollbar.com/blog/post/2013/07/25/debug-production-errors-in-minified-javascript-with-source-maps-and-rollbar/" data-via="rollbar" data-counturl="https://rollbar.com/blog/post/2013/07/25/debug-production-errors-in-minified-javascript-with-source-maps-and-rollbar/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="https://rollbar.com/blog/post/2013/08/08/jquery-error-instrumentation/" data-via="rollbar" data-counturl="https://rollbar.com/blog/post/2013/08/08/jquery-error-instrumentation/" >Tweet</a>
   
   
   
@@ -233,10 +204,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/post/2013/07/12/Async-nodejs-API-server-testing/" title="Previous Post: Async node.js API server testing">&laquo; Async node.js API server testing</a>
+        <a class="basic-alignment left" href="/blog/post/2013/08/02/javascript-and-source-maps-in-a-django-app/" title="Previous Post: JavaScript and Source Maps in a Django App">&laquo; JavaScript and Source Maps in a Django App</a>
       
-      
-        <a class="basic-alignment right" href="/blog/post/2013/08/02/javascript-and-source-maps-in-a-django-app/" title="Next Post: JavaScript and Source Maps in a Django App">JavaScript and Source Maps in a Django App &raquo;</a>
       
     </p>
   </footer>
@@ -401,8 +370,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'https://rollbar.com/blog/post/2013/07/25/debug-production-errors-in-minified-javascript-with-source-maps-and-rollbar/';
-        var disqus_url = 'https://rollbar.com/blog/post/2013/07/25/debug-production-errors-in-minified-javascript-with-source-maps-and-rollbar/';
+        var disqus_identifier = 'https://rollbar.com/blog/post/2013/08/08/jquery-error-instrumentation/';
+        var disqus_url = 'https://rollbar.com/blog/post/2013/08/08/jquery-error-instrumentation/';
         var disqus_script = 'embed.js';
       
     (function () {
