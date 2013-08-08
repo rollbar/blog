@@ -4,7 +4,7 @@
   <title><![CDATA[Category: javascript | Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
   <link href="https://rollbar.com/blog/blog/categories/javascript/atom.xml" rel="self"/>
   <link href="https://rollbar.com/blog/"/>
-  <updated>2013-08-08T11:15:41-07:00</updated>
+  <updated>2013-08-08T11:21:55-07:00</updated>
   <id>https://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
@@ -44,10 +44,10 @@ t=o[t];delete o[t]}return f.call(this,r,n,t)}}(jQuery,window,document);
 <p>The snippet wraps the <code>ready()</code>, <code>on()</code> and <code>off()</code> functions in jQuery to wrap any passed-in handlers in try/except blocks to automatically report errors to Rollbar. This lets us collect the full stack trace with line and column numbers for each frame, instead of just the last frame with only a line number. When combined with <a href="https://rollbar.com/docs/guides_sourcemaps/">source maps</a>, this makes debugging JavaScript errors much more doable.</p>
 
 <p>The new snippet also adds a handler to ajaxError() to automatically report any jQuery AJAX errors such as 404s and 500s to Rollbar. If you don't want this, add the following option to your base snippet's <code>_rollbarParams</code>:
-```
-"notifier.plugins.jquery.ignoreAjaxErrors": true</p>
-
-<p>You can start tracking errors in Rollbar by <a href="https://rollbar.com/signup">signing up for free</a>. Or read more in the <a href="https://rollbar.com/docs/notifier/rollbar.js">docs</a>.</p>
+<code>
+"notifier.plugins.jquery.ignoreAjaxErrors": true
+</code>
+You can start tracking errors in Rollbar by <a href="https://rollbar.com/signup">signing up for free</a>. Or read more in the <a href="https://rollbar.com/docs/notifier/rollbar.js">docs</a>.</p>
 ]]></content>
   </entry>
   

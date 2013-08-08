@@ -32,5 +32,5 @@ The snippet wraps the `ready()`, `on()` and `off()` functions in jQuery to wrap 
 The new snippet also adds a handler to ajaxError() to automatically report any jQuery AJAX errors such as 404s and 500s to Rollbar. If you don't want this, add the following option to your base snippet's `_rollbarParams`:
 ```
 "notifier.plugins.jquery.ignoreAjaxErrors": true
-
+```
 You can start tracking errors in Rollbar by [signing up for free](https://rollbar.com/signup). Or read more in the [docs](https://rollbar.com/docs/notifier/rollbar.js).

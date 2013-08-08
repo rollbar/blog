@@ -156,9 +156,12 @@
 
 <p>The snippet wraps the <code>ready()</code>, <code>on()</code> and <code>off()</code> functions in jQuery to wrap any passed-in handlers in try/except blocks to automatically report errors to Rollbar. This lets us collect the full stack trace with line and column numbers for each frame, instead of just the last frame with only a line number. When combined with <a href="https://rollbar.com/docs/guides_sourcemaps/">source maps</a>, this makes debugging JavaScript errors much more doable.</p>
 
-<p>The new snippet also adds a handler to ajaxError() to automatically report any jQuery AJAX errors such as 404s and 500s to Rollbar. If you don&#8217;t want this, add the following option to your base snippet&#8217;s <code>_rollbarParams</code>:
-&#8220;`
-&#8220;notifier.plugins.jquery.ignoreAjaxErrors&#8221;: true</p>
+<p>The new snippet also adds a handler to ajaxError() to automatically report any jQuery AJAX errors such as 404s and 500s to Rollbar. If you don&#8217;t want this, add the following option to your base snippet&#8217;s <code>_rollbarParams</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'>&quot;notifier.plugins.jquery.ignoreAjaxErrors&quot;: true
+</span></code></pre></td></tr></table></div></figure>
+
 
 <p>You can start tracking errors in Rollbar by <a href="https://rollbar.com/signup">signing up for free</a>. Or read more in the <a href="https://rollbar.com/docs/notifier/rollbar.js">docs</a>.</p>
 </div>
