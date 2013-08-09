@@ -4,7 +4,7 @@ title: "Ad-hoc error reporting with Rollbar CLI"
 date: 2013-08-08 19:00
 comments: true
 author: Cory Virok
-categories: python tools javascript
+categories: python tools
 ---
 
 We just coded up a quick tool to send Rollbar messages from the command line. It's useful for quick, one-off monitoring scripts that you don't have time to instrument with one of our notifiers.
