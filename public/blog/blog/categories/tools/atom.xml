@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: tools | Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
+  <link href="https://rollbar.com/blog/blog/categories/tools/atom.xml" rel="self"/>
+  <link href="https://rollbar.com/blog/"/>
+  <updated>2013-08-08T18:56:20-07:00</updated>
+  <id>https://rollbar.com/blog/</id>
+  <author>
+    <name><![CDATA[Rollbar, Inc.]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Ad-hoc error reporting with Rollbar CLI]]></title>
+    <link href="https://rollbar.com/blog/post/2013/08/08/ad-hoc-error-reporting-with-rollbar-cli/"/>
+    <updated>2013-08-08T19:00:00-07:00</updated>
+    <id>https://rollbar.com/blog/post/2013/08/08/ad-hoc-error-reporting-with-rollbar-cli</id>
+    <content type="html"><![CDATA[<p>We just coded up a quick tool to send Rollbar messages from the command line. It's useful for quick, one-off monitoring scripts that you don't have time to instrument with one of our notifiers.</p>
+
+<p>To install, just <code>pip install rollbar</code> and you're done.</p>
+
+<p>e.g. Tracking all non-500s as WARNINGs from HAProxy</p>
+
+<p><code>bash
+tail -f /var/log/haproxy.log | awk '{print $11,$0}' | grep '^5' | awk '{$1="";print "warning",$0}' | rollbar -t $ACCESS_TOKEN -e production -v
+</code></p>
+
+<p>e.g. Watch failed login attempts</p>
+
+<p><code>bash
+tail -f /var/log/auth.log | grep -i 'Failed password' | awk '{print "error user ",$11,"failed auth from ",$13}' | rollbar -t $ACCESS_TOKEN -e ops
+</code></p>
+
+<p>More info on how to install and use it can be found <a href="https://github.com/rollbar/pyrollbar/blob/master/README.md#command-line-usage">here.</a>.</p>
+]]></content>
+  </entry>
+  
+</feed>

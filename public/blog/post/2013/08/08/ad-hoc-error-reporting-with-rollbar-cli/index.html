@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Upgrading to the new Rollbar notifier libraries - Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash</title>
+  <title>Ad-hoc error reporting with Rollbar CLI - Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash</title>
   <meta name="author" content="Rollbar, Inc.">
 
   
-  <meta name="description" content="Upgrading to the new Rollbar notifier libraries Feb 26th, 2013 We&#8217;ve updated all of our notifier library repositories to match the name change &hellip;">
+  <meta name="description" content="Ad-hoc error reporting with Rollbar CLI Aug 8th, 2013 We just coded up a quick tool to send Rollbar messages from the command line. It&#8217;s &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +19,7 @@
 
   
   
-  <link rel="canonical" href="https://rollbar.com/blog/post/2013/02/26/rollbar-notifier-upgrades/">
+  <link rel="canonical" href="https://rollbar.com/blog/post/2013/08/08/ad-hoc-error-reporting-with-rollbar-cli/">
   
   
   <link rel="publisher" href="https://plus.google.com/u/1/b/117853246165185436076/117853246165185436076/posts"/>
@@ -95,7 +95,7 @@
   
   <header>
     
-      <h1 class="entry-title">Upgrading to the new Rollbar notifier libraries</h1>
+      <h1 class="entry-title">Ad-hoc error reporting with Rollbar CLI</h1>
     
     
       <p class="meta">
@@ -111,31 +111,32 @@
   
 
 
-<time datetime="2013-02-26T17:25:00-08:00" pubdate data-updated="true">Feb 26<span>th</span>, 2013</time>
+<time datetime="2013-08-08T19:00:00-07:00" pubdate data-updated="true">Aug 8<span>th</span>, 2013</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>We&#8217;ve updated all of our notifier library repositories to match the name change to Rollbar today. The old Ratchet.io repos have been deprecated and all further development will continue on the respective Rollbar versions.</p>
+<div class="entry-content"><p>We just coded up a quick tool to send Rollbar messages from the command line. It&#8217;s useful for quick, one-off monitoring scripts that you don&#8217;t have time to instrument with one of our notifiers.</p>
 
-<p>Please note that the <code>submit.ratchet.io</code> endpoint and the existing libraries will continue to work for the indefinite future, so you don&#8217;t have to do anything right now. But we do recommend upgrading to take advantage of future updates.</p>
+<p>To install, just <code>pip install rollbar</code> and you&#8217;re done.</p>
 
-<p>Upgrading <em>should</em> be seamless and quick. Please contact <a href="mailto:support@rollbar.com">support@rollbar.com</a> if you run into any issues.</p>
+<p>e.g. Tracking all non-500s as WARNINGs from HAProxy</p>
 
-<p>Here are links to the upgrade instructions for each:</p>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>tail -f /var/log/haproxy.log | awk <span class="s1">&#39;{print $11,$0}&#39;</span> | grep <span class="s1">&#39;^5&#39;</span> | awk <span class="s1">&#39;{$1=&quot;&quot;;print &quot;warning&quot;,$0}&#39;</span> | rollbar -t <span class="nv">$ACCESS_TOKEN</span> -e production -v
+</span></code></pre></td></tr></table></div></figure>
 
-<ul>
-<li><p>Browser JS - update the JS snippet used on your site to the version shown <a href="http://rollbar.com/docs/">here</a></p></li>
-<li><p><a href="https://github.com/rollbar/pyrollbar/blob/master/UPGRADE_FROM_RATCHET.md">pyratchet</a></p></li>
-<li><p><a href="https://github.com/rollbar/rollbar-gem/blob/master/UPGRADE_FROM_RATCHET.md">ratchetio-gem</a></p></li>
-<li><p><a href="https://github.com/rollbar/rollbar-php/blob/master/UPGRADE_FROM_RATCHET.md">ratchetio-php</a></p></li>
-<li><p><a href="https://github.com/rollbar/rollbar-agent/blob/master/UPGRADE_FROM_RATCHET.md">ratchet-agent</a></p></li>
-<li><p><a href="https://github.com/rollbar/node_rollbar/blob/master/UPGRADE_FROM_RATCHET.md">node_ratchet</a></p></li>
-<li><p><a href="https://github.com/rollbar/flash_rollbar/blob/master/UPGRADE_FROM_RATCHET.md">flash_ratchet</a></p></li>
-</ul>
 
+<p>e.g. Watch failed login attempts</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>tail -f /var/log/auth.log | grep -i <span class="s1">&#39;Failed password&#39;</span> | awk <span class="s1">&#39;{print &quot;error user &quot;,$11,&quot;failed auth from &quot;,$13}&#39;</span> | rollbar -t <span class="nv">$ACCESS_TOKEN</span> -e ops
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>More info on how to install and use it can be found <a href="https://github.com/rollbar/pyrollbar/blob/master/README.md#command-line-usage">here.</a>.</p>
 </div>
 
 
@@ -145,7 +146,7 @@
       
   
 
-<span class="byline author vcard">Posted by <span class="fn">Sergei Bezborodko</span></span>
+<span class="byline author vcard">Posted by <span class="fn">Cory Virok</span></span>
 
       
 
@@ -159,12 +160,12 @@
   
 
 
-<time datetime="2013-02-26T17:25:00-08:00" pubdate data-updated="true">Feb 26<span>th</span>, 2013</time>
+<time datetime="2013-08-08T19:00:00-07:00" pubdate data-updated="true">Aug 8<span>th</span>, 2013</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/blog/categories/notifiers/'>notifiers</a>
+    <a class='category' href='/blog/blog/categories/javascript/'>javascript</a>, <a class='category' href='/blog/blog/categories/python/'>python</a>, <a class='category' href='/blog/blog/categories/tools/'>tools</a>
   
 </span>
 
@@ -173,7 +174,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="https://rollbar.com/blog/post/2013/02/26/rollbar-notifier-upgrades/" data-via="rollbar" data-counturl="https://rollbar.com/blog/post/2013/02/26/rollbar-notifier-upgrades/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="https://rollbar.com/blog/post/2013/08/08/ad-hoc-error-reporting-with-rollbar-cli/" data-via="rollbar" data-counturl="https://rollbar.com/blog/post/2013/08/08/ad-hoc-error-reporting-with-rollbar-cli/" >Tweet</a>
   
   
   
@@ -182,10 +183,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/post/2013/02/26/rollbar-launch-and-initial-funding/" title="Previous Post: Rollbar launches, raises initial funding">&laquo; Rollbar launches, raises initial funding</a>
+        <a class="basic-alignment left" href="/blog/post/2013/08/08/jquery-error-instrumentation/" title="Previous Post: jQuery Error Instrumentation">&laquo; jQuery Error Instrumentation</a>
       
-      
-        <a class="basic-alignment right" href="/blog/post/2013/03/21/improved-grouping-for-javascript-errors/" title="Next Post: Improved grouping for Javascript errors">Improved grouping for Javascript errors &raquo;</a>
       
     </p>
   </footer>
@@ -350,8 +349,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'https://rollbar.com/blog/post/2013/02/26/rollbar-notifier-upgrades/';
-        var disqus_url = 'https://rollbar.com/blog/post/2013/02/26/rollbar-notifier-upgrades/';
+        var disqus_identifier = 'https://rollbar.com/blog/post/2013/08/08/ad-hoc-error-reporting-with-rollbar-cli/';
+        var disqus_url = 'https://rollbar.com/blog/post/2013/08/08/ad-hoc-error-reporting-with-rollbar-cli/';
         var disqus_script = 'embed.js';
       
     (function () {
