@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Category: deployment - Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash</title>
+  <title>Resolving Rollbar Items in Versions - Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash</title>
   <meta name="author" content="Rollbar, Inc.">
 
   
-  <meta name="description" content="Category: deployment">
+  <meta name="description" content="Resolving Rollbar Items in Versions Sep 17th, 2013 We just rolled out a new feature to help track which versions/revisions errors are resolved in. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +19,7 @@
 
   
   
-  <link rel="canonical" href="https://rollbar.com/blog/blog/categories/deployment/">
+  <link rel="canonical" href="https://rollbar.com/blog/post/2013/09/17/resolving-rollbar-items-in-versions/">
   
   
   <link rel="publisher" href="https://plus.google.com/u/1/b/117853246165185436076/117853246165185436076/posts"/>
@@ -90,37 +90,161 @@
     
     <div id="main-stage" class="container">
       <div id="content">
-        <div class="blog-archives">
-<article role="article">
+        <div class="blog-post">
+<article class="hentry" role="article">
   
   <header>
-    <h1 class="entry-title">Category: deployment</h1>
+    
+      <h1 class="entry-title">Resolving Rollbar Items in Versions</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-09-17T09:00:00-07:00" pubdate data-updated="true">Sep 17<span>th</span>, 2013</time>
+        
+      </p>
     
   </header>
-  
-  <div id="blog-archives" class="category">
 
 
+<div class="entry-content"><p>We just rolled out a new feature to help track which versions/revisions errors are resolved in. When resolving items within Rollbar, you have the option of entering a revision or version number. If one is entered, it will appear in the item&#8217;s status history to let anyone looking at the item better understand specifically when it was fixed.</p>
 
-  
-  <h2>2012</h2>
+<p>This version can be combined with a new <code>code_version</code> parameter set in the configuration options of the latest versions of our notifiers. This can be set to either a numerical value (eg. 1, 24, 300), a semantic version value (eg. 1.0.3, 2.9), or a git revision sha. Here are examples on how to set this parameter in our JavaScript and Ruby notifiers:</p>
 
-<article>
-  
-<h1><a href="/blog/post/2012/08/16/writing-a-simple-deploy-script-with-fabric-and-roles/">Writing a simple deploy script with Fabric and @roles</a></h1>
-<time datetime="2012-08-16T11:52:00-07:00" pubdate><span class='month'>Aug</span> <span class='day'>16</span> <span class='year'>2012</span></time>
+<p>In the <a href="https://github.com/rollbar/rollbar.js">JavaScript</a> snippet:</p>
 
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/blog/categories/articles/'>articles</a>, <a class='category' href='/blog/blog/categories/deployment/'>deployment</a></span>
-</footer>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">_rollbarParams</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="c1">// ... other configuration</span>
+</span><span class='line'>    <span class="s2">&quot;client.javascript.code_version&quot;</span><span class="o">:</span> <span class="s2">&quot;bdd2b9241f791fc9f134fb3244b40d452d2d7e35&quot;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
-</article>
+<p>In your <a href="https://github.com/rollbar/rollbar-gem">rollbar-gem</a> configuration:</p>
 
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Rollbar</span><span class="o">.</span><span class="n">configure</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+</span><span class='line'>    <span class="c1"># ... other configuration</span>
+</span><span class='line'>    <span class="n">config</span><span class="o">.</span><span class="n">code_version</span> <span class="o">=</span> <span class="s1">&#39;bdd2b9241f791fc9f134fb3244b40d452d2d7e35&#39;</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The other notifiers have a very similar top-level code_version configuration settings. See the notifier readmes for more info.</p>
+
+<p>If you resolve an item within Rollbar in a certain version and are also specifying a <code>code_version</code> for your code, we will use both of these values to decide whether or not to reactivate the item.</p>
+
+<p>For example, say you have a bug in version 1.0 of your app. The bug is fixed and will be deployed to users in verision 1.1, but that won&#8217;t happen for a few days. You can just resolve the Rollbar item associated with this bug now, but also specify that the resolved version is 1.1. You will no longer get reactivation notifications for this item until occurrences of this item with a <code>code_version</code> >= 1.1 come in.</p>
+
+<p><img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/resolve-in-version-popup.png"></p>
+
+<p>If you connect Rollbar with GitHub, this process will also work with Git SHAs. We&#8217;ll query the GitHub API to determine whether one commit is a parent of the other.</p>
+
+<h2>Auto-resolving items in GitHub commits</h2>
+
+<p>You can now also include Rollbar item tags in your GitHub commit messages to automatically resolve them in the correct revision when deploying. Just include one of the following strings in your commits for each item you want to resolve:</p>
+
+<ul>
+<li>fix $ref</li>
+<li>fixed $ref</li>
+<li>fixes $ref</li>
+<li>resolve $ref</li>
+<li>resolved $ref</li>
+<li>resolves $ref</li>
+<li>close $ref</li>
+<li>closed $ref</li>
+<li>closes $ref</li>
+</ul>
+
+
+<p>Where $ref is one of the following item tags:</p>
+
+<ul>
+<li>Full item URL, eg. <code>https://rollbar.com/item/123456789</code></li>
+<li>Item ID, eg. <code>rb#123456789</code></li>
+<li>Short item ID, eg. <code>rb#22</code> This appears at the top left of an item page.</li>
+</ul>
+
+
+<p>Then execute a deploy by hitting the <a href="http://rollbar.com/docs/deploys_bash/">deploy API endpoint</a>. The items referenced in any of the commit messages of the deploy will be resolved using the respective revision of that commit.</p>
+
+<p>You can start tracking and resolving errors in Rollbar by <a href="https://rollbar.com/signup">signing up for free</a>.</p>
 </div>
 
+
+  <hr>
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">Sergei Bezborodko</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-09-17T09:00:00-07:00" pubdate data-updated="true">Sep 17<span>th</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/blog/categories/github/'>github</a>, <a class='category' href='/blog/blog/categories/releases/'>releases</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="https://rollbar.com/blog/post/2013/09/17/resolving-rollbar-items-in-versions/" data-via="rollbar" data-counturl="https://rollbar.com/blog/post/2013/09/17/resolving-rollbar-items-in-versions/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/post/2013/08/08/ad-hoc-error-reporting-with-rollbar-cli/" title="Previous Post: Ad-hoc error reporting with Rollbar CLI">&laquo; Ad-hoc error reporting with Rollbar CLI</a>
+      
+      
+    </p>
+  </footer>
 </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
 
 </div>
 
@@ -274,7 +398,10 @@
       var disqus_shortname = 'rollbar';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'https://rollbar.com/blog/post/2013/09/17/resolving-rollbar-items-in-versions/';
+        var disqus_url = 'https://rollbar.com/blog/post/2013/09/17/resolving-rollbar-items-in-versions/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

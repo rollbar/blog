@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: github | Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
+  <link href="https://rollbar.com/blog/blog/categories/github/atom.xml" rel="self"/>
+  <link href="https://rollbar.com/blog/"/>
+  <updated>2013-09-16T18:45:17-07:00</updated>
+  <id>https://rollbar.com/blog/</id>
+  <author>
+    <name><![CDATA[Rollbar, Inc.]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Resolving Rollbar Items in Versions]]></title>
+    <link href="https://rollbar.com/blog/post/2013/09/17/resolving-rollbar-items-in-versions/"/>
+    <updated>2013-09-17T09:00:00-07:00</updated>
+    <id>https://rollbar.com/blog/post/2013/09/17/resolving-rollbar-items-in-versions</id>
+    <content type="html"><![CDATA[<p>We just rolled out a new feature to help track which versions/revisions errors are resolved in. When resolving items within Rollbar, you have the option of entering a revision or version number. If one is entered, it will appear in the item's status history to let anyone looking at the item better understand specifically when it was fixed.</p>
+
+<p>This version can be combined with a new <code>code_version</code> parameter set in the configuration options of the latest versions of our notifiers. This can be set to either a numerical value (eg. 1, 24, 300), a semantic version value (eg. 1.0.3, 2.9), or a git revision sha. Here are examples on how to set this parameter in our JavaScript and Ruby notifiers:</p>
+
+<p>In the <a href="https://github.com/rollbar/rollbar.js">JavaScript</a> snippet:
+```javascript
+_rollbarParams = {</p>
+
+<pre><code>// ... other configuration
+"client.javascript.code_version": "bdd2b9241f791fc9f134fb3244b40d452d2d7e35"
+</code></pre>
+
+<p>}
+```</p>
+
+<p>In your <a href="https://github.com/rollbar/rollbar-gem">rollbar-gem</a> configuration:
+```ruby
+Rollbar.configure do |config|</p>
+
+<pre><code># ... other configuration
+config.code_version = 'bdd2b9241f791fc9f134fb3244b40d452d2d7e35'
+</code></pre>
+
+<p>end
+```</p>
+
+<p>The other notifiers have a very similar top-level code_version configuration settings. See the notifier readmes for more info.</p>
+
+<p>If you resolve an item within Rollbar in a certain version and are also specifying a <code>code_version</code> for your code, we will use both of these values to decide whether or not to reactivate the item.</p>
+
+<p>For example, say you have a bug in version 1.0 of your app. The bug is fixed and will be deployed to users in verision 1.1, but that won't happen for a few days. You can just resolve the Rollbar item associated with this bug now, but also specify that the resolved version is 1.1. You will no longer get reactivation notifications for this item until occurrences of this item with a <code>code_version</code> >= 1.1 come in.</p>
+
+<p><img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/resolve-in-version-popup.png"></p>
+
+<p>If you connect Rollbar with GitHub, this process will also work with Git SHAs. We'll query the GitHub API to determine whether one commit is a parent of the other.</p>
+
+<h2>Auto-resolving items in GitHub commits</h2>
+
+<p>You can now also include Rollbar item tags in your GitHub commit messages to automatically resolve them in the correct revision when deploying. Just include one of the following strings in your commits for each item you want to resolve:</p>
+
+<ul>
+<li>fix $ref</li>
+<li>fixed $ref</li>
+<li>fixes $ref</li>
+<li>resolve $ref</li>
+<li>resolved $ref</li>
+<li>resolves $ref</li>
+<li>close $ref</li>
+<li>closed $ref</li>
+<li>closes $ref</li>
+</ul>
+
+
+<p>Where $ref is one of the following item tags:</p>
+
+<ul>
+<li>Full item URL, eg. <code>https://rollbar.com/item/123456789</code></li>
+<li>Item ID, eg. <code>rb#123456789</code></li>
+<li>Short item ID, eg. <code>rb#22</code> This appears at the top left of an item page.</li>
+</ul>
+
+
+<p>Then execute a deploy by hitting the <a href="http://rollbar.com/docs/deploys_bash/">deploy API endpoint</a>. The items referenced in any of the commit messages of the deploy will be resolved using the respective revision of that commit.</p>
+
+<p>You can start tracking and resolving errors in Rollbar by <a href="https://rollbar.com/signup">signing up for free</a>.</p>
+]]></content>
+  </entry>
+  
+</feed>

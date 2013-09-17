@@ -4,96 +4,100 @@
         <loc>
             https://rollbar.com/blog/post/2012/08/16/writing-a-simple-deploy-script-with-fabric-and-roles/
         </loc>
-        <lastmod>2013-07-12T13:10:45-07:00</lastmod>
+        <lastmod>2013-08-01T14:02:22-07:00</lastmod>
     </url>
     <url>
         <loc>
             https://rollbar.com/blog/post/2012/09/07/using-pyramid-request-factory-to-write-less-code/
         </loc>
-        <lastmod>2013-07-12T13:10:45-07:00</lastmod>
+        <lastmod>2013-08-01T14:02:22-07:00</lastmod>
     </url>
     <url>
         <loc>
             https://rollbar.com/blog/post/2012/10/24/real-time-search-for-exceptions-and-errors/
         </loc>
-        <lastmod>2013-07-12T13:10:45-07:00</lastmod>
+        <lastmod>2013-08-01T14:02:22-07:00</lastmod>
     </url>
     <url>
         <loc>https://rollbar.com/blog/post/2012/10/31/happy-halloween/</loc>
-        <lastmod>2013-07-12T13:10:45-07:00</lastmod>
+        <lastmod>2013-08-01T14:02:22-07:00</lastmod>
     </url>
     <url>
         <loc>https://rollbar.com/blog/post/2013/01/11/post-mortem-from-last-nights-outage/</loc>
-        <lastmod>2013-07-12T13:10:45-07:00</lastmod>
+        <lastmod>2013-08-01T14:02:22-07:00</lastmod>
     </url>
     <url>
         <loc>https://rollbar.com/blog/post/2013/02/26/rollbar-launch-and-initial-funding/</loc>
-        <lastmod>2013-07-12T13:10:45-07:00</lastmod>
+        <lastmod>2013-08-01T14:02:22-07:00</lastmod>
     </url>
     <url>
         <loc>https://rollbar.com/blog/post/2013/02/26/rollbar-notifier-upgrades/</loc>
-        <lastmod>2013-07-12T13:10:45-07:00</lastmod>
+        <lastmod>2013-08-01T14:02:22-07:00</lastmod>
     </url>
     <url>
         <loc>
             https://rollbar.com/blog/post/2013/03/21/improved-grouping-for-javascript-errors/
         </loc>
-        <lastmod>2013-07-12T13:10:45-07:00</lastmod>
+        <lastmod>2013-08-01T14:02:22-07:00</lastmod>
     </url>
     <url>
         <loc>
             https://rollbar.com/blog/post/2013/03/29/using-unique-indexes-for-fun-and-profit/
         </loc>
-        <lastmod>2013-07-12T13:10:45-07:00</lastmod>
+        <lastmod>2013-08-01T14:02:22-07:00</lastmod>
     </url>
     <url>
         <loc>
             https://rollbar.com/blog/post/2013/05/06/rules-engine-for-notifications-campfire-hipchat-jira-trello/
         </loc>
-        <lastmod>2013-07-12T13:10:45-07:00</lastmod>
+        <lastmod>2013-08-01T14:02:22-07:00</lastmod>
     </url>
     <url>
         <loc>https://rollbar.com/blog/post/2013/05/29/may-release-roundup/</loc>
-        <lastmod>2013-07-12T13:10:45-07:00</lastmod>
+        <lastmod>2013-08-01T14:02:22-07:00</lastmod>
     </url>
     <url>
         <loc>https://rollbar.com/blog/post/2013/07/12/Async-nodejs-API-server-testing/</loc>
-        <lastmod>2013-07-15T12:06:34-07:00</lastmod>
+        <lastmod>2013-08-01T14:02:22-07:00</lastmod>
     </url>
     <url>
         <loc>
             https://rollbar.com/blog/post/2013/07/25/debug-production-errors-in-minified-javascript-with-source-maps-and-rollbar/
         </loc>
-        <lastmod>2013-08-08T14:42:58-07:00</lastmod>
+        <lastmod>2013-08-01T15:24:25-07:00</lastmod>
     </url>
     <url>
         <loc>
             https://rollbar.com/blog/post/2013/08/02/javascript-and-source-maps-in-a-django-app/
         </loc>
-        <lastmod>2013-08-08T14:42:58-07:00</lastmod>
+        <lastmod>2013-08-07T14:11:06-07:00</lastmod>
     </url>
     <url>
         <loc>https://rollbar.com/blog/post/2013/08/08/jquery-error-instrumentation/</loc>
-        <lastmod>2013-08-08T14:42:58-07:00</lastmod>
+        <lastmod>2013-08-08T13:56:22-07:00</lastmod>
     </url>
     <url>
         <loc>
             https://rollbar.com/blog/post/2013/08/08/ad-hoc-error-reporting-with-rollbar-cli/
         </loc>
-        <lastmod>2013-08-09T11:09:41-07:00</lastmod>
+        <lastmod>2013-09-16T18:09:09-07:00</lastmod>
+    </url>
+    <url>
+        <loc>https://rollbar.com/blog/post/2013/09/17/resolving-rollbar-items-in-versions/</loc>
+        <lastmod>2013-09-16T18:45:10-07:00</lastmod>
     </url>
     <url>
         <loc>
             https://rollbar.com/blog/2012-10-18-efficiently-iterating-over-an-entire-table-with-mysqls-handler-statement.html
         </loc>
-        <lastmod>2013-07-12T13:10:45-07:00</lastmod>
+        <lastmod>2013-08-01T14:02:22-07:00</lastmod>
     </url>
     <url>
         <loc>https://rollbar.com/blog/blog/archives/</loc>
-        <lastmod>2013-08-09T11:09:41-07:00</lastmod>
+        <lastmod>2013-09-16T18:45:10-07:00</lastmod>
     </url>
     <url>
         <loc>https://rollbar.com/blog/</loc>
-        <lastmod>2013-08-09T11:09:41-07:00</lastmod>
+        <lastmod>2013-09-16T18:45:10-07:00</lastmod>
     </url>
 </urlset>
