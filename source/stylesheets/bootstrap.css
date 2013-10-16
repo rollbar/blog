@@ -767,8 +767,7 @@ blockquote {
 }
 blockquote p {
   margin-bottom: 0;
-  font-size: 17.5px;
-  font-weight: 300;
+  color: #888888;
   line-height: 1.25;
 }
 blockquote small {

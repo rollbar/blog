@@ -4,7 +4,7 @@
   <title><![CDATA[Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
   <link href="https://rollbar.com/blog/atom.xml" rel="self"/>
   <link href="https://rollbar.com/blog/"/>
-  <updated>2013-09-16T18:45:17-07:00</updated>
+  <updated>2013-10-16T16:30:27-07:00</updated>
   <id>https://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
@@ -12,6 +12,23 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Connecting Rollbar with PagerDuty]]></title>
+    <link href="https://rollbar.com/blog/post/2013/10/16/connect-rollbar-with-pagerduty/"/>
+    <updated>2013-10-16T16:11:00-07:00</updated>
+    <id>https://rollbar.com/blog/post/2013/10/16/connect-rollbar-with-pagerduty</id>
+    <content type="html"><![CDATA[<p><img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/pagerduty.png" style="float:right;"></p>
+
+<p>Using Rollbar with <a href="http://www.pagerduty.com">PagerDuty</a> is now a lot more seamless.  PagerDuty provides SaaS IT on-call schedule management, alerting, and incident tracking.  With our new integration, you can automatically send issues found by Rollbar into incidents in PagerDuty.</p>
+
+<p>We have a few customers using it already. Here&#8217;s what Richard Lee, CTO at Polydice, a mobile development studio, has to say:</p>
+
+<blockquote><p>&#8220;With Rollbar&#8217;s integration of PagerDuty, we&#8217;re able to get notified as soon as errors detected, and avoid possible downtime to our customers. This powerful combination becomes a must have tool for us.&#8221; &mdash; Richard Lee, CTO at Polydice</p></blockquote>
+
+<p>Integrating Rollbar with PagerDuty is easy; just create a new Generic API System in PagerDuty, and then link it in Rollbar&#8217;s Notification settings. See our <a href="https://rollbar.com/docs/integration/pagerduty/">docs</a> for detailed instructions.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Resolving Rollbar Items in Versions]]></title>
