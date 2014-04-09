@@ -4,7 +4,7 @@
   <title><![CDATA[Category: security | Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
   <link href="https://rollbar.com/blog/blog/categories/security/atom.xml" rel="self"/>
   <link href="https://rollbar.com/blog/"/>
-  <updated>2014-04-08T17:29:39-07:00</updated>
+  <updated>2014-04-08T17:31:47-07:00</updated>
   <id>https://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
@@ -86,7 +86,14 @@
 <h2>Recommended actions for Rollbar Customers</h2>
 
 <ul>
-<li><a href="[](https://rollbar.com/settings/user/password">Change your password</a>)https://rollbar.com/settings/user/password)</li>
+<li><a href="https://rollbar.com/settings/user/password">Change your password</a></li>
+<li><p>Cycle any access tokens you have used (create and start using a new one, then disable or delete the old one).</p>
+
+<ul>
+<li>For projects, go to the project dashboard, then Settings -> Project Access Tokens. Most customers will need to do this.</li>
+<li>For accounts, go to Account Settings -> Account Access Tokens. Most customers will not need to do this.</li>
+</ul>
+</li>
 </ul>
 
 
