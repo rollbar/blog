@@ -4,7 +4,7 @@
   <title><![CDATA[Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
   <link href="https://rollbar.com/blog/atom.xml" rel="self"/>
   <link href="https://rollbar.com/blog/"/>
-  <updated>2014-04-08T17:31:47-07:00</updated>
+  <updated>2014-04-08T17:34:06-07:00</updated>
   <id>https://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
@@ -54,12 +54,10 @@
 
 <p>  We&#8217;re running nginx on Ubuntu 12.04. Updating is as simple as:</p>
 
-<pre><code>  ```
-  apt-get update
+<pre><code>  apt-get update
   apt-get upgrade
   openssl version -a  # should show that it was built on April 7, 2014
   service nginx restart
-  ```
 </code></pre>
 
 <p>  The above didn&#8217;t work for us on the first try because our servers were talking to a mirror that hadn&#8217;t updated to the latest packages (after all, they were only a couple hours old). Changing the domain in each line in  <code>/etc/apt/sources.list</code> to <code>archive.ubuntu.com</code> and then running <code>apt-get update</code> again solved this.</p></li>

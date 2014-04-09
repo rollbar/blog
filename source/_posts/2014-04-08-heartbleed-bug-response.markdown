@@ -41,12 +41,10 @@ Here is a timeline of what we've done since the vulnerability was announced:
 
     We're running nginx on Ubuntu 12.04. Updating is as simple as:
         
-        ```
         apt-get update
         apt-get upgrade
         openssl version -a  # should show that it was built on April 7, 2014
         service nginx restart
-        ```
 
     The above didn't work for us on the first try because our servers were talking to a mirror that hadn't updated to the latest packages (after all, they were only a couple hours old). Changing the domain in each line in  `/etc/apt/sources.list` to `archive.ubuntu.com` and then running `apt-get update` again solved this.
 
