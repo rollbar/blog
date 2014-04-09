@@ -4,7 +4,7 @@
   <title><![CDATA[Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
   <link href="https://rollbar.com/blog/atom.xml" rel="self"/>
   <link href="https://rollbar.com/blog/"/>
-  <updated>2014-04-08T17:34:06-07:00</updated>
+  <updated>2014-04-08T18:53:28-07:00</updated>
   <id>https://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
@@ -84,7 +84,7 @@
 <h2>Recommended actions for Rollbar Customers</h2>
 
 <ul>
-<li><a href="https://rollbar.com/settings/user/password">Change your password</a></li>
+<li><a href="https://rollbar.com/settings/password/">Change your password</a></li>
 <li><p>Cycle any access tokens you have used (create and start using a new one, then disable or delete the old one).</p>
 
 <ul>

@@ -74,7 +74,7 @@ Here is a timeline of what we've done since the vulnerability was announced:
 
 ## Recommended actions for Rollbar Customers
 
-- [Change your password](https://rollbar.com/settings/user/password)
+- [Change your password](https://rollbar.com/settings/password/)
 - Cycle any access tokens you have used (create and start using a new one, then disable or delete the old one).
 
     - For projects, go to the project dashboard, then Settings -> Project Access Tokens. Most customers will need to do this.
