@@ -8,7 +8,7 @@ authorlink: https://plus.google.com/u/1/103254942254370049907/posts
 categories: security
 ---
 
-**What is Heartbleed?**
+## What is Heartbleed?
 
 CVE-2014-0346, known as "Heartbleed", is a bug in OpenSSL v1.0.1 through 1.0.1f that allows a remote attacker to access private memory on the target server. It has existed for almost 2 years. More info can be found here: [http://heartbleed.com/](http://heartbleed.com/)
 
@@ -19,7 +19,7 @@ With this vulnerability, an attacker can:
 
 If this sounds bad, it is. Most sites on the Internet are affected. 
 
-**Are you affected?**
+## Are you affected?
 
 Probably. If your web server or load balancer is running on linux and you've updated your packages anytime in the last 2 years,  you are more-than-likely affected. 
 
@@ -27,7 +27,7 @@ To check your OpenSSL version, run `openssl version -a`.
 
 Check out [http://filippo.io/Heartbleed/](http://filippo.io/Heartbleed/) to test your servers for the vulnerability.
 
-**How We Responded**
+## How We Responded
 
 We learned of CVE-2014-0346 at around 4:50pm on 4/7 and immediately began our response. We completed the most important fix (patching OpenSSL) within about an hour, and have been working over the past 24 hours on related issues. 
 
@@ -74,15 +74,15 @@ Here is a timeline of what we've done since the vulnerability was announced:
 
 - 4/8 - 5:30pm - Published this blog post and added in-app notifications to change passwords and cycle access tokens
 
-**Recommended actions for Rollbar Customers**
+## Recommended actions for Rollbar Customers
 
 -   [Change your password]([](https://rollbar.com/settings/user/password))https://rollbar.com/settings/user/password)
 
-***Note for Heroku Users***
+### Note for Heroku Users
 
 If you're using Rollbar through Heroku, we've already started the process of cycling your access tokens. We've created new tokens and updated them in your Heroku config. You should update the token in any other locations (i.e. development environments, and anywhere it might  be hardcoded) and then disable/delete the old tokens.
 
-**Closing notes**
+## Closing notes
 
 This was painful, but we're thankful to the security researchers who discovered and responsibly disclosed this issue, and to the security teams at Ubuntu and elsewhere who quickly released patched packages.
 
