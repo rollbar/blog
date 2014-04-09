@@ -4,7 +4,7 @@
   <title><![CDATA[Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
   <link href="https://rollbar.com/blog/atom.xml" rel="self"/>
   <link href="https://rollbar.com/blog/"/>
-  <updated>2014-04-08T17:24:46-07:00</updated>
+  <updated>2014-04-08T17:29:39-07:00</updated>
   <id>https://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
@@ -18,7 +18,7 @@
     <link href="https://rollbar.com/blog/post/2014/04/08/heartbleed-bug-response/"/>
     <updated>2014-04-08T17:05:00-07:00</updated>
     <id>https://rollbar.com/blog/post/2014/04/08/heartbleed-bug-response</id>
-    <content type="html"><![CDATA[<p><strong>What is Heartbleed?</strong></p>
+    <content type="html"><![CDATA[<h2>What is Heartbleed?</h2>
 
 <p>CVE-2014-0346, known as &#8220;Heartbleed&#8221;, is a bug in OpenSSL v1.0.1 through 1.0.1f that allows a remote attacker to access private memory on the target server. It has existed for almost 2 years. More info can be found here: <a href="http://heartbleed.com/">http://heartbleed.com/</a></p>
 
@@ -32,7 +32,7 @@
 
 <p>If this sounds bad, it is. Most sites on the Internet are affected.</p>
 
-<p><strong>Are you affected?</strong></p>
+<h2>Are you affected?</h2>
 
 <p>Probably. If your web server or load balancer is running on linux and you&#8217;ve updated your packages anytime in the last 2 years,  you are more-than-likely affected.</p>
 
@@ -40,7 +40,7 @@
 
 <p>Check out <a href="http://filippo.io/Heartbleed/">http://filippo.io/Heartbleed/</a> to test your servers for the vulnerability.</p>
 
-<p><strong>How We Responded</strong></p>
+<h2>How We Responded</h2>
 
 <p>We learned of CVE-2014-0346 at around 4:50pm on 4/7 and immediately began our response. We completed the most important fix (patching OpenSSL) within about an hour, and have been working over the past 24 hours on related issues.</p>
 
@@ -83,18 +83,18 @@
 </ul>
 
 
-<p><strong>Recommended actions for Rollbar Customers</strong></p>
+<h2>Recommended actions for Rollbar Customers</h2>
 
 <ul>
 <li><a href="[](https://rollbar.com/settings/user/password">Change your password</a>)https://rollbar.com/settings/user/password)</li>
 </ul>
 
 
-<p><strong><em>Note for Heroku Users</em></strong></p>
+<h3>Note for Heroku Users</h3>
 
 <p>If you&#8217;re using Rollbar through Heroku, we&#8217;ve already started the process of cycling your access tokens. We&#8217;ve created new tokens and updated them in your Heroku config. You should update the token in any other locations (i.e. development environments, and anywhere it might  be hardcoded) and then disable/delete the old tokens.</p>
 
-<p><strong>Closing notes</strong></p>
+<h2>Closing notes</h2>
 
 <p>This was painful, but we&#8217;re thankful to the security researchers who discovered and responsibly disclosed this issue, and to the security teams at Ubuntu and elsewhere who quickly released patched packages.</p>
 
