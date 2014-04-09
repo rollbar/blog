@@ -4,7 +4,7 @@
   <title><![CDATA[Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
   <link href="https://rollbar.com/blog/atom.xml" rel="self"/>
   <link href="https://rollbar.com/blog/"/>
-  <updated>2013-10-16T16:30:27-07:00</updated>
+  <updated>2014-04-08T17:24:46-07:00</updated>
   <id>https://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
@@ -12,6 +12,95 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Heartbleed Bug Response]]></title>
+    <link href="https://rollbar.com/blog/post/2014/04/08/heartbleed-bug-response/"/>
+    <updated>2014-04-08T17:05:00-07:00</updated>
+    <id>https://rollbar.com/blog/post/2014/04/08/heartbleed-bug-response</id>
+    <content type="html"><![CDATA[<p><strong>What is Heartbleed?</strong></p>
+
+<p>CVE-2014-0346, known as &#8220;Heartbleed&#8221;, is a bug in OpenSSL v1.0.1 through 1.0.1f that allows a remote attacker to access private memory on the target server. It has existed for almost 2 years. More info can be found here: <a href="http://heartbleed.com/">http://heartbleed.com/</a></p>
+
+<p>With this vulnerability, an attacker can:</p>
+
+<ul>
+<li>Get your private key for your domain&#8217;s ssl cert</li>
+<li>Decrypt all current and past SSL traffic to/from all affected machines</li>
+</ul>
+
+
+<p>If this sounds bad, it is. Most sites on the Internet are affected.</p>
+
+<p><strong>Are you affected?</strong></p>
+
+<p>Probably. If your web server or load balancer is running on linux and you&#8217;ve updated your packages anytime in the last 2 years,  you are more-than-likely affected.</p>
+
+<p>To check your OpenSSL version, run <code>openssl version -a</code>.</p>
+
+<p>Check out <a href="http://filippo.io/Heartbleed/">http://filippo.io/Heartbleed/</a> to test your servers for the vulnerability.</p>
+
+<p><strong>How We Responded</strong></p>
+
+<p>We learned of CVE-2014-0346 at around 4:50pm on 4/7 and immediately began our response. We completed the most important fix (patching OpenSSL) within about an hour, and have been working over the past 24 hours on related issues.</p>
+
+<p>Here is a timeline of what we&#8217;ve done since the vulnerability was announced:</p>
+
+<ul>
+<li><p>4/7 - 3:01pm - Ubuntu Security Announcements email</p>
+
+<p>  Subscribe to this list <a href="https://lists.ubuntu.com/mailman/listinfo/ubuntu-security-announce">here</a></p></li>
+<li><p>4/7 - 4:50pm - Began updating our load balancers with the fix. All servers patched by 6pm.</p>
+
+<p>  We&#8217;re running nginx on Ubuntu 12.04. Updating is as simple as:</p>
+
+<pre><code>  ```
+  apt-get update
+  apt-get upgrade
+  openssl version -a  # should show that it was built on April 7, 2014
+  service nginx restart
+  ```
+</code></pre>
+
+<p>  The above didn&#8217;t work for us on the first try because our servers were talking to a mirror that hadn&#8217;t updated to the latest packages (after all, they were only a couple hours old). Changing the domain in each line in  <code>/etc/apt/sources.list</code> to <code>archive.ubuntu.com</code> and then running <code>apt-get update</code> again solved this.</p></li>
+<li><p>4/7 - 11pm - rollbar.com and api.rollbar.com SSL certs were rekeyed</p>
+
+<p>  We use <a href="http://www.digicert.com/">DigiCert</a> for our SSL certs. The process was quick and easy.</p></li>
+<li><p>4/7 - 11:10pm - Previous rollbar.com and api.rollbar.com SSL certs revoked</p>
+
+<p>  In order to prevent a possible man-in-the-middle attack we had Digicert revoke our old certs.</p></li>
+<li><p>4/7 - 11:30pm - ratchet.io and submit.ratchet.io rekey requested</p>
+
+<p>  We still support our old domain, ratchet.io which use NetworkSolutions SSL certs</p></li>
+<li><p>4/8 - 11:50am - All rollbar.com cookies were invalidated, forcing users to re-auth</p>
+
+<p>  Since an attacker could have accessed our customers&#8217; cookies, we changed the secret key that we use to encrypt cookies. This invalidated all logged-in users&#8217; sessions.</p></li>
+<li><p>4/8 - 12:30pm - 2:25pm - All third-party tokens and keys were regenerated and deployed</p>
+
+<p>  We use services like Stripe, Mailgun, Heroku - All required new keys to be generated.</p></li>
+<li><p>4/8 - 3:30pm - ratchet.io and submit.ratchet.io certs were rekeyed and deployed</p></li>
+<li><p>4/8 - 5:30pm - Published this blog post and added in-app notifications to change passwords and cycle access tokens</p></li>
+</ul>
+
+
+<p><strong>Recommended actions for Rollbar Customers</strong></p>
+
+<ul>
+<li><a href="[](https://rollbar.com/settings/user/password">Change your password</a>)https://rollbar.com/settings/user/password)</li>
+</ul>
+
+
+<p><strong><em>Note for Heroku Users</em></strong></p>
+
+<p>If you&#8217;re using Rollbar through Heroku, we&#8217;ve already started the process of cycling your access tokens. We&#8217;ve created new tokens and updated them in your Heroku config. You should update the token in any other locations (i.e. development environments, and anywhere it might  be hardcoded) and then disable/delete the old tokens.</p>
+
+<p><strong>Closing notes</strong></p>
+
+<p>This was painful, but we&#8217;re thankful to the security researchers who discovered and responsibly disclosed this issue, and to the security teams at Ubuntu and elsewhere who quickly released patched packages.</p>
+
+<p>If you have any questions, please don&#8217;t hesitate to contact us at <a href="support@rollbar.com">support@rollbar.com</a>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Connecting Rollbar with PagerDuty]]></title>

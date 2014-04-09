@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>May Release Roundup - Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash</title>
+  <title>Category: security - Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash</title>
   <meta name="author" content="Rollbar, Inc.">
 
   
-  <meta name="description" content="May Release Roundup May 29th, 2013 Here&#8217;s a roundup of what&#8217;s new at Rollbar in the month of May. Big Features We revamped our &hellip;">
+  <meta name="description" content="Category: security">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,10 +19,8 @@
 
   
   
-  <link rel="canonical" href="https://rollbar.com/blog/post/2013/05/29/may-release-roundup/">
+  <link rel="canonical" href="https://rollbar.com/blog/blog/categories/security/">
   
-  
-  <link rel="author" href="https://plus.google.com/u/1/103254942254370049907/posts"/>
   
   <link rel="publisher" href="https://plus.google.com/u/1/b/117853246165185436076/117853246165185436076/posts"/>
   
@@ -92,155 +90,37 @@
     
     <div id="main-stage" class="container">
       <div id="content">
-        <div class="blog-post">
-<article class="hentry" role="article">
+        <div class="blog-archives">
+<article role="article">
   
   <header>
-    
-      <h1 class="entry-title">May Release Roundup</h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-05-29T15:30:00-07:00" pubdate data-updated="true">May 29<span>th</span>, 2013</time>
-        
-      </p>
+    <h1 class="entry-title">Category: security</h1>
     
   </header>
-
-
-<div class="entry-content"><p>Here&#8217;s a roundup of what&#8217;s new at Rollbar in the month of May.</p>
-
-<h3>Big Features</h3>
-
-<p>We revamped our notifications system, and added integrations with a bunch of new services. Rollbar now works with <a href="http://asana.com">Asana</a>, <a href="http://campfirenow.com/">Campfire</a>, <a href="https://flowdock.com">Flowdock</a>, <a href="https://github.com/features/projects/issues">Github Issues</a>, <a href="http://hipchat.com">Hipchat</a>, <a href="http://jira.com">JIRA</a>, <a href="http://pivotaltracker.com">Pivotal Tracker</a>, and <a href="http://trello.com">Trello</a>, as well as any arbitrary system via a <a href="http://www.webhooks.org/">Webhook</a>. See the <a href="https://rollbar.com/blog/post/2013/05/06/rules-engine-for-notifications-campfire-hipchat-jira-trello/">announcement blog post</a> for more details.</p>
-
-<h3>Small Features</h3>
-
-<ul>
-<li><p>You can now customize how occurrences are grouped. This first release allows you to define rules of things that should always be grouped together. See the documentation: <a href="https://rollbar.com/docs/guides_custom_grouping/">Custom Grouping Rules</a>. An in-depth post on how to use this is coming soon.</p></li>
-<li><p>There&#8217;s now a &#8220;Download CSV&#8221; link at the bottom of the Items page, which will let you download a CSV of what you see on the page. Note that this information is also available via our <a href="https://rollbar.com/docs/test_console/">API</a>.</p>
-
-<p><img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/download-csv.png"></p></li>
-<li><p>You can now sort the Items page by Total Occurrences or Unique Users, in additon to Last Occurrence. Click on the column headers to change the sort.</p>
-
-<p><img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/item-list-sort.png"></p></li>
-<li><p>Links to files in Github are now linked to the appropriate revision, when this information is available. We&#8217;ll use one of the following (trying each in order):</p>
-
-<ul>
-<li>the value of <code>server.sha</code></li>
-<li>the value of <code>server.branch</code>, if it looks like a SHA</li>
-<li>the revision from the last deploy before the first occurrence of the item</li>
-</ul>
-</li>
-</ul>
-
-
-<h3>Library Updates</h3>
-
-<h4>Ruby</h4>
-
-<p>We released <a href="https://github.com/rollbar/rollbar-gem">rollbar-gem</a> versions 0.9.11 through 0.9.14. The changes include a fix for use with Rails 4, a concurrency bugfix, better support for JSON requests, and the ability to include custom metadata with all reports. See the full <a href="https://github.com/rollbar/rollbar-gem/blob/master/CHANGELOG.md">changelog</a> for details. To upgrade, change the rollbar line in your Gemfile to:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">gem</span> <span class="s1">&#39;rollbar&#39;</span><span class="p">,</span> <span class="s1">&#39;~&gt; 0.9.14&#39;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>We also contributed a fix to <a href="https://github.com/CrowdFlower/resque-rollbar">resque-rollbar</a> to force use of synchronous mode when reporting Resque failures (instead of async mode, which doesn&#8217;t play nicely with Resque).</p>
-
-<h4>Python</h4>
-
-<p><a href="https://github.com/rollbar/pyrollbar">pyrollbar</a> gained a feature and now at version 0.5.7. See the <a href="https://github.com/rollbar/pyrollbar/blob/master/CHANGELOG.md">changelog</a> for details.</p>
-
-<h3>Bug Fixes</h3>
-
-<ul>
-<li>Fixed an issue where pressing the back button would sometimes cause Chrome to render one of our JSON responses as if it were HTML</li>
-<li>Fixed a bug where removed email addresses could not be re-added</li>
-</ul>
-
-
-<h3>Documentation Updates</h3>
-
-<ul>
-<li>Added guide on how our <a href="https://rollbar.com/docs/guides_grouping/">grouping algorithm</a> works.</li>
-<li>Cleaned up our <a href="https://rollbar.com/docs/api_items/">Items API Reference</a> and fixed a few outdated parts</li>
-</ul>
-
-
-<p>More is on the way. Stay tuned! And don&#8217;t forget to send us any feedback: <a href="mailto:team@rollbar.com">team@rollbar.com</a> &mdash; we love hearing from you.</p>
-</div>
-
-
-  <hr>
-  <footer>
-    <p class="meta">
-      
   
-
-<span class="byline author vcard">Posted by <span class="fn">Brian Rue</span></span>
-
-      
-
-
-
-
-
+  <div id="blog-archives" class="category">
 
 
 
   
+  <h2>2014</h2>
+
+<article>
+  
+<h1><a href="/blog/post/2014/04/08/heartbleed-bug-response/">Heartbleed Bug Response</a></h1>
+<time datetime="2014-04-08T17:05:00-07:00" pubdate><span class='month'>Apr</span> <span class='day'>08</span> <span class='year'>2014</span></time>
+
+<footer>
+  <span class="categories">posted in <a class='category' href='/blog/blog/categories/security/'>security</a></span>
+</footer>
 
 
-<time datetime="2013-05-29T15:30:00-07:00" pubdate data-updated="true">May 29<span>th</span>, 2013</time>
-      
-
-<span class="categories">
-  
-    <a class='category' href='/blog/blog/categories/releases/'>releases</a>
-  
-</span>
-
-
-    </p>
-    
-      <div class="sharing">
-  
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="https://rollbar.com/blog/post/2013/05/29/may-release-roundup/" data-via="rollbar" data-counturl="https://rollbar.com/blog/post/2013/05/29/may-release-roundup/" >Tweet</a>
-  
-  
-  
-</div>
-
-    
-    <p class="meta">
-      
-        <a class="basic-alignment left" href="/blog/post/2013/05/06/rules-engine-for-notifications-campfire-hipchat-jira-trello/" title="Previous Post: Rules Engine for Notifications, Plus Integrations with Campfire, Hipchat, JIRA, and Trello">&laquo; Rules Engine for Notifications, Plus Integrations with Campfire, Hipchat, JIRA, and Trello</a>
-      
-      
-        <a class="basic-alignment right" href="/blog/post/2013/07/12/Async-nodejs-API-server-testing/" title="Next Post: Async node.js API server testing">Async node.js API server testing &raquo;</a>
-      
-    </p>
-  </footer>
 </article>
 
-  <section>
-    <h1>Comments</h1>
-    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 </div>
-  </section>
+
+  
+</article>
 
 </div>
 
@@ -394,10 +274,7 @@
       var disqus_shortname = 'rollbar';
       
         
-        // var disqus_developer = 1;
-        var disqus_identifier = 'https://rollbar.com/blog/post/2013/05/29/may-release-roundup/';
-        var disqus_url = 'https://rollbar.com/blog/post/2013/05/29/may-release-roundup/';
-        var disqus_script = 'embed.js';
+        var disqus_script = 'count.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

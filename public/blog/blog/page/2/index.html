@@ -9,7 +9,7 @@
   <meta name="author" content="Rollbar, Inc.">
 
   
-  <meta name="description" content="We&#8217;ve released an updated to how Javascript errors are grouped in Rollbar. The new update does a better job of separating different errors into &hellip;">
+  <meta name="description" content="You&#8217;ve probably seen unique constraints somewhere &#8211; either in Rails&#8217; validates :uniqueness, Django&#8217;s Field.unique, or a raw &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -92,6 +92,278 @@
       <div id="content">
         <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/post/2013/03/29/using-unique-indexes-for-fun-and-profit/">Taking UNIQUE indexes to the next level</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-03-29T09:15:00-07:00" pubdate data-updated="true">Mar 29<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>You&#8217;ve probably seen unique constraints somewhere &#8211; either in Rails&#8217; <a href="http://guides.rubyonrails.org/active_record_validations_callbacks.html#uniqueness"><code>validates :uniqueness</code></a>, Django&#8217;s <a href="https://docs.djangoproject.com/en/dev/ref/models/fields/#unique"><code>Field.unique</code></a>, or a raw SQL <a href="http://dev.mysql.com/doc/refman/5.5/en/create-index.html">table definition</a>. The basic function of unique constraints (preventing duplicate data from being inserted) is nice, but they&#8217;re so much more powerful than that. When you write INSERT or REPLACE statements that rely on them, you can do some pretty cool (and efficient) things that you would&#8217;ve had to do multiple queries for otherwise.</p>
+
+<p>This post covers unique indexes in MySQL 5.5. Other versions of MySQL are similar. I&#8217;m not sure about Postgres or other relational databases but presume they&#8217;re similar-ish as well.</p>
+
+<h2>Primer: what is a unique index?</h2>
+
+<p>Pre-primer: data in a database is stored on disk somewhere. In a SQL database, the data is organized into tables which have rows and columns. An index is a way to look up particular rows, based on the values of one or more columns, without having to scan through the whole table. Instead, you look up those values in the index, which tells you where to find the matching rows.</p>
+
+<p>Index lookups are typically faster than full table scans because they&#8217;re organized for fast searches on the indexed columns (usually using binary trees), and they&#8217;re also generally smaller than the original data.</p>
+
+<p>A unique index is an index that also imposes a constraint: that no two entries in the index can have the same values. It can be comprised of one column or many columns. If many columns, then the entire tuple of columns is used for determining uniqueness. There can be other columns in the table that are not part of the index; these don&#8217;t affect the constraint.</p>
+
+<p>Primary keys are a special case of unique index; we&#8217;ll cover this in more detail later.</p>
+
+<p>Unique indexes can be created in a CREATE TABLE statement like this 123123:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="k">user</span> <span class="p">(</span>
+</span><span class='line'>  <span class="n">username</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span>
+</span><span class='line'>  <span class="n">password</span> <span class="nb">char</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span>
+</span><span class='line'>  <span class="k">unique</span> <span class="p">(</span><span class="n">username</span><span class="p">)</span>
+</span><span class='line'><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>or using an ALTER TABLE statement like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">users</span> <span class="k">ADD</span> <span class="k">unique</span> <span class="p">(</span><span class="n">username</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>What does a unique constraint affect?</h2>
+
+<p>A unique constraint prevents you from changing your data in a way that would result in having duplicate data in the index. For example, given the above &#8216;user&#8217; table, the following will happen if we try to insert duplicate data:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="n">mysql</span><span class="o">&gt;</span> <span class="k">INSERT</span> <span class="k">INTO</span> <span class="k">user</span> <span class="k">VALUES</span> <span class="p">(</span><span class="s1">&#39;brian&#39;</span><span class="p">,</span> <span class="n">PASSWORD</span><span class="p">(</span><span class="s1">&#39;asdf&#39;</span><span class="p">));</span>
+</span><span class='line'><span class="n">Query</span> <span class="n">OK</span><span class="p">,</span> <span class="mi">1</span> <span class="k">row</span> <span class="n">affected</span><span class="p">,</span> <span class="mi">1</span> <span class="n">warning</span> <span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="mi">04</span> <span class="n">sec</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">mysql</span><span class="o">&gt;</span> <span class="k">INSERT</span> <span class="k">INTO</span> <span class="k">user</span> <span class="k">VALUES</span> <span class="p">(</span><span class="s1">&#39;brian&#39;</span><span class="p">,</span> <span class="n">PASSWORD</span><span class="p">(</span><span class="s1">&#39;asdfjkl&#39;</span><span class="p">));</span>
+</span><span class='line'><span class="n">ERROR</span> <span class="mi">1062</span> <span class="p">(</span><span class="mi">23000</span><span class="p">):</span> <span class="n">Duplicate</span> <span class="n">entry</span> <span class="s1">&#39;brian&#39;</span> <span class="k">for</span> <span class="k">key</span> <span class="s1">&#39;username&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>or if we try to get duplicate data with an update:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="n">mysql</span><span class="o">&gt;</span> <span class="k">INSERT</span> <span class="k">INTO</span> <span class="k">user</span> <span class="k">VALUES</span><span class="p">(</span><span class="s1">&#39;sherlock&#39;</span><span class="p">,</span> <span class="n">PASSWORD</span><span class="p">(</span><span class="s1">&#39;123456&#39;</span><span class="p">));</span>
+</span><span class='line'><span class="n">Query</span> <span class="n">OK</span><span class="p">,</span> <span class="mi">1</span> <span class="k">row</span> <span class="n">affected</span><span class="p">,</span> <span class="mi">1</span> <span class="n">warning</span> <span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span> <span class="n">sec</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">mysql</span><span class="o">&gt;</span> <span class="k">UPDATE</span> <span class="k">user</span> <span class="k">SET</span> <span class="n">username</span> <span class="o">=</span> <span class="s1">&#39;brian&#39;</span> <span class="k">WHERE</span> <span class="n">username</span> <span class="o">=</span> <span class="s1">&#39;sherlock&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="n">ERROR</span> <span class="mi">1062</span> <span class="p">(</span><span class="mi">23000</span><span class="p">):</span> <span class="n">Duplicate</span> <span class="n">entry</span> <span class="s1">&#39;brian&#39;</span> <span class="k">for</span> <span class="k">key</span> <span class="s1">&#39;username&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So we can see that unique indexes are a great way to maintain consistency of our data at the database level. If two people try to sign up with the same username, for example, the database will reject it and return a duplicate key error.</p>
+
+<h2>Taking it to the next level</h2>
+
+<p>MySQL provides several commands, all variations of INSERT, that can take advantage of unique indexes by specifying what to do (instead of erroring) when the insert would result in a duplicate. These are best illustrated by example.</p>
+
+<h3>INSERT &#8230; ON DUPLICATE KEY UPDATE</h3>
+
+<p>Let&#8217;s say we&#8217;re building a simple ad impression tracking system. Ads are served by web servers and the impression counts are tracked in a database. We just want to know the number of ad impressions each hour. So we make a table like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">hour_impression</span> <span class="p">(</span>
+</span><span class='line'>  <span class="n">hour</span> <span class="nb">int</span> <span class="n">unsigned</span> <span class="k">not</span> <span class="k">null</span><span class="p">,</span>  <span class="c1">-- number of hours since unix epoch</span>
+</span><span class='line'>  <span class="n">impressions</span> <span class="nb">int</span> <span class="n">unsigned</span> <span class="k">not</span> <span class="k">null</span> <span class="k">default</span> <span class="mi">0</span><span class="p">,</span>
+</span><span class='line'>  <span class="k">primary</span> <span class="k">key</span><span class="p">(</span><span class="n">hour</span><span class="p">)</span>
+</span><span class='line'><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Side note: here we&#8217;re using <code>hour</code> as the primary key, rather than having an auto-increment primary key like before in the &#8216;user&#8217; table. This guarantees that <code>hour</code> is unique (since primary keys are a subset of unique keys), and has a nice property of laying out the data on disk in hour-order.</p>
+
+<p>A naive algorithm for recording each impression would be to:</p>
+
+<ol>
+<li>Check if a row already exists for the hour</li>
+<li>If not: <code>INSERT INTO hour_impression (hour, impressions) VALUES (:hour, 1)</code></li>
+<li>If so: <code>UPDATE hour_impression SET impressions = impressions + 1 WHERE hour = :hour</code></li>
+</ol>
+
+
+<p>But this exposes a race condition: what happens if two impressions happen at approximately the same time, on two different web servers? It&#8217;s possible that both will try to INSERT, and the second one is going to fail (because of the unique constraint).</p>
+
+<p>What we want to do is combine the above algorithm into a single step. This is what INSERT … ON DUPLICATE KEY UPDATE is for:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">hour_impression</span> <span class="p">(</span><span class="n">hour</span><span class="p">,</span> <span class="n">impressions</span><span class="p">)</span>
+</span><span class='line'><span class="k">VALUES</span> <span class="p">(</span><span class="mi">379015</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</span><span class='line'><span class="k">ON</span> <span class="n">DUPLICATE</span> <span class="k">KEY</span> <span class="k">UPDATE</span> <span class="n">impressions</span> <span class="o">=</span> <span class="n">impressions</span> <span class="o">+</span> <span class="mi">1</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now that it&#8217;s a single step, we can run as many of these statements in parallel as we want, and the database will take care of the concurrency issues for us. Sweet!</p>
+
+<h3>INSERT IGNORE</h3>
+
+<p>Now let&#8217;s say instead of counting the number of impressions in each hour, we just want to know which minutes any impressions at all were shown. So we create a table like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">minute_impression</span> <span class="p">(</span>
+</span><span class='line'>  <span class="k">minute</span> <span class="nb">int</span> <span class="n">unsigned</span> <span class="k">not</span> <span class="k">null</span><span class="p">,</span>  <span class="c1">-- number of minutes since the unix epoch</span>
+</span><span class='line'>  <span class="k">primary</span> <span class="k">key</span> <span class="p">(</span><span class="k">minute</span><span class="p">)</span>
+</span><span class='line'><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Similar to before, a naive algorithm for recording which minutes had any impressions would be to:</p>
+
+<ol>
+<li>Check if a row already exists for the minute</li>
+<li>If so, do nothing</li>
+<li>If not, <code>INSERT INTO minute_impression (minute) VALUES (:minute)</code></li>
+</ol>
+
+
+<p>This has the same kind of race condition as in the previous example. INSERT IGNORE exists to combine all of this into a single step:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">INSERT</span> <span class="k">IGNORE</span> <span class="k">INTO</span> <span class="n">minute_impression</span> <span class="p">(</span><span class="k">minute</span><span class="p">)</span> <span class="k">VALUES</span> <span class="p">(</span><span class="mi">22740922</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And as before, now we can run as many of these in parallel as we want and let the database take care of the concurrency.</p>
+
+<h2>More tricks</h2>
+
+<h3>REPLACE</h3>
+
+<p>The opposite of INSERT IGNORE. Overwrites matching rows with the new data instead of discarding it.</p>
+
+<h3>Nullable unique indexes</h3>
+
+<p>Values in a unique index have to be unique, but there&#8217;s an exception: NULLs don&#8217;t count. For example, let&#8217;s say you let people pick their username after signup. You might have table like:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="k">user</span> <span class="p">(</span>
+</span><span class='line'>  <span class="n">id</span> <span class="nb">int</span> <span class="n">unsigned</span> <span class="k">not</span> <span class="k">null</span> <span class="n">auto_increment</span><span class="p">,</span>
+</span><span class='line'>  <span class="n">username</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span> <span class="k">default</span> <span class="k">null</span><span class="p">,</span>
+</span><span class='line'>  <span class="k">unique</span> <span class="p">(</span><span class="n">username</span><span class="p">),</span>
+</span><span class='line'>  <span class="k">primary</span> <span class="k">key</span> <span class="p">(</span><span class="n">id</span><span class="p">)</span>
+</span><span class='line'><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can have as many users as you like who haven&#8217;t chosen a username (it&#8217;ll be NULL) while still preventing multiple users from having the same username.</p>
+
+<h3>VALUES() in the ON DUPLICATE KEY UPDATE clause</h3>
+
+<p>You can insert multiple rows in a single INSERT … ON DUPLICATE KEY UPDATE statement, and the UPDATE rule will apply for each row that would&#8217;ve been a duplicate. In some cases you&#8217;ll want the update statement to reflect the values of each particular row, and that&#8217;s not possible to do by hardcoding them in the statement.</p>
+
+<p>For example, let&#8217;s return to the ad impression tracking problem from before, with this hour_impression table:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">hour_impression</span> <span class="p">(</span>
+</span><span class='line'>  <span class="n">hour</span> <span class="nb">int</span> <span class="n">unsigned</span> <span class="k">not</span> <span class="k">null</span><span class="p">,</span>  <span class="c1">-- number of hours since unix epoch</span>
+</span><span class='line'>  <span class="n">impressions</span> <span class="nb">int</span> <span class="n">unsigned</span> <span class="k">not</span> <span class="k">null</span> <span class="k">default</span> <span class="mi">0</span><span class="p">,</span>
+</span><span class='line'>  <span class="k">primary</span> <span class="k">key</span><span class="p">(</span><span class="n">hour</span><span class="p">)</span>
+</span><span class='line'><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>But now instead of recording impressions one at a time, we&#8217;re batching them so that each INSERT increments <code>impressions</code> by a value 1 or higher. If we insert one of these batches at a time, we can do:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">hour_impression</span> <span class="p">(</span><span class="n">hour</span><span class="p">,</span> <span class="n">impressions</span><span class="p">)</span>
+</span><span class='line'><span class="k">VALUES</span> <span class="p">(</span><span class="mi">379015</span><span class="p">,</span> <span class="mi">23</span><span class="p">)</span>  <span class="c1">-- 23 impressions during 12am 3/28/2013</span>
+</span><span class='line'><span class="k">ON</span> <span class="n">DUPLICATE</span> <span class="k">KEY</span> <span class="k">UPDATE</span>
+</span><span class='line'><span class="n">impressions</span> <span class="o">=</span> <span class="n">impressions</span> <span class="o">+</span> <span class="mi">23</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If we want to insert multiple rows in the same statement, there&#8217;s a problem &#8211; the amount in the UPDATE clause is hardcoded. We can fix this using VALUES() to reference the value from the would-have-been-inserted row:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">hour_impression</span> <span class="p">(</span><span class="n">hour</span><span class="p">,</span> <span class="n">impressions</span><span class="p">)</span>
+</span><span class='line'><span class="k">VALUES</span> <span class="p">(</span><span class="mi">379015</span><span class="p">,</span> <span class="mi">23</span><span class="p">),</span> <span class="p">(</span><span class="mi">379015</span><span class="p">,</span> <span class="mi">55</span><span class="p">)</span>
+</span><span class='line'><span class="k">ON</span> <span class="n">DUPLICATE</span> <span class="k">KEY</span> <span class="k">UPDATE</span>
+</span><span class='line'><span class="n">impressions</span> <span class="o">=</span> <span class="n">impressions</span> <span class="o">+</span> <span class="k">VALUES</span><span class="p">(</span><span class="n">impressions</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Conclusion</h2>
+
+<p>Unique indexes are useful when used alone and become incredibly powerful when used in combination with INSERT &#8230; ON DUPLICATE KEY UPDATE and its variants. We make heavy use of this at <a href="https://rollbar.com">Rollbar</a> and it works great.</p>
+
+<p>Questions? Corrections? Let me know in the comments.</p>
+
+<h3>References</h3>
+
+<ol>
+<li><a href="http://dev.mysql.com/doc/refman/5.0/en/insert-on-duplicate.html">INSERT &#8230; ON DUPLICATE KEY UPDATE syntax</a></li>
+<li><a href="http://dev.mysql.com/doc/refman/5.0/en/insert.html">INSERT IGNORE syntax</a> (ctrl+f on the page)</li>
+<li><a href="http://dev.mysql.com/doc/refman/5.0/en/replace.html">REPLACE syntax</a></li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
+    <hr>
   
   
     <article>
@@ -1331,6 +1603,10 @@
     <li class="nav-header">Recent Posts</li>
     
       <li class="post">
+        <a href="/blog/post/2014/04/08/heartbleed-bug-response/">Heartbleed Bug Response</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/post/2013/10/16/connect-rollbar-with-pagerduty/">Connecting Rollbar with PagerDuty</a>
       </li>
     
@@ -1344,10 +1620,6 @@
     
       <li class="post">
         <a href="/blog/post/2013/08/08/jquery-error-instrumentation/">jQuery Error Instrumentation</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/post/2013/08/02/javascript-and-source-maps-in-a-django-app/">JavaScript and Source Maps in a Django App</a>
       </li>
     
     <li class="divider"></li>
