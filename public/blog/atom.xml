@@ -4,7 +4,7 @@
   <title><![CDATA[Rollbar - Blog - real-time error tracking for Rails, Python, PHP, Javascript, and Flash]]></title>
   <link href="https://rollbar.com/blog/atom.xml" rel="self"/>
   <link href="https://rollbar.com/blog/"/>
-  <updated>2014-04-08T18:53:28-07:00</updated>
+  <updated>2014-04-09T19:31:41-07:00</updated>
   <id>https://rollbar.com/blog/</id>
   <author>
     <name><![CDATA[Rollbar, Inc.]]></name>
@@ -18,7 +18,9 @@
     <link href="https://rollbar.com/blog/post/2014/04/08/heartbleed-bug-response/"/>
     <updated>2014-04-08T17:05:00-07:00</updated>
     <id>https://rollbar.com/blog/post/2014/04/08/heartbleed-bug-response</id>
-    <content type="html"><![CDATA[<h2>What is Heartbleed?</h2>
+    <content type="html"><![CDATA[<p><strong> Updated 4/9 7:30pm </strong></p>
+
+<h2>What is Heartbleed?</h2>
 
 <p>CVE-2014-0346, known as &#8220;Heartbleed&#8221;, is a bug in OpenSSL v1.0.1 through 1.0.1f that allows a remote attacker to access private memory on the target server. It has existed for almost 2 years. More info can be found here: <a href="http://heartbleed.com/">http://heartbleed.com/</a></p>
 
@@ -80,6 +82,10 @@
 <li><p>4/8 - 5:30pm - Published this blog post and added in-app notifications to change passwords and cycle access tokens</p></li>
 </ul>
 
+
+<p><strong> Update 4/9 </strong></p>
+
+<p>Thanks to <a href="http://security.stackexchange.com/questions/55249/what-clients-are-proven-to-be-vulnerable-to-heartbleed">this post on security.stackexchange</a>, we additionally patched our application and compute servers (everything that can make outgoing HTTPS requests). This was started at 3:45pm and completed at 4:45pm. The attack surface here is much lower, as it requires creating a Rollbar account and setting up a webhook that points to the attacker&#8217;s malicious server. We audited our logs and confirmed that there has been no such suspicious activity.</p>
 
 <h2>Recommended actions for Rollbar Customers</h2>
 

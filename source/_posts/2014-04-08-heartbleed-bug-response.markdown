@@ -8,6 +8,8 @@ authorlink: https://plus.google.com/u/1/103254942254370049907/posts
 categories: security
 ---
 
+** Updated 4/9 7:30pm **
+
 ## What is Heartbleed?
 
 CVE-2014-0346, known as "Heartbleed", is a bug in OpenSSL v1.0.1 through 1.0.1f that allows a remote attacker to access private memory on the target server. It has existed for almost 2 years. More info can be found here: [http://heartbleed.com/](http://heartbleed.com/)
@@ -71,6 +73,11 @@ Here is a timeline of what we've done since the vulnerability was announced:
 - 4/8 - 3:30pm - ratchet.io and submit.ratchet.io certs were rekeyed and deployed
 
 - 4/8 - 5:30pm - Published this blog post and added in-app notifications to change passwords and cycle access tokens
+
+** Update 4/9 **
+
+Thanks to [this post on security.stackexchange](http://security.stackexchange.com/questions/55249/what-clients-are-proven-to-be-vulnerable-to-heartbleed), we additionally patched our application and compute servers (everything that can make outgoing HTTPS requests). This was started at 3:45pm and completed at 4:45pm. The attack surface here is much lower, as it requires creating a Rollbar account and setting up a webhook that points to the attacker's malicious server. We audited our logs and confirmed that there has been no such suspicious activity.
+
 
 ## Recommended actions for Rollbar Customers
 
