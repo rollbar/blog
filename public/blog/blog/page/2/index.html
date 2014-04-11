@@ -9,7 +9,7 @@
   <meta name="author" content="Rollbar, Inc.">
 
   
-  <meta name="description" content="You&#8217;ve probably seen unique constraints somewhere &#8211; either in Rails&#8217; validates :uniqueness, Django&#8217;s Field.unique, or a raw &hellip;">
+  <meta name="description" content="Today we&#8217;re revamping the model for defining what you want to be notified about from Rollbar. Rollbar now integrates with Asana, Campfire, &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -92,6 +92,79 @@
       <div id="content">
         <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/post/2013/05/06/rules-engine-for-notifications-campfire-hipchat-jira-trello/">Rules Engine for Notifications, Plus Integrations with Campfire, Hipchat, JIRA, and Trello</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-05-06T21:30:00-07:00" pubdate data-updated="true">May 6<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Today we&#8217;re revamping the model for defining what you want to be notified about from <a href="https://rollbar.com">Rollbar</a>. Rollbar now integrates with <a href="http://asana.com">Asana</a>, <a href="http://campfirenow.com/">Campfire</a>, <a href="https://github.com/features/projects/issues">Github Issues</a>, <a href="http://hipchat.com">Hipchat</a>, <a href="http://jira.com">JIRA</a>, <a href="http://pivotaltracker.com">Pivotal Tracker</a>, and <a href="http://trello.com">Trello</a>, as well as any arbitrary system via a <a href="http://www.webhooks.org/">Webhook</a>.</p>
+
+<h2>New Integration Channels</h2>
+
+<p>In addition to our existing channels (Email, Asana, Github Issues, Pivotal Tracker, and Webhook), we&#8217;re launching support for four more: Campfire, Hipchat, JIRA, and Trello. You can set up all of this in Settings -> Notifications.</p>
+
+<p><img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/integration-channels.png"></p>
+
+<h2>Notification Rules Engine</h2>
+
+<p>Notifications are now configured per-project (instead of per-user-per-project), using a trigger-action model. There are triggers for the following events:</p>
+
+<ul>
+<li>New Item (first occurrence of a new issue)</li>
+<li>Reactivated Item (a previously resolved issue has occurred again)</li>
+<li>10<sup>nth</sup> Occurrence (an issue has occurred for the 10th, 100th, etc. time)</li>
+<li>Resolved Item (an item has been resolved by hand)</li>
+<li>Reopened Item (an item has been reopened by hand)</li>
+<li>Post-deploy (you&#8217;ve notified us that you deployed a new release)</li>
+</ul>
+
+
+<p>Corresponding actions are available for most actions in most channels. If it would make sense, it probably exists.</p>
+
+<p><img src="https://d37gvrvc0wt4s1.cloudfront.net/static/img/blog/rules-engine.png"></p>
+
+<p>Most actions can be configured as you&#8217;d expect (i.e. set which teams should receive an email, or which user to assign JIRA issues to).</p>
+
+<p>Item-related triggers can be filtered by environment, level, title (exception class+message), and filename. Deploy triggers can be filtered by environment and comment. Our underlying tech supports much more than the UI exposes, so let us know what other filters you&#8217;d like to see.</p>
+
+<h2>Migration for existing customers</h2>
+
+<p>We&#8217;ve migrated existing customers&#8217; settings to the new system, but there were a few aspects that didn&#8217;t map very well (i.e. per-user-per-project settings). We hope the new system is easier to use for most use-cases and still workable for complex setups, but let us know if there&#8217;s something you are having trouble doing.</p>
+
+<h2>Questions? Feedback?</h2>
+
+<p>Let us know if you have any questions about how to get the notifications you want. We look forward to your feedback. What other integrations do you want? Let us know in the comments, or email us at <a href="mailto:team@rollbar.com">team@rollbar.com</a>.</p>
+</div>
+  
+  
+
+
+    </article>
+    <hr>
   
   
     <article>
@@ -1603,6 +1676,10 @@
     <li class="nav-header">Recent Posts</li>
     
       <li class="post">
+        <a href="/blog/post/2014/04/11/processing-delay-postmortem/">4/10/2014 Processing Delay Postmortem</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/post/2014/04/08/heartbleed-bug-response/">Heartbleed Bug Response</a>
       </li>
     
@@ -1616,10 +1693,6 @@
     
       <li class="post">
         <a href="/blog/post/2013/08/08/ad-hoc-error-reporting-with-rollbar-cli/">Ad-hoc error reporting with Rollbar CLI</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/post/2013/08/08/jquery-error-instrumentation/">jQuery Error Instrumentation</a>
       </li>
     
     <li class="divider"></li>

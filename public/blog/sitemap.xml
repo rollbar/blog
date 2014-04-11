@@ -95,6 +95,10 @@
         <lastmod>2014-04-09T19:31:31-07:00</lastmod>
     </url>
     <url>
+        <loc>https://rollbar.com/blog/post/2014/04/11/processing-delay-postmortem/</loc>
+        <lastmod>2014-04-11T10:55:45-07:00</lastmod>
+    </url>
+    <url>
         <loc>
             https://rollbar.com/blog/2012-10-18-efficiently-iterating-over-an-entire-table-with-mysqls-handler-statement.html
         </loc>
@@ -102,10 +106,10 @@
     </url>
     <url>
         <loc>https://rollbar.com/blog/blog/archives/</loc>
-        <lastmod>2014-04-09T19:31:31-07:00</lastmod>
+        <lastmod>2014-04-11T10:55:45-07:00</lastmod>
     </url>
     <url>
         <loc>https://rollbar.com/blog/</loc>
-        <lastmod>2014-04-09T19:31:31-07:00</lastmod>
+        <lastmod>2014-04-11T10:55:45-07:00</lastmod>
     </url>
 </urlset>
